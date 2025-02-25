@@ -53,11 +53,9 @@ class AppTheme {
 }
 
 class ScreenConfig {
-  // Static variables to store screen height and width
   static late double screenWidth;
   static late double screenHeight;
 
-  // Initialize method to set width and height
   static void init(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;

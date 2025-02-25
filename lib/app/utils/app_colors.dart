@@ -16,5 +16,3 @@ class AppColors {
 
   static const bg1 = Color(0xFFF5F5F5);
 }
-// e48525
-// 00adef
