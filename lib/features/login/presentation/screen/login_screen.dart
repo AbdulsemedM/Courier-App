@@ -1,6 +1,7 @@
 import 'package:courier_app/app/app_button.dart';
 import 'package:courier_app/app/utils/app_colors.dart';
 import 'package:courier_app/app/utils/app_themes.dart';
+import 'package:courier_app/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -123,9 +124,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 MyButton(
                   height: 50,
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Handle login logic here
-                    }
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const DashboardScreen()));
+                    // if (_formKey.currentState!.validate()) {
+                    //   // Handle login logic here
+                    // }
                   },
                   buttonText: const Text(
                     'Login',
