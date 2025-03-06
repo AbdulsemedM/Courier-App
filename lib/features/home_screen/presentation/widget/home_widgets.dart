@@ -5,26 +5,51 @@ class HomeWidgets {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    bool? isDarkMode,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade100,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, size: 30, color: Colors.blue),
+    return Builder(
+      builder: (context) {
+        final isDark =
+            isDarkMode ?? Theme.of(context).brightness == Brightness.dark;
+
+        return GestureDetector(
+          onTap: onTap,
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.blue.shade900.withOpacity(0.3)
+                      : Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: isDark ? Colors.blue.shade200 : Colors.blue.shade700,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -33,61 +58,132 @@ class HomeWidgets {
     required String status,
     required String address,
     required String date,
+    bool? isDarkMode,
   }) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Builder(
+      builder: (context) {
+        final isDark =
+            isDarkMode ?? Theme.of(context).brightness == Brightness.dark;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  orderNumber,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    status,
-                    style: TextStyle(
-                      color: Colors.blue.shade900,
-                      fontSize: 12,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      orderNumber,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.grey.shade900,
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: status.toLowerCase().contains('transit')
+                            ? (isDark
+                                ? Colors.green.shade900
+                                : Colors.green.shade50)
+                            : (isDark
+                                ? Colors.orange.shade900
+                                : Colors.orange.shade50),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: status.toLowerCase().contains('transit')
+                              ? (isDark
+                                  ? Colors.green.shade700
+                                  : Colors.green.shade200)
+                              : (isDark
+                                  ? Colors.orange.shade700
+                                  : Colors.orange.shade200),
+                        ),
+                      ),
+                      child: Text(
+                        status,
+                        style: TextStyle(
+                          color: status.toLowerCase().contains('transit')
+                              ? (isDark
+                                  ? Colors.green.shade200
+                                  : Colors.green.shade700)
+                              : (isDark
+                                  ? Colors.orange.shade200
+                                  : Colors.orange.shade700),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on,
+                      size: 18,
+                      color:
+                          isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        address,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: isDark
+                              ? Colors.grey.shade300
+                              : Colors.grey.shade800,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 18,
+                      color:
+                          isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      date,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: isDark
+                            ? Colors.grey.shade300
+                            : Colors.grey.shade800,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.location_on, size: 16),
-                const SizedBox(width: 4),
-                Text(address),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, size: 16),
-                const SizedBox(width: 4),
-                Text(date),
-              ],
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

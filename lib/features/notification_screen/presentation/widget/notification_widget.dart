@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NotificationWidgets {
-  static Widget buildDateHeader(String date) {
+  static Widget buildDateHeader(String date, {bool? isDarkMode}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Text(
@@ -9,7 +9,7 @@ class NotificationWidgets {
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Colors.grey.shade800,
+          color: isDarkMode ?? false ? Colors.white : Colors.grey.shade800,
         ),
       ),
     );
@@ -22,84 +22,99 @@ class NotificationWidgets {
     required String description,
     required String time,
     required bool isUnread,
-    VoidCallback? onTap,
+    required VoidCallback onTap,
+    bool? isDarkMode,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isUnread ? Colors.blue.shade50 : Colors.white,
+        color: isDarkMode ?? false ? const Color(0xFF152642) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(isDarkMode ?? false ? 0.2 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            color: color,
-            size: 28,
-          ),
-        ),
-        title: Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: isUnread ? FontWeight.bold : FontWeight.w600,
-                    color: Colors.grey.shade900,
-                  ),
-                ),
-              ),
-              if (isUnread)
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Container(
-                  width: 8,
-                  height: 8,
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(4),
+                    color: color.withOpacity(isDarkMode ?? false ? 0.2 : 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: color,
+                    size: 24,
                   ),
                 ),
-            ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight:
+                              isUnread ? FontWeight.bold : FontWeight.w600,
+                          color: isDarkMode ?? false
+                              ? Colors.white
+                              : Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDarkMode ?? false
+                              ? Colors.grey.shade400
+                              : Colors.grey.shade600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        time,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDarkMode ?? false
+                              ? Colors.grey.shade500
+                              : Colors.grey.shade500,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isUnread)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: isDarkMode ?? false
+                          ? Colors.blue.shade200
+                          : Colors.blue.shade700,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              description,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              time,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade500,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-        onTap: onTap,
       ),
     );
   }
