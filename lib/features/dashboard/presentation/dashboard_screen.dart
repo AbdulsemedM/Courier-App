@@ -1,4 +1,7 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
+import 'package:courier_app/features/notification_screen/presentation/screen/notification_screen.dart';
+import 'package:courier_app/features/settings_screen/presentation/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -34,19 +37,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onPageChanged: (index) {
             setState(() => _currentIndex = index);
           },
-          children: <Widget>[
-            Container(
-              color: Colors.blueGrey,
-            ),
-            Container(
-              color: Colors.red,
-            ),
-            Container(
-              color: Colors.green,
-            ),
-            Container(
-              color: Colors.blue,
-            ),
+          children: const <Widget>[
+            HomeScreen(),
+            NotificationScreen(),
+            SettingsScreen(),
           ],
         ),
       ),
@@ -57,12 +51,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _pageController.jumpToPage(index);
         },
         items: <BottomNavyBarItem>[
-          BottomNavyBarItem(title: Text('Item One'), icon: Icon(Icons.home)),
-          BottomNavyBarItem(title: Text('Item Two'), icon: Icon(Icons.apps)),
           BottomNavyBarItem(
-              title: Text('Item Three'), icon: Icon(Icons.chat_bubble)),
+              title: const Text('Home'), icon: const Icon(Icons.home)),
           BottomNavyBarItem(
-              title: Text('Item Four'), icon: Icon(Icons.settings)),
+              title: const Text('Notification'), icon: const Icon(Icons.apps)),
+          BottomNavyBarItem(
+              title: const Text('Settings'), icon: const Icon(Icons.settings)),
         ],
       ),
     );
