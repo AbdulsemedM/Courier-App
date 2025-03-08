@@ -43,7 +43,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SettingsWidgets.buildProfileCard(
               name: 'John Doe',
               email: 'john.doe@example.com',
-              imageUrl: 'https://example.com/profile.jpg',
+              imageUrl:
+                  'https://www.shutterstock.com/image-vector/businessman-icon-can-be-used-260nw-247098721.jpg',
               onTap: () {
                 // Handle profile tap
               },

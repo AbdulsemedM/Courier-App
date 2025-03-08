@@ -39,6 +39,7 @@ dependencies:
   flutter_bloc: ^8.1.6
   bottom_navy_bar: ^6.1.0
   provider: ^6.0.5
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
