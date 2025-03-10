@@ -1,3 +1,4 @@
+import 'package:courier_app/features/barcode_reader/presentation/screen/barcode_reader_screen.dart';
 import 'package:courier_app/features/track_order/presentation/screens/track_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -168,10 +169,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     isDarkMode: isDarkMode,
                   ),
                   HomeWidgets.buildQuickActionButton(
-                    icon: Icons.qr_code_scanner_outlined,
+                    icon: Icons.barcode_reader,
                     label: 'Scan',
                     onTap: () {
-                      // Handle history
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const BarcodeReaderScreen()));
                     },
                     isDarkMode: isDarkMode,
                   ),
