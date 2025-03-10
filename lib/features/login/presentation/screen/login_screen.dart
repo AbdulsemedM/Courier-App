@@ -246,32 +246,32 @@ class _LoginScreenState extends State<LoginScreen> {
                         : AppColors.primaryColor,
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Don't have an account?",
-                        style: TextStyle(
-                          color: isDarkMode
-                              ? Colors.grey.shade400
-                              : Colors.grey.shade700,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          // Handle navigation to signup
-                        },
-                        child: Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            color: isDarkMode
-                                ? Colors.blue.shade200
-                                : Colors.blue.shade700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     Text(
+                  //       "Don't have an account?",
+                  //       style: TextStyle(
+                  //         color: isDarkMode
+                  //             ? Colors.grey.shade400
+                  //             : Colors.grey.shade700,
+                  //       ),
+                  //     ),
+                  //     TextButton(
+                  //       onPressed: () {
+                  //         // Handle navigation to signup
+                  //       },
+                  //       child: Text(
+                  //         'Sign Up',
+                  //         style: TextStyle(
+                  //           color: isDarkMode
+                  //               ? Colors.blue.shade200
+                  //               : Colors.blue.shade700,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
             ),

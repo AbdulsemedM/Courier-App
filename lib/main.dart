@@ -1,13 +1,19 @@
-import 'package:courier_app/app/utils/app_themes.dart';
 import 'package:courier_app/features/login/presentation/screen/login_screen.dart';
+import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
+import 'package:courier_app/features/track_order/data/data_provider/track_order_data_provider.dart';
+import 'package:courier_app/features/track_order/data/repository/track_order_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/theme_provider.dart';
-import 'features/dashboard/presentation/dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Required for SharedPreferences
-  runApp(const MyApp());
+  runApp(MultiProvider(providers: [
+    BlocProvider(
+        create: (context) =>
+            TrackOrderBloc(TrackOrderRepository(TrackOrderDataProvider()))),
+  ], child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

@@ -33,7 +33,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    final customColors = Theme.of(context).extension<CustomColors>()!;
+    // final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return Container(
       decoration: BoxDecoration(

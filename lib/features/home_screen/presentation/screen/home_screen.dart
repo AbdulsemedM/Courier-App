@@ -1,3 +1,4 @@
+import 'package:courier_app/features/track_order/presentation/screens/track_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
@@ -159,7 +160,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.track_changes,
                     label: 'Track Order',
                     onTap: () {
-                      // Handle track order
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const TrackOrderScreen()));
                     },
                     isDarkMode: isDarkMode,
                   ),
