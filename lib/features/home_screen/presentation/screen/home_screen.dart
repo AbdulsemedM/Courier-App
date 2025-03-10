@@ -168,8 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     isDarkMode: isDarkMode,
                   ),
                   HomeWidgets.buildQuickActionButton(
-                    icon: Icons.history,
-                    label: 'History',
+                    icon: Icons.qr_code_scanner_outlined,
+                    label: 'Scan',
                     onTap: () {
                       // Handle history
                     },
