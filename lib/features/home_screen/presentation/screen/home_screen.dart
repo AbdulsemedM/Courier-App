@@ -150,8 +150,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   HomeWidgets.buildQuickActionButton(
-                    icon: Icons.local_shipping,
-                    label: 'Send Package',
+                    icon: Icons.add_box_outlined,
+                    label: 'Add Shipment',
                     onTap: () {
                       // Handle send package
                     },
