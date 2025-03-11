@@ -1,4 +1,5 @@
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
+import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../model/shipmet_status_model.dart';
@@ -14,6 +15,7 @@ class TrackOrderScreen extends StatefulWidget {
 }
 
 class _TrackOrderScreenState extends State<TrackOrderScreen> {
+  List<StatusModel> statuses = [];
   @override
   void initState() {
     super.initState();
@@ -22,6 +24,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
 
   Future<void> _loadShipments() async {
     context.read<TrackOrderBloc>().add(TrackOrder());
+    context.read<TrackOrderBloc>().add(FetchStatuses());
   }
 
   void _onShipmentTapped(ShipmentModel shipment) {
@@ -56,6 +59,12 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
           builder: (context, state) {
             if (state is TrackOrderLoading) {
               return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
+            }
+            if (state is FetchStatusLoading) {
+              return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
+            }
+            if (state is FetchStatusSuccess) {
+              statuses = state.statuses;
             }
             
             if (state is TrackOrdeFailure) {

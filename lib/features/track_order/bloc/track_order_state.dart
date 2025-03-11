@@ -18,3 +18,17 @@ final class TrackOrdeFailure extends TrackOrderState {
 
   TrackOrdeFailure({required this.errorMessage});
 }
+
+final class FetchStatusLoading extends TrackOrderState {}
+
+final class FetchStatusSuccess extends TrackOrderState {
+  final List<StatusModel> statuses;
+
+  FetchStatusSuccess({required this.statuses});
+}
+
+final class FetchStatusFailure extends TrackOrderState {
+  final String errorMessage;
+
+  FetchStatusFailure({required this.errorMessage});
+}

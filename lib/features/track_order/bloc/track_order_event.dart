@@ -4,3 +4,5 @@ part of 'track_order_bloc.dart';
 sealed class TrackOrderEvent {}
 
 class TrackOrder extends TrackOrderEvent {}
+
+class FetchStatuses extends TrackOrderEvent {}
