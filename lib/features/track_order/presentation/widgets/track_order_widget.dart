@@ -68,6 +68,148 @@ class TrackOrderWidgets {
     );
   }
 
+  static Widget buildShipmentCard({
+    required bool isDarkMode,
+    required ShipmentModel shipment,
+    required bool isSelected,
+    required VoidCallback onTap,
+    required VoidCallback onLongPress,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: isSelected
+            ? (isDarkMode ? const Color(0xFF1A365D) : Colors.blue[50])
+            : (isDarkMode ? const Color(0xFF152642) : Colors.white),
+        borderRadius: BorderRadius.circular(12),
+        border: isSelected
+            ? Border.all(
+                color: isDarkMode ? Colors.blue[400]! : Colors.blue[700]!,
+                width: 2,
+              )
+            : null,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          onLongPress: onLongPress,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'AWB: ${shipment.awb}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        if (isSelected)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Icon(
+                              Icons.check_circle,
+                              color: isDarkMode
+                                  ? Colors.blue[400]
+                                  : Colors.blue[700],
+                              size: 20,
+                            ),
+                          ),
+                        buildStatusChip(
+                          shipment.shipmentStatus.code,
+                          isDarkMode,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'From: ${shipment.senderBranch.name}',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'To: ${shipment.receiverBranch.name}',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Qty: ${shipment.qty} ${shipment.unit}',
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                    ),
+                    Text(
+                      'Fee: ${shipment.netFee} ${shipment.senderBranch.currency.code}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
+                      ),
+                    ),
+                  ],
+                ),
+                if (shipment.extraFee > 0) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Extra: ${shipment.extraFee} ${shipment.senderBranch.currency.code}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDarkMode
+                              ? Colors.orange[200]
+                              : Colors.orange[700],
+                        ),
+                      ),
+                      if (shipment.extraFeeDescription?.isNotEmpty == true) ...[
+                        const SizedBox(width: 4),
+                        Tooltip(
+                          message: shipment.extraFeeDescription!,
+                          child: Icon(
+                            Icons.info_outline,
+                            size: 14,
+                            color: isDarkMode
+                                ? Colors.orange[200]
+                                : Colors.orange[700],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   static Widget buildEmptyState(bool isDarkMode) {
     return Center(
       child: Column(
