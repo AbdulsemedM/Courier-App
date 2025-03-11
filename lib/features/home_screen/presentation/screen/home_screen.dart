@@ -1,3 +1,4 @@
+import 'package:courier_app/features/add_shipment/presentation/screens/add_shipment_screen.dart';
 import 'package:courier_app/features/barcode_reader/presentation/screen/barcode_reader_screen.dart';
 import 'package:courier_app/features/track_order/presentation/screens/track_order_screen.dart';
 import 'package:flutter/material.dart';
@@ -153,7 +154,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.add_box_outlined,
                     label: 'Add Shipment',
                     onTap: () {
-                      // Handle send package
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const AddShipmentScreen()));
                     },
                     isDarkMode: isDarkMode,
                   ),
