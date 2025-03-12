@@ -20,11 +20,11 @@ class PaymentModeModel {
 
     return PaymentModeModel(
       id: json['id'] as int?,
-      code: json['code'] as String?,
-      description: json['description'] as String?,
-      addedBy: json['addedBy'] as String?,
-      createdAt: json['createdAt'] as String?,
-      updatedAt: json['updatedAt'] as String?,
+      code: json['code']?.toString(),
+      description: json['description']?.toString(),
+      addedBy: json['addedBy']?.toString(),
+      createdAt: json['createdAt']?.toString(),
+      updatedAt: json['updatedAt']?.toString(),
     );
   }
 

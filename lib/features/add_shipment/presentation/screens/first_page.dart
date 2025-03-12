@@ -1,3 +1,4 @@
+import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
@@ -5,11 +6,13 @@ import '../../../../core/theme/theme_provider.dart';
 class FirstPage extends StatelessWidget {
   final Map<String, dynamic> formData;
   final VoidCallback onNext;
+  final List<BranchModel> branch;
 
   const FirstPage({
     super.key,
     required this.formData,
     required this.onNext,
+    required this.branch,
   });
 
   @override

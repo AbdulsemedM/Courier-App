@@ -32,18 +32,20 @@ class BranchModel {
       id: json['id'] as int?,
       name: json['name'] as String?,
       code: json['code'] as String?,
-      addedBy: json['addedBy'] as String?,
+      addedBy: json['addedBy']?.toString(),
       currency: json['currency'] != null
-          ? CurrencyModel.fromJson(json['currency'] as Map<String, dynamic>)
+          ? CurrencyModel.fromJson(json['currency'] as Map<String, dynamic>?)
           : null,
       country: json['country'] != null
-          ? CountryModel.fromJson(json['country'] as Map<String, dynamic>)
+          ? CountryModel.fromJson(json['country'] as Map<String, dynamic>?)
           : null,
-      phone: json['phone'] as String?,
+      phone: json['phone']?.toString(),
       isAgent: json['isAgent'] as bool?,
-      hudhudPercent: json['hudhudPercent']?.toDouble(),
-      createdAt: json['createdAt'] as String?,
-      updatedAt: json['updatedAt'] as String?,
+      hudhudPercent: json['hudhudPercent'] != null
+          ? double.tryParse(json['hudhudPercent'].toString())
+          : null,
+      createdAt: json['createdAt']?.toString(),
+      updatedAt: json['updatedAt']?.toString(),
     );
   }
 

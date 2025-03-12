@@ -1,3 +1,6 @@
+import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
+import 'package:courier_app/features/add_shipment/data/data_provider/add_shipment_data_provider.dart';
+import 'package:courier_app/features/add_shipment/data/repository/add_shipment_repository.dart';
 import 'package:courier_app/features/login/presentation/screen/login_screen.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/data/data_provider/track_order_data_provider.dart';
@@ -9,11 +12,23 @@ import 'core/theme/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Required for SharedPreferences
-  runApp(MultiProvider(providers: [
-    BlocProvider(
-        create: (context) =>
-            TrackOrderBloc(TrackOrderRepository(TrackOrderDataProvider()))),
-  ], child: MyApp()));
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) =>
+              TrackOrderBloc(TrackOrderRepository(TrackOrderDataProvider())),
+        ),
+        BlocProvider(
+          create: (context) => AddShipmentBloc(AddShipmentRepository()),
+        ),
+      ],
+      child: ChangeNotifierProvider(
+        create: (_) => ThemeProvider(),
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
