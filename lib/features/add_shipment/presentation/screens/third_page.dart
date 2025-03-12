@@ -1,3 +1,7 @@
+import 'package:courier_app/features/add_shipment/model/delivery_types_model.dart';
+import 'package:courier_app/features/add_shipment/model/payment_method_model.dart';
+import 'package:courier_app/features/add_shipment/model/payment_mode_model.dart';
+import 'package:courier_app/features/add_shipment/model/transport_mode_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
@@ -6,12 +10,20 @@ class ThirdPage extends StatelessWidget {
   final Map<String, dynamic> formData;
   final VoidCallback onPrevious;
   final VoidCallback onSubmit;
+  final List<PaymentModeModel> paymentModes;
+  final List<PaymentMethodModel> paymentMethods;
+  final List<DeliveryTypeModel> deliveryTypes;
+  final List<TransportModeModel> transportModes;
 
   const ThirdPage({
     super.key,
     required this.formData,
     required this.onPrevious,
     required this.onSubmit,
+    required this.paymentModes,
+    required this.paymentMethods,
+    required this.deliveryTypes,
+    required this.transportModes,
   });
 
   @override
@@ -67,36 +79,92 @@ class ThirdPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildDropdownField(
                   label: 'Payment Mode',
-                  value: formData['paymentMode'],
-                  items: const ['CASH', 'CREDIT'],
-                  onChanged: (value) => formData['paymentMode'] = value,
+                  value: formData['paymentModeId']?.toString(),
+                  items: paymentModes
+                      .map((mode) => DropdownMenuItem(
+                            value: mode.code?.toString(),
+                            child: Text(mode.code ?? mode.description ?? ''),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      final selectedMode = paymentModes.firstWhere(
+                        (mode) => mode.id?.toString() == value,
+                        orElse: () => PaymentModeModel(),
+                      );
+                      formData['paymentModeId'] =
+                          selectedMode.id; // Store the ID
+                    }
+                  },
                   isDarkMode: isDarkMode,
                   icon: Icons.payment,
                 ),
                 const SizedBox(height: 24),
                 _buildDropdownField(
                   label: 'Payment Method',
-                  value: formData['paymentMethod'],
-                  items: const ['cash', 'bank transfer', 'mobile money'],
-                  onChanged: (value) => formData['paymentMethod'] = value,
+                  value: formData['paymentMethodId']?.toString(),
+                  items: paymentMethods
+                      .map((method) => DropdownMenuItem(
+                            value: method.description?.toString(),
+                            child: Text(method.description ?? ''),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      final selectedMethod = paymentMethods.firstWhere(
+                        (method) => method.description?.toString() == value,
+                        orElse: () => PaymentMethodModel(),
+                      );
+                      formData['paymentMethodId'] =
+                          selectedMethod.id; // Store the ID
+                    }
+                  },
                   isDarkMode: isDarkMode,
                   icon: Icons.account_balance_wallet,
                 ),
                 const SizedBox(height: 24),
                 _buildDropdownField(
                   label: 'Delivery Type',
-                  value: formData['deliveryType'],
-                  items: const ['BRANCH TO BRANCH', 'DOOR TO DOOR'],
-                  onChanged: (value) => formData['deliveryType'] = value,
+                  value: formData['deliveryTypeId']?.toString(),
+                  items: deliveryTypes
+                      .map((type) => DropdownMenuItem(
+                            value: type.type?.toString(),
+                            child: Text(type.type ?? ''),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      final selectedType = deliveryTypes.firstWhere(
+                        (type) => type.description?.toString() == value,
+                        orElse: () => DeliveryTypeModel(),
+                      );
+                      formData['deliveryTypeId'] =
+                          selectedType.id; // Store the ID
+                    }
+                  },
                   isDarkMode: isDarkMode,
                   icon: Icons.local_shipping,
                 ),
                 const SizedBox(height: 24),
                 _buildDropdownField(
                   label: 'Transport Mode',
-                  value: formData['transportMode'],
-                  items: const ['ground', 'air'],
-                  onChanged: (value) => formData['transportMode'] = value,
+                  value: formData['transportModeId']?.toString(),
+                  items: transportModes
+                      .map((mode) => DropdownMenuItem(
+                            value: mode.description?.toString(),
+                            child: Text(mode.description ?? ''),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      final selectedMode = transportModes.firstWhere(
+                        (mode) => mode.description?.toString() == value,
+                        orElse: () => TransportModeModel(),
+                      );
+                      formData['transportModeId'] =
+                          selectedMode.id; // Store the ID
+                    }
+                  },
                   isDarkMode: isDarkMode,
                   icon: Icons.directions_bus,
                 ),
@@ -298,11 +366,17 @@ class ThirdPage extends StatelessWidget {
   Widget _buildDropdownField({
     required String label,
     required String? value,
-    required List<String> items,
+    required List<DropdownMenuItem<String>> items,
     required Function(String?) onChanged,
     required bool isDarkMode,
     IconData? icon,
   }) {
+    // Ensure value is null if it's empty or not in the valid items list
+    final validValue =
+        value?.isNotEmpty == true && items.any((item) => item.value == value)
+            ? value
+            : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -316,13 +390,8 @@ class ThirdPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: value,
-          items: items
-              .map((item) => DropdownMenuItem(
-                    value: item,
-                    child: Text(item),
-                  ))
-              .toList(),
+          value: validValue, // Use validated value
+          items: items,
           onChanged: onChanged,
           style: TextStyle(
             color: isDarkMode ? Colors.white : Colors.black87,

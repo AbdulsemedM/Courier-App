@@ -33,15 +33,35 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
   List<ShipmentTypeModel> shipmentTypes = [];
   List<TransportModeModel> transportModes = [];
 
-  final Map<String, dynamic> formData = {
-    'receiverBranch': null,
-    'receiverMobile': '',
-    'receiverName': '',
-    'senderMobile': '',
-    'senderName': '',
-    'senderBranch': null,
+  final Map<String, dynamic> formData1 = {
+    "senderName": "",
+    "senderMobile": "",
+    "receiverName": "",
+    "receiverMobile": "",
+    "senderBranchId": 1,
+    "receiverBranchId": 1,
   };
-
+  final Map<String, dynamic> formData2 = {
+    "extraFeeDescription": "",
+    "shipmentTypeId": 1,
+    "quantity": 1,
+    "unit": "",
+    "netFee": 1,
+    "numPcs": 0,
+    "numBoxes": 0,
+    "rate": 50.75,
+    "serviceModeId": 1,
+  };
+  final Map<String, dynamic> formData3 = {
+    "paymentMethodId": 1,
+    "deliveryTypeId": 1,
+    "transportModeId": 1,
+    "hudhudPercent": 0,
+    "hudhudNet": 0,
+    "creditAccount": "",
+    // "paymentModeId": 1,
+    "addedBy": 1,
+  };
   void _nextPage() {
     if (_currentPage < 2) {
       _pageController.nextPage(
@@ -109,9 +129,9 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    return Container(
-      color: isDarkMode ? const Color(0xFF0A1931) : Colors.grey[100],
-      child: Center(
+    return Scaffold(
+      backgroundColor: isDarkMode ? const Color(0xFF0A1931) : Colors.grey[100],
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -314,21 +334,27 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                         },
                         children: [
                           FirstPage(
-                            formData: formData,
+                            formData: formData1,
                             onNext: _nextPage,
                             branch: branches,
                           ),
                           SecondPage(
-                            formData: formData,
+                            formData: formData2,
                             onNext: _nextPage,
                             onPrevious: _previousPage,
+                            serviceModes: services,
+                            shipmentTypes: shipmentTypes,
                           ),
                           ThirdPage(
-                            formData: formData,
+                            formData: formData3,
                             onPrevious: _previousPage,
+                            paymentModes: paymentModes,
+                            paymentMethods: paymentMethods,
+                            deliveryTypes: deliveryTypes,
+                            transportModes: transportModes,
                             onSubmit: () {
                               if (_formKey.currentState!.validate()) {
-                                print(formData);
+                                print(formData3);
                               }
                             },
                           ),

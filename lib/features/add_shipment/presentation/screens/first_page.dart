@@ -36,9 +36,24 @@ class FirstPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildDropdownField(
             label: 'Receiver Branch',
-            value: formData['receiverBranch'],
-            items: const ['Addis Branch'], // TODO: Add actual branches
-            onChanged: (value) => formData['receiverBranch'] = value,
+            value: formData['receiverBranchId']?.toString(),
+            items: branch
+                .map((branch) => DropdownMenuItem(
+                      value: branch.id?.toString(),
+                      child: Text(branch.name ?? ''),
+                    ))
+                .where((item) => item.value != null)
+                .toList(),
+            onChanged: (value) {
+              if (value != null) {
+                final selectedBranch = branch.firstWhere(
+                  (b) => b.id?.toString() == value,
+                  orElse: () => BranchModel(),
+                );
+                formData['receiverBranchId'] = selectedBranch.id;
+                // formData['receiverBranchObject'] = selectedBranch;
+              }
+            },
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: 16),
@@ -111,9 +126,24 @@ class FirstPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildDropdownField(
             label: 'Sender Branch',
-            value: formData['senderBranch'],
-            items: const ['Addis Branch'], // TODO: Add actual branches
-            onChanged: (value) => formData['senderBranch'] = value,
+            value: formData['senderBranchId']?.toString(),
+            items: branch
+                .map((branch) => DropdownMenuItem(
+                      value: branch.id?.toString(),
+                      child: Text(branch.name ?? ''),
+                    ))
+                .where((item) => item.value != null)
+                .toList(),
+            onChanged: (value) {
+              if (value != null) {
+                final selectedBranch = branch.firstWhere(
+                  (b) => b.id?.toString() == value,
+                  orElse: () => BranchModel(),
+                );
+                formData['senderBranchId'] = selectedBranch.id;
+                // formData['senderBranchObject'] = selectedBranch;
+              }
+            },
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: 32),
@@ -204,7 +234,7 @@ class FirstPage extends StatelessWidget {
   Widget _buildDropdownField({
     required String label,
     required String? value,
-    required List<String> items,
+    required List<DropdownMenuItem<String>> items,
     required Function(String?) onChanged,
     required bool isDarkMode,
   }) {
@@ -220,12 +250,7 @@ class FirstPage extends StatelessWidget {
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           value: value,
-          items: items
-              .map((item) => DropdownMenuItem(
-                    value: item,
-                    child: Text(item),
-                  ))
-              .toList(),
+          items: items,
           onChanged: onChanged,
           style: TextStyle(
             color: isDarkMode ? Colors.white : Colors.black87,
