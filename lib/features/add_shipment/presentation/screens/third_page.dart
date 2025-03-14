@@ -66,11 +66,11 @@ class ThirdPage extends StatelessWidget {
                       size: 24,
                     ),
                     const SizedBox(width: 12),
-                    Text(
+          Text(
                       'SHIPMENT INFORMATION',
-                      style: TextStyle(
+            style: TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.bold,
                         color: Colors.red[400],
                       ),
                     ),
@@ -207,17 +207,17 @@ class ThirdPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                      ),
-                    ),
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            ),
+          ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                _buildTextField(
+          _buildTextField(
                   label: 'Credit Account',
                   value: formData['creditAccount'] ?? '',
                   onChanged: (value) => formData['creditAccount'] = value,
-                  isDarkMode: isDarkMode,
+            isDarkMode: isDarkMode,
                   hintText: 'Type something...',
                   icon: Icons.credit_card,
                 ),
@@ -227,7 +227,7 @@ class ThirdPage extends StatelessWidget {
                   value: formData['hudhudPercent']?.toString() ?? '',
                   onChanged: (value) =>
                       formData['hudhudPercent'] = double.tryParse(value) ?? 0.0,
-                  isDarkMode: isDarkMode,
+            isDarkMode: isDarkMode,
                   keyboardType: TextInputType.number,
                   icon: Icons.percent,
                 ),
@@ -237,7 +237,7 @@ class ThirdPage extends StatelessWidget {
                   value: formData['hudHudNet']?.toString() ?? '',
                   onChanged: (value) =>
                       formData['hudHudNet'] = double.tryParse(value) ?? 0.0,
-                  isDarkMode: isDarkMode,
+            isDarkMode: isDarkMode,
                   keyboardType: TextInputType.number,
                   icon: Icons.attach_money,
                 ),
