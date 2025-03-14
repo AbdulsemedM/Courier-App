@@ -115,6 +115,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       return;
     }
 
+    // Check for duplicates
     if (_scannedBarcodes.contains(barcode)) {
       setState(() {
         _error = 'This barcode has already been scanned';
@@ -122,22 +123,16 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       return;
     }
 
-    setState(() => _isPaused = true); // Pause scanning
+    // Add to list directly
+    setState(() {
+      _scannedBarcodes.add(barcode);
+      _error = null;
+    });
 
-    final bool? shouldStore = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => _buildBarcodeDialog(barcode),
-    );
-
-    if (shouldStore == true) {
-      setState(() {
-        _scannedBarcodes.add(barcode);
-        _error = null;
-      });
-    }
-
-    setState(() => _isPaused = false); // Resume scanning
+    // Optional: Add a brief pause to prevent multiple rapid scans
+    setState(() => _isPaused = true);
+    await Future.delayed(const Duration(milliseconds: 500));
+    setState(() => _isPaused = false);
   }
 
   Widget _buildBarcodeDialog(String barcode) {
@@ -222,13 +217,46 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                   color: isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.clear_all),
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                onPressed: () {
-                  setState(() => _scannedBarcodes.clear());
-                },
-                tooltip: 'Clear all',
+              Row(
+                children: [
+                  if (_scannedBarcodes.isNotEmpty)
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        if (selectedStatus == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please select a status first'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+                        context.read<BarcodeReaderBloc>().add(
+                              BarcodeReaderChangeStatusEvent(
+                                shipmentIds: _scannedBarcodes.toList(),
+                                status: selectedStatus!,
+                              ),
+                            );
+                      },
+                      icon: const Icon(Icons.update, size: 18),
+                      label: const Text('Update'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isDarkMode ? Colors.blue[700] : Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                      ),
+                    ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.clear_all),
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    onPressed: () {
+                      setState(() => _scannedBarcodes.clear());
+                    },
+                    tooltip: 'Clear all',
+                  ),
+                ],
               ),
             ],
           ),
@@ -423,6 +451,16 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
         ),
         body: Column(
           children: [
+            BarcodeReaderWidgets.buildStatusDropdown(
+              isDarkMode: isDarkMode,
+              selectedStatus: selectedStatus,
+              statuses: statuses,
+              onChanged: (value) {
+                setState(() {
+                  selectedStatus = value;
+                });
+              },
+            ),
             if (_error != null)
               BarcodeReaderWidgets.buildErrorMessage(_error!, isDarkMode),
             if (_scannedBarcodes.isNotEmpty) _buildScannedList(isDarkMode),
@@ -434,17 +472,10 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                           onBarcodeDetected: _onBarcodeDetected,
                         )
                       : _buildCameraPermissionDenied(isDarkMode)
-                  : Column(
-                      children: [
-                        _buildStatusDropdown(isDarkMode),
-                        Expanded(
-                          child: BarcodeReaderWidgets.buildManualEntry(
-                            isDarkMode: isDarkMode,
-                            controller: _trackingController,
-                            onSubmit: _onManualSubmit,
-                          ),
-                        ),
-                      ],
+                  : BarcodeReaderWidgets.buildManualEntry(
+                      isDarkMode: isDarkMode,
+                      controller: _trackingController,
+                      onSubmit: _onManualSubmit,
                     ),
             ),
           ],

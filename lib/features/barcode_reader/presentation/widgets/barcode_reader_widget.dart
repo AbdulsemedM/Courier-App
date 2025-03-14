@@ -1,3 +1,4 @@
+import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 // import 'package:provider/provider.dart';
@@ -213,6 +214,71 @@ class BarcodeReaderWidgets {
               message,
               style: TextStyle(
                 color: isDarkMode ? Colors.red[300] : Colors.red[700],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget buildStatusDropdown({
+    required bool isDarkMode,
+    required String? selectedStatus,
+    required List<StatusModel> statuses,
+    required Function(String?) onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Select Status',
+            style: TextStyle(
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: isDarkMode
+                  ? Colors.grey[800]!.withOpacity(0.5)
+                  : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+              ),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: selectedStatus,
+                hint: Text(
+                  'Select status',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+                isExpanded: true,
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                ),
+                dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                items: statuses
+                    .map((status) => DropdownMenuItem<String>(
+                          value: status.code,
+                          child: Text(
+                            '${status.code} - ${status.description}',
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                        ))
+                    .toList(),
+                onChanged: onChanged,
               ),
             ),
           ),
