@@ -67,4 +67,19 @@ class TrackOrderRepository {
       rethrow; // This will throw only the `message` part if thrown from above
     }
   }
+
+  Future<String> changeStatus(List<String> shipmentIds, String status) async {
+    try {
+      final response =
+          await trackOrderDataProvider.changeStatus(shipmentIds, status);
+      final data = jsonDecode(response);
+      if (data['status'] != 200) {
+        throw data['message'];
+      }
+      return data['message'];
+    } catch (e) {
+      print(e.toString());
+      rethrow;
+    }
+  }
 }

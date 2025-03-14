@@ -261,13 +261,28 @@ class TrackOrderWidgets {
         chipColor = Colors.green;
         statusText = 'Arrived';
         break;
-      case 'TRN':
-        chipColor = Colors.orange;
+      case 'TRA':
+        chipColor = Colors.cyanAccent;
         statusText = 'In Transit';
         break;
+      case 'OTW':
+        chipColor = Colors.yellowAccent;
+        statusText = 'On the way';
+        break;
+      case 'R4P':
+        chipColor = Colors.orange;
+        statusText = 'Ready for pickup';
+        break;
+      case 'MIS':
+        chipColor = Colors.red;
+        statusText = 'Missing';
+        break;
       case 'DEL':
-        chipColor = Colors.blue;
+        chipColor = Colors.green;
         statusText = 'Delivered';
+      case 'CTM':
+        chipColor = Colors.indigo;
+        statusText = 'Customs';
         break;
       default:
         chipColor = Colors.grey;

@@ -1,5 +1,4 @@
 import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
-import 'package:courier_app/features/add_shipment/data/data_provider/add_shipment_data_provider.dart';
 import 'package:courier_app/features/add_shipment/data/repository/add_shipment_repository.dart';
 import 'package:courier_app/features/login/presentation/screen/login_screen.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';

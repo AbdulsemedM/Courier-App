@@ -12,6 +12,7 @@ class TrackOrderBloc extends Bloc<TrackOrderEvent, TrackOrderState> {
   TrackOrderBloc(this.trackOrderRepository) : super(TrackOrderInitial()) {
     on<TrackOrder>(_trackOrderFetch);
     on<FetchStatuses>(_statusFetch);
+    on<ChangeStatus>(_changeStatus);
   }
   void _trackOrderFetch(TrackOrder event, Emitter<TrackOrderState> emit) async {
     emit(TrackOrderLoading());
@@ -36,6 +37,17 @@ class TrackOrderBloc extends Bloc<TrackOrderEvent, TrackOrderState> {
       emit(FetchStatusSuccess(statuses: statuses));
     } catch (e) {
       emit(FetchStatusFailure(errorMessage: e.toString()));
+    }
+  }
+
+  void _changeStatus(ChangeStatus event, Emitter<TrackOrderState> emit) async {
+    emit(ChangeStatusLoading());
+    try {
+      final message = await trackOrderRepository.changeStatus(
+          event.shipmentIds, event.status);
+      emit(ChangeStatusSuccess(message: message));
+    } catch (e) {
+      emit(ChangeStatusFailure(errorMessage: e.toString()));
     }
   }
 }

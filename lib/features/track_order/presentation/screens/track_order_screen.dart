@@ -113,7 +113,19 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                             ),
                           ))
                       .toList(),
-                  onChanged: (value) => Navigator.pop(context, value),
+                  onChanged: (value) {
+                    Navigator.pop(context);
+                    context.read<TrackOrderBloc>().add(ChangeStatus(
+                          shipmentIds: selectedShipments
+                              .map((s) => s.awb.toString())
+                              .toList(),
+                          status: value!,
+                        ));
+                    setState(() {
+                      selectedShipments.clear();
+                      isSelectionMode = false;
+                    });
+                  },
                 ),
               ),
             ),
@@ -301,105 +313,126 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: _buildAppBar(isDarkMode),
-      body: RefreshIndicator(
-        onRefresh: _loadShipments,
-        child: BlocBuilder<TrackOrderBloc, TrackOrderState>(
-          builder: (context, state) {
-            if (state is TrackOrderLoading) {
-              return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
-            }
-            if (state is FetchStatusLoading) {
-              return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
-            }
-            if (state is FetchStatusSuccess) {
-              statuses = state.statuses;
-            }
-
-            if (state is TrackOrdeFailure) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: isDarkMode ? Colors.red[300] : Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error loading shipments',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      state.errorMessage,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: isDarkMode ? Colors.grey[500] : Colors.grey[700],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: _loadShipments,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            isDarkMode ? Colors.blue[700] : Colors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                      ),
-                      child: const Text('Try Again'),
-                    ),
-                  ],
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<TrackOrderBloc, TrackOrderState>(
+          listenWhen: (previous, current) => current is ChangeStatusSuccess,
+          listener: (context, state) {
+            if (state is ChangeStatusSuccess) {
+              _loadShipments();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green,
                 ),
               );
             }
-
-            if (state is TrackOrderSuccess) {
-              return Column(
-                children: [
-                  if (!isSelectionMode) _buildStatusFilter(isDarkMode),
-                  Expanded(
-                    child: state.shipments.isEmpty
-                        ? TrackOrderWidgets.buildEmptyState(isDarkMode)
-                        : ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: _filterShipments(state.shipments).length,
-                            itemBuilder: (context, index) {
-                              final shipment =
-                                  _filterShipments(state.shipments)[index];
-                              return TrackOrderWidgets.buildShipmentCard(
-                                isDarkMode: isDarkMode,
-                                shipment: shipment,
-                                isSelected:
-                                    selectedShipments.contains(shipment),
-                                onTap: () {
-                                  if (isSelectionMode) {
-                                    _toggleShipmentSelection(shipment);
-                                  } else {
-                                    _onShipmentTapped(shipment);
-                                  }
-                                },
-                                onLongPress: () =>
-                                    _onLongPressShipment(shipment),
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              );
-            }
-
-            return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
           },
+        ),
+      ],
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: _buildAppBar(isDarkMode),
+        body: RefreshIndicator(
+          onRefresh: _loadShipments,
+          child: BlocBuilder<TrackOrderBloc, TrackOrderState>(
+            builder: (context, state) {
+              if (state is TrackOrderLoading) {
+                return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
+              }
+              if (state is FetchStatusLoading) {
+                return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
+              }
+              if (state is FetchStatusSuccess) {
+                statuses = state.statuses;
+              }
+
+              if (state is TrackOrdeFailure) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: isDarkMode ? Colors.red[300] : Colors.red,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error loading shipments',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color:
+                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        state.errorMessage,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color:
+                              isDarkMode ? Colors.grey[500] : Colors.grey[700],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: _loadShipments,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              isDarkMode ? Colors.blue[700] : Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text('Try Again'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              if (state is TrackOrderSuccess) {
+                return Column(
+                  children: [
+                    if (!isSelectionMode) _buildStatusFilter(isDarkMode),
+                    Expanded(
+                      child: state.shipments.isEmpty
+                          ? TrackOrderWidgets.buildEmptyState(isDarkMode)
+                          : ListView.builder(
+                              padding: const EdgeInsets.all(16),
+                              itemCount:
+                                  _filterShipments(state.shipments).length,
+                              itemBuilder: (context, index) {
+                                final shipment =
+                                    _filterShipments(state.shipments)[index];
+                                return TrackOrderWidgets.buildShipmentCard(
+                                  isDarkMode: isDarkMode,
+                                  shipment: shipment,
+                                  isSelected:
+                                      selectedShipments.contains(shipment),
+                                  onTap: () {
+                                    if (isSelectionMode) {
+                                      _toggleShipmentSelection(shipment);
+                                    } else {
+                                      _onShipmentTapped(shipment);
+                                    }
+                                  },
+                                  onLongPress: () =>
+                                      _onLongPressShipment(shipment),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                );
+              }
+
+              return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
+            },
+          ),
         ),
       ),
     );

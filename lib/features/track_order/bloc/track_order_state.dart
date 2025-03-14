@@ -32,3 +32,17 @@ final class FetchStatusFailure extends TrackOrderState {
 
   FetchStatusFailure({required this.errorMessage});
 }
+
+final class ChangeStatusLoading extends TrackOrderState {}
+
+final class ChangeStatusSuccess extends TrackOrderState {
+  final String message;
+
+  ChangeStatusSuccess({required this.message});
+}
+
+final class ChangeStatusFailure extends TrackOrderState {
+  final String errorMessage;
+
+  ChangeStatusFailure({required this.errorMessage});
+}
