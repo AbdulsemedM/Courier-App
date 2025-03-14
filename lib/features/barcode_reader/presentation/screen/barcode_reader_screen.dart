@@ -1,4 +1,8 @@
+import 'package:courier_app/features/barcode_reader/bloc/barcode_reader_bloc.dart';
+import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
+import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/theme/theme_provider.dart';
@@ -18,11 +22,14 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   String? _error;
   final Set<String> _scannedBarcodes = {}; // Using Set to ensure uniqueness
   bool _isPaused = false;
+  List<StatusModel> statuses = [];
+  String? selectedStatus;
 
   @override
   void initState() {
     super.initState();
     _checkCameraPermission();
+    context.read<TrackOrderBloc>().add(FetchStatuses());
   }
 
   @override
@@ -256,16 +263,98 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
     );
   }
 
-  void _onManualSubmit(String value) {
-    if (value.isEmpty) {
-      setState(() {
-        _error = 'Please enter a tracking number';
-      });
+  Widget _buildStatusDropdown(bool isDarkMode) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Select Status',
+            style: TextStyle(
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: isDarkMode
+                  ? Colors.grey[800]!.withOpacity(0.5)
+                  : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+              ),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: selectedStatus,
+                hint: Text(
+                  'Select status',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+                isExpanded: true,
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                ),
+                dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                items: statuses
+                    .map((status) => DropdownMenuItem<String>(
+                          value: status.code,
+                          child: Text(
+                            '${status.code} - ${status.description}',
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedStatus = value;
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onManualSubmit(dynamic value) {
+    if (value == null || (value is List && value.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter tracking number(s)'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
-    // TODO: Navigate to tracking details or handle the input
-    print('Manual entry: $value');
+    if (selectedStatus == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a status'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Now we can be sure value is a List<String>
+    context.read<BarcodeReaderBloc>().add(
+          BarcodeReaderChangeStatusEvent(
+            shipmentIds: value,
+            status: selectedStatus!,
+          ),
+        );
   }
 
   void _toggleScanMode() {
@@ -280,47 +369,93 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    return Scaffold(
-      backgroundColor: isDarkMode ? const Color(0xFF0A1931) : Colors.grey[100],
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: Text(
-          'Track Shipment',
-          style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<TrackOrderBloc, TrackOrderState>(
+          listenWhen: (previous, current) => current is FetchStatusSuccess,
+          listener: (context, state) {
+            if (state is FetchStatusSuccess) {
+              setState(() {
+                statuses = state.statuses;
+              });
+            }
+          },
+        ),
+        BlocListener<BarcodeReaderBloc, BarcodeReaderState>(
+          listener: (context, state) {
+            if (state is BarcodeReaderSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              _trackingController.clear();
+              setState(() {
+                selectedStatus = null;
+              });
+            }
+            if (state is BarcodeReaderError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+        ),
+      ],
+      child: Scaffold(
+        backgroundColor:
+            isDarkMode ? const Color(0xFF0A1931) : Colors.grey[100],
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          title: Text(
+            'Track Shipment',
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black87,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
+        body: Column(
+          children: [
+            if (_error != null)
+              BarcodeReaderWidgets.buildErrorMessage(_error!, isDarkMode),
+            if (_scannedBarcodes.isNotEmpty) _buildScannedList(isDarkMode),
+            Expanded(
+              child: _isScanning
+                  ? _hasCameraPermission
+                      ? BarcodeReaderWidgets.buildScanner(
+                          isDarkMode: isDarkMode,
+                          onBarcodeDetected: _onBarcodeDetected,
+                        )
+                      : _buildCameraPermissionDenied(isDarkMode)
+                  : Column(
+                      children: [
+                        _buildStatusDropdown(isDarkMode),
+                        Expanded(
+                          child: BarcodeReaderWidgets.buildManualEntry(
+                            isDarkMode: isDarkMode,
+                            controller: _trackingController,
+                            onSubmit: _onManualSubmit,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ],
+        ),
+        floatingActionButton: BarcodeReaderWidgets.buildToggleButton(
+          isDarkMode: isDarkMode,
+          isScanning: _isScanning,
+          onToggle: _toggleScanMode,
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
-      body: Column(
-        children: [
-          if (_error != null)
-            BarcodeReaderWidgets.buildErrorMessage(_error!, isDarkMode),
-          if (_scannedBarcodes.isNotEmpty) _buildScannedList(isDarkMode),
-          Expanded(
-            child: _isScanning
-                ? _hasCameraPermission
-                    ? BarcodeReaderWidgets.buildScanner(
-                        isDarkMode: isDarkMode,
-                        onBarcodeDetected: _onBarcodeDetected,
-                      )
-                    : _buildCameraPermissionDenied(isDarkMode)
-                : BarcodeReaderWidgets.buildManualEntry(
-                    isDarkMode: isDarkMode,
-                    controller: _trackingController,
-                    onSubmit: _onManualSubmit,
-                  ),
-          ),
-        ],
-      ),
-      floatingActionButton: BarcodeReaderWidgets.buildToggleButton(
-        isDarkMode: isDarkMode,
-        isScanning: _isScanning,
-        onToggle: _toggleScanMode,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

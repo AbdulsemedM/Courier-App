@@ -49,7 +49,7 @@ class BarcodeReaderWidgets {
   static Widget buildManualEntry({
     required bool isDarkMode,
     required TextEditingController controller,
-    required Function(String) onSubmit,
+    required Function(dynamic) onSubmit,
   }) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -90,7 +90,7 @@ class BarcodeReaderWidgets {
               }
             },
             decoration: InputDecoration(
-              hintText: 'e.g. AWB123,AWB456,AWB789',
+              hintText: 'e.g. ETAA11111,ETAA22222,ETAA33333',
               hintStyle: TextStyle(
                 color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
               ),
@@ -118,24 +118,30 @@ class BarcodeReaderWidgets {
               ),
             ),
             onSubmitted: (value) {
-              final barcodes =
-                  value.split(',').where((code) => code.isNotEmpty).toList();
-              for (final barcode in barcodes) {
-                onSubmit(barcode);
-              }
+              if (value.isEmpty) return;
+
+              final barcodes = value
+                  .split(',')
+                  .where((code) => code.trim().isNotEmpty)
+                  .map((code) => code.trim())
+                  .toList();
+
+              onSubmit(barcodes);
               controller.clear();
             },
           ),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
+              if (controller.text.isEmpty) return;
+
               final barcodes = controller.text
                   .split(',')
-                  .where((code) => code.isNotEmpty)
+                  .where((code) => code.trim().isNotEmpty)
+                  .map((code) => code.trim())
                   .toList();
-              for (final barcode in barcodes) {
-                onSubmit(barcode);
-              }
+
+              onSubmit(barcodes);
               controller.clear();
             },
             style: ElevatedButton.styleFrom(

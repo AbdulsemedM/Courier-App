@@ -1,5 +1,8 @@
 import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
 import 'package:courier_app/features/add_shipment/data/repository/add_shipment_repository.dart';
+import 'package:courier_app/features/barcode_reader/bloc/barcode_reader_bloc.dart';
+import 'package:courier_app/features/barcode_reader/data/data_provider/barcode_data_provider.dart';
+import 'package:courier_app/features/barcode_reader/data/repository/barcode_repository.dart';
 import 'package:courier_app/features/login/presentation/screen/login_screen.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/data/data_provider/track_order_data_provider.dart';
@@ -20,6 +23,11 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => AddShipmentBloc(AddShipmentRepository()),
+        ),
+        BlocProvider(
+          create: (context) => BarcodeReaderBloc(
+            BarcodeRepository(BarcodeDataProvider()),
+          ),
         ),
       ],
       child: ChangeNotifierProvider(
