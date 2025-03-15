@@ -1,6 +1,7 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:courier_app/features/applications/presentation/screens/applications_screen.dart';
 import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
-import 'package:courier_app/features/notification_screen/presentation/screen/notification_screen.dart';
+// import 'package:courier_app/features/notification_screen/presentation/screen/notification_screen.dart';
 import 'package:courier_app/features/settings_screen/presentation/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDarkMode 
+          colors: isDarkMode
               ? [
                   const Color(0xFF0A1931), // Dark blue
                   const Color(0xFF152642), // Slightly lighter blue
@@ -61,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
             children: const <Widget>[
               HomeScreen(),
-              NotificationScreen(),
+              ApplicationsScreen(),
               SettingsScreen(),
             ],
           ),
@@ -71,7 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             color: isDarkMode ? const Color(0xFF0A1931) : Colors.white,
             boxShadow: [
               BoxShadow(
-                color: isDarkMode 
+                color: isDarkMode
                     ? Colors.black.withOpacity(0.3)
                     : Colors.black.withOpacity(0.1),
                 blurRadius: 10,
@@ -82,7 +83,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: BottomNavyBar(
             selectedIndex: _currentIndex,
             showElevation: false,
-            backgroundColor:isDarkMode?const Color.fromARGB(255, 1, 38, 67): Colors.transparent,
+            backgroundColor: isDarkMode
+                ? const Color.fromARGB(255, 1, 38, 67)
+                : Colors.transparent,
             onItemSelected: (index) {
               setState(() => _currentIndex = index);
               _pageController.jumpToPage(index);
@@ -91,22 +94,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
               BottomNavyBarItem(
                 icon: const Icon(Icons.home),
                 title: const Text('Home'),
-                activeColor: isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
-                inactiveColor: isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
+                activeColor:
+                    isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
+                inactiveColor:
+                    isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
                 textAlign: TextAlign.center,
               ),
               BottomNavyBarItem(
-                icon: const Icon(Icons.notifications_outlined),
-                title: const Text('Notifications'),
-                activeColor: isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
-                inactiveColor: isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
+                icon: const Icon(Icons.app_shortcut_rounded),
+                title: const Text('Application'),
+                activeColor:
+                    isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
+                inactiveColor:
+                    isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
                 textAlign: TextAlign.center,
               ),
               BottomNavyBarItem(
                 icon: const Icon(Icons.settings),
                 title: const Text('Settings'),
-                activeColor: isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
-                inactiveColor: isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
+                activeColor:
+                    isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
+                inactiveColor:
+                    isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
                 textAlign: TextAlign.center,
               ),
             ],
