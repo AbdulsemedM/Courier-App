@@ -233,8 +233,8 @@ class TrackShipmentWidgets {
               final shipment = shipments[index];
               return _buildTimelineItem(
                 isDarkMode: isDarkMode,
-                description: shipment.description ?? '',
-                time: shipment.createdAt ?? '',
+                description: shipment.description,
+                time: shipment.createdAt,
                 isLast: index == shipments.length - 1,
               );
             },

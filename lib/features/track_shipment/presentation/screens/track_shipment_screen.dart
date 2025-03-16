@@ -15,7 +15,6 @@ class TrackShipmentScreen extends StatefulWidget {
 
 class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   final _searchController = TextEditingController();
-  bool _isSearching = false;
 
   @override
   void dispose() {
@@ -35,7 +34,6 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       return;
     }
 
-    setState(() => _isSearching = true);
     context.read<TrackShipmentBloc>().add(TrackShipment(awb));
   }
 
@@ -95,7 +93,6 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                     ),
                     onPressed: () {
                       _searchController.clear();
-                      setState(() => _isSearching = false);
                     },
                   ),
                   border: OutlineInputBorder(
