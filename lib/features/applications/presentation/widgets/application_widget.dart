@@ -114,7 +114,7 @@ class ApplicationWidgets {
           ),
           const SizedBox(height: 16),
           Text(
-            'No Applications Available',
+            'There are no applications available',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
