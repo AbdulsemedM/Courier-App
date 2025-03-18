@@ -157,14 +157,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  const AddShipmentScreen()));
+                              builder: (context) => const AddShipmentScreen()));
                     },
                     isDarkMode: isDarkMode,
                   ),
                   HomeWidgets.buildQuickActionButton(
                     icon: Icons.track_changes,
-                    label: 'Track Order',
+                    label: 'Shipment',
                     onTap: () {
                       Navigator.push(
                           context,

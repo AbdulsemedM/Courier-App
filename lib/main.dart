@@ -7,6 +7,9 @@ import 'package:courier_app/features/login/presentation/screen/login_screen.dart
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/data/data_provider/track_order_data_provider.dart';
 import 'package:courier_app/features/track_order/data/repository/track_order_repository.dart';
+import 'package:courier_app/features/track_shipment/bloc/track_shipment_bloc.dart';
+import 'package:courier_app/features/track_shipment/data/data_provider/track_shipment_data_provider.dart';
+import 'package:courier_app/features/track_shipment/data/repository/track_shipment_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +30,11 @@ void main() async {
         BlocProvider(
           create: (context) => BarcodeReaderBloc(
             BarcodeRepository(BarcodeDataProvider()),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => TrackShipmentBloc(
+            TrackShipmentRepository(TrackShipmentDataProvider()),
           ),
         ),
       ],

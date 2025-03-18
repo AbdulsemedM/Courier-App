@@ -1,4 +1,5 @@
 import 'package:courier_app/features/notification_screen/presentation/screen/notification_screen.dart';
+import 'package:courier_app/features/track_shipment/presentation/screens/track_shipment_screen.dart';
 import 'package:flutter/material.dart';
 
 class ApplicationWidgets {
@@ -157,7 +158,7 @@ final List<MenuOption> defaultMenuOptions = [
     subtitle: 'Track your packages',
     icon: Icons.local_shipping,
     color: Colors.blue,
-    screen: NotificationScreen(),
+    screen: TrackShipmentScreen(),
   ),
   const MenuOption(
     title: 'Add Shipment',
