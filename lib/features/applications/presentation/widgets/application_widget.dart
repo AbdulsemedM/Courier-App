@@ -1,3 +1,4 @@
+import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
 import 'package:courier_app/features/notification_screen/presentation/screen/notification_screen.dart';
 import 'package:courier_app/features/track_shipment/presentation/screens/track_shipment_screen.dart';
 import 'package:flutter/material.dart';
@@ -161,11 +162,11 @@ final List<MenuOption> defaultMenuOptions = [
     screen: TrackShipmentScreen(),
   ),
   const MenuOption(
-    title: 'Add Shipment',
-    subtitle: 'Create new shipment',
-    icon: Icons.add_box,
+    title: 'Miles Configuration',
+    subtitle: 'Configure miles',
+    icon: Icons.directions_car_outlined,
     color: Colors.green,
-    screen: NotificationScreen(),
+    screen: MilesConfigurationScreen(),
   ),
   const MenuOption(
     title: 'Scan Barcode',
