@@ -44,6 +44,7 @@ dependencies:
   mobile_scanner: ^3.5.6
   permission_handler: ^11.3.0
   intl: ^0.19.0
+  shadcn_ui: ^0.16.3
 
 dev_dependencies:
   flutter_test:

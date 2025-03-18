@@ -2,11 +2,11 @@
 import 'dart:convert';
 
 class MilesConfigurationModel {
-  final String id;
+  final int id;
   final String originBranchName;
   final String destinationBranchName;
   final String unit;
-  final String milesPerUnit;
+  final double milesPerUnit;
   MilesConfigurationModel({
     required this.id,
     required this.originBranchName,
@@ -16,15 +16,17 @@ class MilesConfigurationModel {
   });
 
   MilesConfigurationModel copyWith({
-    String? id,
+    int? id,
     String? originBranchName,
+    String? destinationBranchName,
     String? unit,
-    String? milesPerUnit,
+    double? milesPerUnit,
   }) {
     return MilesConfigurationModel(
       id: id ?? this.id,
       originBranchName: originBranchName ?? this.originBranchName,
-      destinationBranchName: destinationBranchName,
+      destinationBranchName:
+          destinationBranchName ?? this.destinationBranchName,
       unit: unit ?? this.unit,
       milesPerUnit: milesPerUnit ?? this.milesPerUnit,
     );
@@ -42,11 +44,11 @@ class MilesConfigurationModel {
 
   factory MilesConfigurationModel.fromMap(Map<String, dynamic> map) {
     return MilesConfigurationModel(
-      id: map['id'] as String? ?? '',
-      originBranchName: map['originBranch']['name'] as String? ?? '',
-      destinationBranchName: map['destinationBranch']['name'] as String? ?? '',
-      unit: map['unit'] as String? ?? '',
-      milesPerUnit: map['milesPerUnit'] as String? ?? '',
+      id: map['id'] as int,
+      originBranchName: map['originBranch']['name'] as String,
+      destinationBranchName: map['destinationBranch']['name'] as String,
+      unit: map['unit'] as String,
+      milesPerUnit: map['milesPerUnit'] as double,
     );
   }
 
