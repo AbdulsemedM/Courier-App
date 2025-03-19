@@ -1,5 +1,6 @@
 import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
 import 'package:courier_app/features/notification_screen/presentation/screen/notification_screen.dart';
+import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
 import 'package:courier_app/features/track_shipment/presentation/screens/track_shipment_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -169,11 +170,11 @@ final List<MenuOption> defaultMenuOptions = [
     screen: MilesConfigurationScreen(),
   ),
   const MenuOption(
-    title: 'Scan Barcode',
+    title: 'Shipment Invoice',
     subtitle: 'Scan package barcodes',
-    icon: Icons.qr_code_scanner,
+    icon: Icons.local_shipping_rounded,
     color: Colors.purple,
-    screen: NotificationScreen(),
+    screen: ShipmentInvoiceScreen(),
   ),
   const MenuOption(
     title: 'Delivery Run Sheet',

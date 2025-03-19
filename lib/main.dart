@@ -7,6 +7,9 @@ import 'package:courier_app/features/login/presentation/screen/login_screen.dart
 import 'package:courier_app/features/miles_configuration/bloc/miles_configuration_bloc.dart';
 import 'package:courier_app/features/miles_configuration/data/data_provider/miles_configuration_data_provider.dart';
 import 'package:courier_app/features/miles_configuration/data/repository/miles_configuration_repository.dart';
+import 'package:courier_app/features/shipment_invoice/bloc/shipment_invoice_bloc.dart';
+import 'package:courier_app/features/shipment_invoice/data/data_provider/shipment_invoice_data_provider.dart';
+import 'package:courier_app/features/shipment_invoice/data/repository/shipment_invoice_repository.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/data/data_provider/track_order_data_provider.dart';
 import 'package:courier_app/features/track_order/data/repository/track_order_repository.dart';
@@ -45,6 +48,9 @@ void main() async {
             MilesConfigurationRepository(MilesConfigurationDataProvider()),
           ),
         ),
+        BlocProvider(
+            create: (context) => ShipmentInvoiceBloc(ShipmentInvoiceRepository(
+                shipmentInvoiceDataProvider: ShipmentInvoiceDataProvider())))
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
