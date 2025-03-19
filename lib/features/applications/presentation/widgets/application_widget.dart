@@ -1,5 +1,6 @@
 import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
 import 'package:courier_app/features/notification_screen/presentation/screen/notification_screen.dart';
+import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
 import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
 import 'package:courier_app/features/track_shipment/presentation/screens/track_shipment_screen.dart';
 import 'package:flutter/material.dart';
@@ -177,11 +178,11 @@ final List<MenuOption> defaultMenuOptions = [
     screen: ShipmentInvoiceScreen(),
   ),
   const MenuOption(
-    title: 'Delivery Run Sheet',
+    title: 'All Shipments',
     subtitle: 'View shipment reports',
     icon: Icons.assessment,
     color: Colors.orange,
-    screen: NotificationScreen(),
+    screen: ShipmentsScreen(),
   ),
   const MenuOption(
     title: 'Update Shipments',

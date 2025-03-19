@@ -7,6 +7,9 @@ import 'package:courier_app/features/login/presentation/screen/login_screen.dart
 import 'package:courier_app/features/miles_configuration/bloc/miles_configuration_bloc.dart';
 import 'package:courier_app/features/miles_configuration/data/data_provider/miles_configuration_data_provider.dart';
 import 'package:courier_app/features/miles_configuration/data/repository/miles_configuration_repository.dart';
+import 'package:courier_app/features/shipment/bloc/shipments_bloc.dart';
+import 'package:courier_app/features/shipment/data/data_provider/shipment_data_provider.dart';
+import 'package:courier_app/features/shipment/data/repository/shipment_repository.dart';
 import 'package:courier_app/features/shipment_invoice/bloc/shipment_invoice_bloc.dart';
 import 'package:courier_app/features/shipment_invoice/data/data_provider/shipment_invoice_data_provider.dart';
 import 'package:courier_app/features/shipment_invoice/data/repository/shipment_invoice_repository.dart';
@@ -50,7 +53,11 @@ void main() async {
         ),
         BlocProvider(
             create: (context) => ShipmentInvoiceBloc(ShipmentInvoiceRepository(
-                shipmentInvoiceDataProvider: ShipmentInvoiceDataProvider())))
+                shipmentInvoiceDataProvider: ShipmentInvoiceDataProvider()))),
+        BlocProvider(
+          create: (context) => ShipmentsBloc(
+              ShipmentRepository(shipmentDataProvider: ShipmentDataProvider())),
+        )
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),

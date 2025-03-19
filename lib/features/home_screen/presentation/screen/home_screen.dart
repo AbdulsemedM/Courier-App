@@ -163,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   HomeWidgets.buildQuickActionButton(
                     icon: Icons.track_changes,
-                    label: 'Shipment',
+                    label: 'Change Status',
                     onTap: () {
                       Navigator.push(
                           context,
