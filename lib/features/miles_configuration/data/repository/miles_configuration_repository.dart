@@ -27,4 +27,24 @@ class MilesConfigurationRepository {
       rethrow;
     }
   }
+
+  Future<List<MilesConfigurationModel>> addMilesConfiguration(
+      int originBranchId,
+      int destinationBranchId,
+      String unit,
+      int milesPerUnit) async {
+    try {
+      final response =
+          await milesConfigurationDataProvider.addMilesConfiguration(
+              originBranchId, destinationBranchId, unit, milesPerUnit);
+      final data = jsonDecode(response);
+      if (data['status'] != 200) {
+        throw data['message'];
+      }
+      return data['message'];
+    } catch (e) {
+      print(e.toString());
+      rethrow;
+    }
+  }
 }
