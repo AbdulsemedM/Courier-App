@@ -1,4 +1,5 @@
 import 'package:courier_app/core/theme/theme_provider.dart';
+import 'package:courier_app/features/miles_configuration/bloc/miles_configuration_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../add_shipment/bloc/add_shipment_bloc.dart';
@@ -159,6 +160,7 @@ class MilesConfigurationWidgets {
 
   static Future<void> showAddMilesConfigModal(BuildContext context) async {
     final addShipmentBloc = context.read<AddShipmentBloc>();
+    // final milesConfigBloc = context.read<MilesConfigurationBloc>();
     addShipmentBloc.add(FetchBranches());
 
     final TextEditingController unitController = TextEditingController();
@@ -166,16 +168,317 @@ class MilesConfigurationWidgets {
         TextEditingController();
     String? selectedOriginBranch;
     String? selectedDestinationBranch;
+    // String? selectedOriginBranchName;
+    // String? selectedDestinationBranchName;
 
     showDialog(
       context: context,
+      barrierDismissible: false, // Prevent dismissing while loading
       builder: (context) {
         final themeProvider = Provider.of<ThemeProvider>(context);
         final isDarkMode = themeProvider.isDarkMode;
 
-        return BlocBuilder<AddShipmentBloc, AddShipmentState>(
-          builder: (context, state) {
-            if (state is FetchBranchesLoading) {
+        return BlocListener<MilesConfigurationBloc, MilesConfigurationState>(
+          listener: (context, state) {
+            if (state is AddMilesConfigSuccess) {
+              // Close modal
+              Navigator.of(context).pop();
+
+              // Fetch updated configurations
+              context
+                  .read<MilesConfigurationBloc>()
+                  .add(FetchMilesConfiguration());
+
+              // Show success message
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Miles configuration added successfully'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } else if (state is MilesConfigurationFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          child: BlocBuilder<AddShipmentBloc, AddShipmentState>(
+            builder: (context, state) {
+              if (state is FetchBranchesLoading) {
+                return Center(
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                );
+              }
+
+              if (state is FetchBranchesSuccess) {
+                return BlocBuilder<MilesConfigurationBloc,
+                    MilesConfigurationState>(
+                  builder: (context, milesConfigState) {
+                    return Stack(
+                      children: [
+                        AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          backgroundColor: isDarkMode
+                              ? const Color(0xFF1E293B)
+                              : Colors.white,
+                          title: Text(
+                            'Add Miles Configuration',
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black87,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          content: StatefulBuilder(
+                            builder: (context, setState) {
+                              return Container(
+                                width: 400,
+                                padding: const EdgeInsets.all(8),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    DropdownButtonFormField<String>(
+                                      value: selectedOriginBranch,
+                                      dropdownColor: isDarkMode
+                                          ? const Color(0xFF1E293B)
+                                          : Colors.white,
+                                      items: state.branches.map((branch) {
+                                        return DropdownMenuItem(
+                                          value: branch.id.toString(),
+                                          child: Text(
+                                            branch.name!,
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : Colors.black87,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedOriginBranch = value;
+                                          // selectedOriginBranchName = state
+                                          //     .branches
+                                          //     .firstWhere((b) =>
+                                          //         b.id.toString() == value)
+                                          //     .name;
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: 'Origin Branch',
+                                        labelStyle: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.blue[300]
+                                              : Colors.blue[700],
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        filled: true,
+                                        fillColor: isDarkMode
+                                            ? const Color(0xFF0F172A)
+                                            : Colors.grey[50],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    DropdownButtonFormField<String>(
+                                      value: selectedDestinationBranch,
+                                      dropdownColor: isDarkMode
+                                          ? const Color(0xFF1E293B)
+                                          : Colors.white,
+                                      items: state.branches.map((branch) {
+                                        return DropdownMenuItem(
+                                          value: branch.id.toString(),
+                                          child: Text(
+                                            branch.name!,
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : Colors.black87,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedDestinationBranch = value;
+                                          // selectedDestinationBranchName = state
+                                          //     .branches
+                                          //     .firstWhere((b) =>
+                                          //         b.id.toString() == value)
+                                          //     .name;
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: 'Destination Branch',
+                                        labelStyle: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.blue[300]
+                                              : Colors.blue[700],
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        filled: true,
+                                        fillColor: isDarkMode
+                                            ? const Color(0xFF0F172A)
+                                            : Colors.grey[50],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      controller: unitController,
+                                      style: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black87,
+                                      ),
+                                      decoration: InputDecoration(
+                                        labelText: 'Unit',
+                                        labelStyle: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.blue[300]
+                                              : Colors.blue[700],
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        filled: true,
+                                        fillColor: isDarkMode
+                                            ? const Color(0xFF0F172A)
+                                            : Colors.grey[50],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      controller: milesPerUnitController,
+                                      style: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black87,
+                                      ),
+                                      decoration: InputDecoration(
+                                        labelText: 'Miles/Unit',
+                                        labelStyle: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.blue[300]
+                                              : Colors.blue[700],
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        filled: true,
+                                        fillColor: isDarkMode
+                                            ? const Color(0xFF0F172A)
+                                            : Colors.grey[50],
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed:
+                                  milesConfigState is MilesConfigurationLoading
+                                      ? null // Disable when loading
+                                      : () => Navigator.of(context).pop(),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  color: isDarkMode
+                                      ? Colors.grey[400]
+                                      : Colors.grey[700],
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: milesConfigState
+                                      is MilesConfigurationLoading
+                                  ? null // Disable when loading
+                                  : () {
+                                      if (selectedOriginBranch != null &&
+                                          selectedDestinationBranch != null &&
+                                          unitController.text.isNotEmpty &&
+                                          milesPerUnitController
+                                              .text.isNotEmpty) {
+                                        context
+                                            .read<MilesConfigurationBloc>()
+                                            .add(AddNewMilesConfiguration(
+                                                originBranchId: int.parse(
+                                                    selectedOriginBranch!),
+                                                destinationBranchId: int.parse(
+                                                    selectedDestinationBranch!),
+                                                unit: unitController.text,
+                                                milesPerUnit: int.parse(
+                                                    milesPerUnitController
+                                                        .text)));
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content:
+                                                Text('Please fill all fields'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child:
+                                  milesConfigState is MilesConfigurationLoading
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
+                                          ),
+                                        )
+                                      : const Text('Save'),
+                            ),
+                          ],
+                        ),
+                        if (milesConfigState is MilesConfigurationLoading)
+                          Positioned.fill(
+                            child: Container(
+                              color: Colors.black.withOpacity(0.3),
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                );
+              }
+
               return Center(
                 child: Card(
                   shape: RoundedRectangleBorder(
@@ -183,201 +486,12 @@ class MilesConfigurationWidgets {
                   ),
                   child: const Padding(
                     padding: EdgeInsets.all(24.0),
-                    child: CircularProgressIndicator(),
+                    child: Text('Failed to load branches'),
                   ),
                 ),
               );
-            }
-
-            if (state is FetchBranchesSuccess) {
-              return AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                backgroundColor:
-                    isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                title: Text(
-                  'Add Miles Configuration',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                content: StatefulBuilder(
-                  builder: (context, setState) {
-                    return Container(
-                      width: 400,
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          DropdownButtonFormField<String>(
-                            value: selectedOriginBranch,
-                            dropdownColor: isDarkMode
-                                ? const Color(0xFF1E293B)
-                                : Colors.white,
-                            items: state.branches.map((branch) {
-                              return DropdownMenuItem(
-                                value: branch.id.toString(),
-                                child: Text(
-                                  branch.name!,
-                                  style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedOriginBranch = value;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Origin Branch',
-                              labelStyle: TextStyle(
-                                color: isDarkMode
-                                    ? Colors.blue[300]
-                                    : Colors.blue[700],
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              filled: true,
-                              fillColor: isDarkMode
-                                  ? const Color(0xFF0F172A)
-                                  : Colors.grey[50],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          DropdownButtonFormField<String>(
-                            value: selectedDestinationBranch,
-                            dropdownColor: isDarkMode
-                                ? const Color(0xFF1E293B)
-                                : Colors.white,
-                            items: state.branches.map((branch) {
-                              return DropdownMenuItem(
-                                value: branch.id.toString(),
-                                child: Text(
-                                  branch.name!,
-                                  style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedDestinationBranch = value;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Destination Branch',
-                              labelStyle: TextStyle(
-                                color: isDarkMode
-                                    ? Colors.blue[300]
-                                    : Colors.blue[700],
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              filled: true,
-                              fillColor: isDarkMode
-                                  ? const Color(0xFF0F172A)
-                                  : Colors.grey[50],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: unitController,
-                            style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black87,
-                            ),
-                            decoration: InputDecoration(
-                              labelText: 'Unit',
-                              labelStyle: TextStyle(
-                                color: isDarkMode
-                                    ? Colors.blue[300]
-                                    : Colors.blue[700],
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              filled: true,
-                              fillColor: isDarkMode
-                                  ? const Color(0xFF0F172A)
-                                  : Colors.grey[50],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: milesPerUnitController,
-                            style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black87,
-                            ),
-                            decoration: InputDecoration(
-                              labelText: 'Miles/Unit',
-                              labelStyle: TextStyle(
-                                color: isDarkMode
-                                    ? Colors.blue[300]
-                                    : Colors.blue[700],
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              filled: true,
-                              fillColor: isDarkMode
-                                  ? const Color(0xFF0F172A)
-                                  : Colors.grey[50],
-                            ),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Handle save logic
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text('Save'),
-                  ),
-                ],
-              );
-            }
-
-            return Center(
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: Text('Failed to load branches'),
-                ),
-              ),
-            );
-          },
+            },
+          ),
         );
       },
     );

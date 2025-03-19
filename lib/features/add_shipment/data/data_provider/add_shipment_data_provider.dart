@@ -87,4 +87,64 @@ class AddShipmentDataProvider {
       throw e.toString();
     }
   }
+
+  Future<String> addNewShipment(
+      String senderName,
+      String senderMobile,
+      String receiverName,
+      String receiverMobile,
+      int senderBranchId,
+      int receiverBranchId,
+      int quantity,
+      String unit,
+      int numPcs,
+      int numBoxes,
+      double rate,
+      double extraFee,
+      String extraFeeDescription,
+      String shipmentDescription,
+      int serviceModeId,
+      int paymentMethodId,
+      int deliveryTypeId,
+      int transportModeId,
+      String creditAccount,
+      int addedBy,
+      int shipmentTypeId,
+      double hudhudPercent,
+      double hudhudNet) async {
+    final body = {
+      "senderName": senderName,
+      "senderMobile": senderMobile,
+      "receiverName": receiverName,
+      "receiverMobile": receiverMobile,
+      "senderBranchId": senderBranchId,
+      "receiverBranchId": receiverBranchId,
+      "quantity": quantity,
+      "unit": unit,
+      "numPcs": numPcs,
+      "numBoxes": numBoxes,
+      "rate": rate,
+      "extraFee": extraFee,
+      "extraFeeDescription": extraFeeDescription,
+      "shipmentDescription": shipmentDescription,
+      "serviceModeId": serviceModeId,
+      "paymentMethodId": paymentMethodId,
+      "deliveryTypeId": deliveryTypeId,
+      "transportModeId": transportModeId,
+      "creditAccount": creditAccount,
+      "addedBy": addedBy,
+      "shipmentTypeId": shipmentTypeId,
+      "hudhudPercent": hudhudPercent,
+      "hudhudNet": hudhudNet
+    };
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider.postRequest("/api/v1/shipment", body);
+      return response.body;
+    } catch (e) {
+      // print("here is the response");
+      // print(e.toString());
+      throw e.toString();
+    }
+  }
 }

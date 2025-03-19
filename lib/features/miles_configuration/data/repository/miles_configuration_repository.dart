@@ -28,11 +28,8 @@ class MilesConfigurationRepository {
     }
   }
 
-  Future<List<MilesConfigurationModel>> addMilesConfiguration(
-      int originBranchId,
-      int destinationBranchId,
-      String unit,
-      int milesPerUnit) async {
+  Future<String> addMilesConfiguration(int originBranchId,
+      int destinationBranchId, String unit, int milesPerUnit) async {
     try {
       final response =
           await milesConfigurationDataProvider.addMilesConfiguration(

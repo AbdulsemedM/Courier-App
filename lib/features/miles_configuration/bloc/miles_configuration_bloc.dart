@@ -12,6 +12,7 @@ class MilesConfigurationBloc
   MilesConfigurationBloc(this.milesConfigurationRepository)
       : super(MilesConfigurationInitial()) {
     on<FetchMilesConfiguration>(_fetchMilesConfiguration);
+    on<AddNewMilesConfiguration>(_addNewMilesConfig);
   }
   void _fetchMilesConfiguration(FetchMilesConfiguration event,
       Emitter<MilesConfigurationState> emit) async {
@@ -22,6 +23,22 @@ class MilesConfigurationBloc
       emit(MilesConfigurationSuccess(milesConfigurations));
     } catch (e) {
       emit(MilesConfigurationFailure(e.toString()));
+    }
+  }
+
+  void _addNewMilesConfig(AddNewMilesConfiguration event,
+      Emitter<MilesConfigurationState> emit) async {
+    emit(AddMilesConfigLoading());
+    try {
+      final milesConfigurations =
+          await milesConfigurationRepository.addMilesConfiguration(
+              event.originBranchId,
+              event.destinationBranchId,
+              event.unit,
+              event.milesPerUnit);
+      emit(AddMilesConfigSuccess(milesConfigurations));
+    } catch (e) {
+      emit(AddMilesConfigFailure(e.toString()));
     }
   }
 }
