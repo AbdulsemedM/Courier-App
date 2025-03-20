@@ -24,7 +24,7 @@ class AuthInterceptor {
     }
     return {
       'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
+      // if (token != null) 'Authorization': 'Bearer $token',
     };
   }
 }

@@ -3,6 +3,9 @@ import 'package:courier_app/features/add_shipment/data/repository/add_shipment_r
 import 'package:courier_app/features/barcode_reader/bloc/barcode_reader_bloc.dart';
 import 'package:courier_app/features/barcode_reader/data/data_provider/barcode_data_provider.dart';
 import 'package:courier_app/features/barcode_reader/data/repository/barcode_repository.dart';
+import 'package:courier_app/features/login/bloc/login_bloc.dart';
+import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
+import 'package:courier_app/features/login/data/repository/login_repository.dart';
 import 'package:courier_app/features/login/presentation/screen/login_screen.dart';
 import 'package:courier_app/features/miles_configuration/bloc/miles_configuration_bloc.dart';
 import 'package:courier_app/features/miles_configuration/data/data_provider/miles_configuration_data_provider.dart';
@@ -55,9 +58,11 @@ void main() async {
             create: (context) => ShipmentInvoiceBloc(ShipmentInvoiceRepository(
                 shipmentInvoiceDataProvider: ShipmentInvoiceDataProvider()))),
         BlocProvider(
-          create: (context) => ShipmentsBloc(
-              ShipmentRepository(shipmentDataProvider: ShipmentDataProvider())),
-        )
+            create: (context) => ShipmentsBloc(ShipmentRepository(
+                shipmentDataProvider: ShipmentDataProvider()))),
+        BlocProvider(
+            create: (context) =>
+                LoginBloc(LoginRepository(LoginDataProvider())))
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),

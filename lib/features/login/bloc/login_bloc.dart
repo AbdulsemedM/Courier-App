@@ -13,11 +13,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
   void _userLogin(LoginFetched event, Emitter<LoginState> emit) async {
     emit(LoginLoading());
-    // print("loading...");
     try {
-      // final login =
-      await loginRepository.sendLogin(event.phoneNumber, event.password);
-      phoneManager.setPhoneNumber(event.phoneNumber);
+      await loginRepository.sendLogin(event.email, event.password);
+      phoneManager.setPhoneNumber(event.email);
       emit(LoginSuccess());
     } catch (e) {
       emit(LoginFailure(e.toString()));

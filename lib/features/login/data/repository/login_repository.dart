@@ -9,15 +9,14 @@ class LoginRepository {
   // final UserManager userManager;
   LoginRepository(this.loginDataProvider);
 
-  Future<String> sendLogin(String phoneNumber, String password) async {
+  Future<String> sendLogin(String email, String password) async {
     final authService = AuthService();
     try {
       // print("here we gooooo");
-      final loginData =
-          await loginDataProvider.sendLogin(phoneNumber, password);
+      final loginData = await loginDataProvider.sendLogin(email, password);
 
       final data = jsonDecode(loginData);
-      if (data['httpStatus'] != 200) {
+      if (data['status'] != 200) {
         // Log the message if needed
         // print('Error Message: ${data['message']}');
 
@@ -26,8 +25,8 @@ class LoginRepository {
       }
 
       // Store the token if the login is successful
-      await authService.storeToken(data['response']['token']);
-      // await userManager.setFullName(data['response']['fullName']);
+      await authService.storeToken(data['token']);
+      await authService.storeUserId(data['userId'].toString());
       // await userManager.setKYCStatus(data['response']['kycStatus']);
 
       return data['message'];

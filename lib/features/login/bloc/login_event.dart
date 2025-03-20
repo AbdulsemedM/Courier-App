@@ -4,8 +4,8 @@ part of 'login_bloc.dart';
 sealed class LoginEvent {}
 
 class LoginFetched extends LoginEvent {
-  final String phoneNumber;
+  final String email;
   final String password;
 
-  LoginFetched({required this.phoneNumber, required this.password});
+  LoginFetched({required this.email, required this.password});
 }
