@@ -1,6 +1,5 @@
-package com.example.courier_app
+package com.hudhud.courier
 
-import io.flutter.embedding.android.FlutterFragmentActivity
+import io.flutter.embedding.android.FlutterActivity
 
-
-class MainActivity: FlutterFragmentActivity()
+class MainActivity: FlutterActivity()

@@ -4,7 +4,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
     <application
-        android:label="courier_app"
+        android:label="HudHud Courier"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
