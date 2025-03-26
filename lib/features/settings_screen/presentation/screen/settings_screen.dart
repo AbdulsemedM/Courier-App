@@ -1,3 +1,4 @@
+import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/settings_widget.dart';
 import 'package:provider/provider.dart';
@@ -56,7 +57,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               iconColor: Colors.blue,
               subtitle: 'Update your personal details',
               onTap: () {
-                // Handle personal info
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ComingSoonScreen(),
+                  ),
+                );
               },
             ),
             SettingsWidgets.buildSettingItem(
@@ -65,7 +71,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               iconColor: Colors.green,
               subtitle: 'Manage your payment options',
               onTap: () {
-                // Handle payment methods
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ComingSoonScreen(),
+                  ),
+                );
               },
             ),
             SettingsWidgets.buildSettingItem(
@@ -74,7 +85,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               iconColor: Colors.orange,
               subtitle: 'Manage delivery addresses',
               onTap: () {
-                // Handle address book
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ComingSoonScreen(),
+                  ),
+                );
               },
             ),
             SettingsWidgets.buildSectionHeader('App Settings'),
@@ -115,7 +131,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               iconColor: Colors.teal,
               subtitle: 'Get help with your orders',
               onTap: () {
-                // Handle help center
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ComingSoonScreen(),
+                  ),
+                );
               },
             ),
             SettingsWidgets.buildSettingItem(
@@ -123,7 +144,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               icon: Icons.privacy_tip_outlined,
               iconColor: Colors.grey,
               onTap: () {
-                // Handle privacy policy
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ComingSoonScreen(),
+                  ),
+                );
               },
             ),
             SettingsWidgets.buildSettingItem(
@@ -132,7 +158,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               iconColor: Colors.blue,
               subtitle: 'Version 1.0.0',
               onTap: () {
-                // Handle about
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ComingSoonScreen(),
+                  ),
+                );
               },
             ),
             const SizedBox(height: 24),
