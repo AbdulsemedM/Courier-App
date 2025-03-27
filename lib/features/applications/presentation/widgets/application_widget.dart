@@ -155,7 +155,6 @@ class MenuOption {
   });
 }
 
-// Example menu options
 final List<MenuOption> defaultMenuOptions = [
   const MenuOption(
     title: 'Track Shipment',
