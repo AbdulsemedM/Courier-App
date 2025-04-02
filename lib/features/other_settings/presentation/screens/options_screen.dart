@@ -1,3 +1,4 @@
+import 'package:courier_app/features/branches/presentation/screen/branches_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/options_widget.dart';
 
@@ -79,13 +80,18 @@ class _OptionsScreenState extends State<OptionsScreen> {
 
   void _handleOptionTap(BuildContext context, String option) {
     // You can implement specific navigation logic here
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(title: Text(option)),
-          body: Center(child: Text('$option content goes here')),
-        ),
-      ),
-    );
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => Scaffold(
+    //       appBar: AppBar(title: Text(option)),
+    //       body: Center(child: Text('$option content goes here')),
+    //     ),
+    //   ),
+    // );
+    if (option == 'Branches') {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const BranchesScreen()),
+      );
+    }
   }
 }
