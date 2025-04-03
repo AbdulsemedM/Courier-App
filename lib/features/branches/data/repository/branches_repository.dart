@@ -45,6 +45,20 @@ class BranchesRepository {
         throw "Invalid response format: Expected a list";
       }
     } catch (e) {
+      print(e.toString());
+      throw e.toString();
+    }
+  }
+
+  Future<String> addBranch(Map<String, dynamic> body) async {
+    try {
+      final response = await branchesDataProvider.addBranch(body);
+      final data = jsonDecode(response);
+      if (data['status'] != 200) {
+        throw data['message'];
+      }
+      return data['message'];
+    } catch (e) {
       throw e.toString();
     }
   }

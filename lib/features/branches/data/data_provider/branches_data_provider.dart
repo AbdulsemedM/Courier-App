@@ -20,4 +20,13 @@ class BranchesDataProvider {
       throw e.toString();
     }
   }
+  Future<String> addBranch(Map<String, dynamic> body) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider.postRequest("/api/v1/branches", body);
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }

@@ -2,17 +2,18 @@
 import 'dart:convert';
 
 class CountryModel {
-  final int id;
-  final String name;
-  final String isoCode;
-  final String countryCode;
-  final String createdAt;
+  final int? id;
+  final String? name;
+  final String? isoCode;
+  final String? countryCode;
+  final String? createdAt;
+
   CountryModel({
-    required this.id,
-    required this.name,
-    required this.isoCode,
-    required this.countryCode,
-    required this.createdAt,
+    this.id,
+    this.name,
+    this.isoCode,
+    this.countryCode,
+    this.createdAt,
   });
 
   CountryModel copyWith({
@@ -43,11 +44,12 @@ class CountryModel {
 
   factory CountryModel.fromMap(Map<String, dynamic> map) {
     return CountryModel(
-      id: map['id'] as int,
-      name: map['name'] as String,
-      isoCode: map['isoCode'] as String,
-      countryCode: map['countryCode'] as String,
-      createdAt: map['createdAt'] as String,
+      id: map['id'] != null ? map['id'] as int : null,
+      name: map['name'] != null ? map['name'] as String : null,
+      isoCode: map['isoCode'] != null ? map['isoCode'] as String : null,
+      countryCode:
+          map['countryCode'] != null ? map['countryCode'] as String : null,
+      createdAt: map['createdAt'] != null ? map['createdAt'] as String : null,
     );
   }
 

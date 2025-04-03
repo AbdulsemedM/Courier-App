@@ -1,3 +1,4 @@
+import 'package:courier_app/features/branches/presentation/widget/add_branch_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/branches_bloc.dart';
@@ -18,48 +19,54 @@ class _BranchesScreenState extends State<BranchesScreen> {
   @override
   void initState() {
     super.initState();
+    _fetchBranches();
+  }
+
+  void _fetchBranches() {
     context.read<BranchesBloc>().add(FetchBranches());
   }
 
   void _handleSearch(String query) {
-    // final branches =
-    //     (context.read<BranchesBloc>().state as BranchesLoadedState).branches;
-    // setState(() {
-    //   _filteredBranches = branches.where((branch) {
-    //     return branch.name.toLowerCase().contains(query.toLowerCase()) ||
-    //         branch.code.toLowerCase().contains(query.toLowerCase()) ||
-    //         branch.phone.toLowerCase().contains(query.toLowerCase());
-    //   }).toList();
-    // });
+    final state = context.read<BranchesBloc>().state;
+    if (state is FetchBranchesLoaded) {
+      setState(() {
+        _filteredBranches = state.branches.where((branch) {
+          final searchLower = query.toLowerCase();
+          return branch.name.toLowerCase().contains(searchLower) ||
+              branch.code.toLowerCase().contains(searchLower) ||
+              branch.phone.toLowerCase().contains(searchLower);
+        }).toList();
+      });
+    }
   }
 
-  void _handleEdit(BranchesModel branch) {
-    // TODO: Implement edit functionality
-    print('Editing ${branch.name}');
-  }
+  // void _handleEdit(BranchesModel branch) {
+  //   // TODO: Implement edit functionality
+  //   print('Editing ${branch.name}');
+  // }
 
-  void _handleDelete(BranchesModel branch) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: Text('Are you sure you want to delete ${branch.name}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              // context.read<BranchesBloc>().add(DeleteBranchEvent(branch.id));
-              // Navigator.pop(context);
-            },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
+  // void _handleDelete(BranchesModel branch) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Confirm Delete'),
+  //       content: Text('Are you sure you want to delete ${branch.name}?'),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('Cancel'),
+  //         ),
+  //         TextButton(
+  //           onPressed: () {
+  //             // context.read<BranchesBloc>().add(DeleteBranchEvent(branch.id));
+  //             // Navigator.pop(context);
+  //           },
+  //           child: const Text('Delete', style: TextStyle(color: Colors.red)),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -69,8 +76,23 @@ class _BranchesScreenState extends State<BranchesScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {
-              // TODO: Implement add new branch
+            onPressed: () async {
+              await showDialog(
+                context: context,
+                barrierDismissible: true,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    insetPadding: const EdgeInsets.all(24),
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 500),
+                      child: const AddBranchModal(),
+                    ),
+                  );
+                },
+              ).then((value) {
+                // Refresh the branches list after modal is closed
+                _fetchBranches();
+              });
             },
           ),
         ],
@@ -88,9 +110,7 @@ class _BranchesScreenState extends State<BranchesScreen> {
                 children: [
                   Text('Error: ${state.message}'),
                   ElevatedButton(
-                    onPressed: () {
-                      context.read<BranchesBloc>().add(FetchBranches());
-                    },
+                    onPressed: _fetchBranches,
                     child: const Text('Retry'),
                   ),
                 ],
@@ -113,8 +133,8 @@ class _BranchesScreenState extends State<BranchesScreen> {
                 Expanded(
                   child: BranchesTable(
                     branches: branches,
-                    onEdit: _handleEdit,
-                    onDelete: _handleDelete,
+                    // onEdit: _handleEdit,
+                    // onDelete: _handleDelete,
                   ),
                 ),
               ],

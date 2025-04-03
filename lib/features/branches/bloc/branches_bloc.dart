@@ -12,6 +12,7 @@ class BranchesBloc extends Bloc<BranchesEvent, BranchesState> {
   BranchesBloc(this.branchesRepository) : super(BranchesInitial()) {
     on<FetchBranches>(_fetchBranches);
     on<FetchCountry>(_fetchCountry);
+    on<AddBranch>(_addBranch);
   }
   void _fetchBranches(FetchBranches event, Emitter<BranchesState> emit) async {
     emit(FetchBranchesLoading());
@@ -30,6 +31,16 @@ class BranchesBloc extends Bloc<BranchesEvent, BranchesState> {
       emit(FetchCountryLoaded(countries: countries));
     } catch (e) {
       emit(FetchCountryError(message: e.toString()));
+    }
+  }
+
+  void _addBranch(AddBranch event, Emitter<BranchesState> emit) async {
+    emit(AddBranchLoading());
+    try {
+      final message = await branchesRepository.addBranch(event.body);
+      emit(AddBranchLoaded(message: message));
+    } catch (e) {
+      emit(AddBranchError(message: e.toString()));
     }
   }
 }

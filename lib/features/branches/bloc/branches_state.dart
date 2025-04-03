@@ -28,3 +28,15 @@ final class FetchCountryError extends BranchesState {
   final String message;
   FetchCountryError({required this.message});
 }
+
+final class AddBranchLoading extends BranchesState {}
+
+final class AddBranchLoaded extends BranchesState {
+  final String message;
+  AddBranchLoaded({required this.message});
+}
+
+final class AddBranchError extends BranchesState {
+  final String message;
+  AddBranchError({required this.message});
+}

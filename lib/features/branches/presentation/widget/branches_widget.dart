@@ -27,6 +27,8 @@ class SearchBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       child: TextField(
@@ -34,9 +36,15 @@ class SearchBarWidget extends StatelessWidget {
         onChanged: onChanged,
         decoration: InputDecoration(
           hintText: 'Search branches...',
-          prefixIcon: const Icon(Icons.search, color: Colors.grey),
+          prefixIcon: Icon(
+            Icons.search,
+            color: isDarkMode ? Colors.grey : Colors.grey[600],
+          ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: isDarkMode ? Colors.white10 : Colors.grey[100],
+          hintStyle: TextStyle(
+            color: isDarkMode ? Colors.grey : Colors.grey[600],
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -47,8 +55,11 @@ class SearchBarWidget extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: Colors.blue, width: 2),
           ),
+        ),
+        style: TextStyle(
+          color: isDarkMode ? Colors.white : Colors.black,
         ),
       ),
     );
@@ -57,40 +68,123 @@ class SearchBarWidget extends StatelessWidget {
 
 class BranchesTable extends StatelessWidget {
   final List<BranchesModel> branches;
-  final Function(BranchesModel) onEdit;
-  final Function(BranchesModel) onDelete;
 
   const BranchesTable({
     super.key,
     required this.branches,
-    required this.onEdit,
-    required this.onDelete,
+    // required this.onEdit,
+    // required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SingleChildScrollView(
         child: DataTable(
-          headingRowColor: MaterialStateProperty.all(Colors.grey[200]),
-          columns: const [
-            DataColumn(label: Text('Branch Name')),
-            DataColumn(label: Text('Code')),
-            DataColumn(label: Text('Phone')),
-            DataColumn(label: Text('Balance')),
-            DataColumn(label: Text('Currency')),
-            DataColumn(label: Text('Type')),
-            DataColumn(label: Text('Actions')),
+          headingRowColor: MaterialStateProperty.all(
+            isDarkMode ? Colors.grey[800] : Colors.grey[200],
+          ),
+          columns: [
+            DataColumn(
+              label: Text(
+                'Branch Name',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Text(
+                'Code',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Text(
+                'Phone',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Text(
+                'Balance',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Text(
+                'Currency',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Text(
+                'Type',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            // DataColumn(
+            //   label: Text(
+            //     'Actions',
+            //     style: TextStyle(
+            //       color: isDarkMode ? Colors.white : Colors.black,
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            // ),
           ],
           rows: branches.map((branch) {
             return DataRow(
               cells: [
-                DataCell(Text(branch.name)),
-                DataCell(Text(branch.code)),
-                DataCell(Text(branch.phone)),
-                DataCell(Text(branch.balance.toStringAsFixed(2))),
-                DataCell(Text(branch.currency)),
+                DataCell(Text(
+                  branch.name,
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                )),
+                DataCell(Text(
+                  branch.code,
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                )),
+                DataCell(Text(
+                  branch.phone,
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                )),
+                DataCell(Text(
+                  branch.balance.toStringAsFixed(2),
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                )),
+                DataCell(Text(
+                  branch.currency,
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                )),
                 DataCell(
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -98,33 +192,35 @@ class BranchesTable extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color:
-                          branch.isAgent ? Colors.blue[100] : Colors.green[100],
+                      color: branch.isAgent
+                          ? (isDarkMode ? Colors.blue[900] : Colors.blue[100])
+                          : (isDarkMode ? Colors.green[900] : Colors.green[100]),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       branch.isAgent ? 'Agent' : 'Branch',
                       style: TextStyle(
                         color: branch.isAgent
-                            ? Colors.blue[900]
-                            : Colors.green[900],
+                            ? (isDarkMode ? Colors.blue[100] : Colors.blue[900])
+                            : (isDarkMode ? Colors.green[100] : Colors.green[900]),
                       ),
                     ),
                   ),
                 ),
-                DataCell(Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
-                      onPressed: () => onEdit(branch),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => onDelete(branch),
-                    ),
-                  ],
-                )),
+                // DataCell(Row(
+                //   mainAxisSize: MainAxisSize.min,
+                //   children: [
+                //     IconButton(
+                //       icon: const Icon(Icons.edit, color: Colors.blue),
+                //       onPressed: () => onEdit(branch),
+                //     ),
+                //     IconButton(
+                //       icon: const Icon(Icons.delete, color: Colors.red),
+                //       onPressed: () => onDelete(branch),
+                //     ),
+                //   ],
+                // )
+                // ),
               ],
             );
           }).toList(),
@@ -133,3 +229,4 @@ class BranchesTable extends StatelessWidget {
     );
   }
 }
+
