@@ -6,6 +6,9 @@ import 'package:courier_app/features/barcode_reader/data/repository/barcode_repo
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:courier_app/features/branches/data/data_provider/branches_data_provider.dart';
 import 'package:courier_app/features/branches/data/repository/branches_repository.dart';
+import 'package:courier_app/features/countries/bloc/countries_bloc.dart';
+import 'package:courier_app/features/countries/data/data_provider/countries_data_provider.dart';
+import 'package:courier_app/features/countries/data/repository/countries_repository.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
 import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
 import 'package:courier_app/features/login/data/repository/login_repository.dart';
@@ -68,7 +71,10 @@ void main() async {
                 LoginBloc(LoginRepository(LoginDataProvider()))),
         BlocProvider(
             create: (context) => BranchesBloc(BranchesRepository(
-                branchesDataProvider: BranchesDataProvider())))
+                branchesDataProvider: BranchesDataProvider()))),
+        BlocProvider(
+            create: (context) =>
+                CountriesBloc(CountriesRepository(CountriesDataProvider())))
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),

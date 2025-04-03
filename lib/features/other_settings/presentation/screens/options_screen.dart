@@ -1,4 +1,5 @@
 import 'package:courier_app/features/branches/presentation/screen/branches_screen.dart';
+import 'package:courier_app/features/countries/presentation/screen/countries_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/options_widget.dart';
 
@@ -95,6 +96,10 @@ class _OptionsScreenState extends State<OptionsScreen> {
     if (option == 'Branches') {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => const BranchesScreen()),
+      );
+    } else if (option == 'Countries') {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const CountriesScreen()),
       );
     }
   }
