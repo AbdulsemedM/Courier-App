@@ -1,5 +1,6 @@
 import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
+import 'package:courier_app/features/other_settings/presentation/screens/options_screen.dart';
 import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
 import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
 import 'package:courier_app/features/track_shipment/presentation/screens/track_shipment_screen.dart';
@@ -202,6 +203,6 @@ final List<MenuOption> defaultMenuOptions = [
     subtitle: 'Get help',
     icon: Icons.settings,
     color: Colors.teal,
-    screen: ComingSoonScreen(),
+    screen: OptionsScreen(),
   ),
 ];
