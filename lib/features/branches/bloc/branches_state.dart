@@ -16,3 +16,15 @@ final class FetchBranchesError extends BranchesState {
   final String message;
   FetchBranchesError({required this.message});
 }
+
+final class FetchCountryLoading extends BranchesState {}
+
+final class FetchCountryLoaded extends BranchesState {
+  final List<CountryModel> countries;
+  FetchCountryLoaded({required this.countries});
+}
+
+final class FetchCountryError extends BranchesState {
+  final String message;
+  FetchCountryError({required this.message});
+}

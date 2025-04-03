@@ -11,4 +11,13 @@ class BranchesDataProvider {
       throw e.toString();
     }
   }
+  Future<String> fetchCountry() async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider.getRequest("/api/v1/countries");
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }
