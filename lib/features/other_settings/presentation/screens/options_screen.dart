@@ -1,6 +1,7 @@
 import 'package:courier_app/features/branches/presentation/screen/branches_screen.dart';
 import 'package:courier_app/features/countries/presentation/screen/countries_screen.dart';
 import 'package:courier_app/features/payment_method/presentation/screen/payment_methods_screen.dart';
+import 'package:courier_app/features/services_mode/presentation/screen/services_mode_screen.dart';
 import 'package:courier_app/features/shipment_types/presentation/screen/shipment_types_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/options_widget.dart';
@@ -110,6 +111,10 @@ class _OptionsScreenState extends State<OptionsScreen> {
     } else if (option == "Shipment types") {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => const ShipmentTypesScreen()),
+      );
+    } else if (option == "Services modes") {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const ServicesModeScreen()),
       );
     }
   }

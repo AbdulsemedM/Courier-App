@@ -19,6 +19,9 @@ import 'package:courier_app/features/miles_configuration/data/repository/miles_c
 import 'package:courier_app/features/payment_method/bloc/payment_methods_bloc.dart';
 import 'package:courier_app/features/payment_method/data/data_provider/payment_methods_data_provider.dart';
 import 'package:courier_app/features/payment_method/data/repository/payment_methods_repository.dart';
+import 'package:courier_app/features/services_mode/bloc/services_mode_bloc.dart';
+import 'package:courier_app/features/services_mode/data/data_provider/services_mode_data_provider.dart';
+import 'package:courier_app/features/services_mode/data/repository/services_mode_repository.dart';
 import 'package:courier_app/features/shipment/bloc/shipments_bloc.dart';
 import 'package:courier_app/features/shipment/data/data_provider/shipment_data_provider.dart';
 import 'package:courier_app/features/shipment/data/repository/shipment_repository.dart';
@@ -86,7 +89,10 @@ void main() async {
                 PaymentMethodsRepository(PaymentMethodsDataProvider()))),
         BlocProvider(
             create: (context) => ShipmentTypesBloc(
-                ShipmentTypesRepository(ShipmentTypesDataProvider())))
+                ShipmentTypesRepository(ShipmentTypesDataProvider()))),
+        BlocProvider(
+            create: (context) => ServicesModeBloc(
+                ServicesModeRepository(ServicesModeDataProvider())))
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
