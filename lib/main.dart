@@ -25,6 +25,9 @@ import 'package:courier_app/features/shipment/data/repository/shipment_repositor
 import 'package:courier_app/features/shipment_invoice/bloc/shipment_invoice_bloc.dart';
 import 'package:courier_app/features/shipment_invoice/data/data_provider/shipment_invoice_data_provider.dart';
 import 'package:courier_app/features/shipment_invoice/data/repository/shipment_invoice_repository.dart';
+import 'package:courier_app/features/shipment_types/bloc/shipment_types_bloc.dart';
+import 'package:courier_app/features/shipment_types/data/data_provider/shipment_types_data_provider.dart';
+import 'package:courier_app/features/shipment_types/data/repository/shipment_types_repository.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/data/data_provider/track_order_data_provider.dart';
 import 'package:courier_app/features/track_order/data/repository/track_order_repository.dart';
@@ -80,7 +83,10 @@ void main() async {
                 CountriesBloc(CountriesRepository(CountriesDataProvider()))),
         BlocProvider(
             create: (context) => PaymentMethodsBloc(
-                PaymentMethodsRepository(PaymentMethodsDataProvider())))
+                PaymentMethodsRepository(PaymentMethodsDataProvider()))),
+        BlocProvider(
+            create: (context) => ShipmentTypesBloc(
+                ShipmentTypesRepository(ShipmentTypesDataProvider())))
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
