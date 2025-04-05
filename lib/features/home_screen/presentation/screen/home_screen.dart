@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User welcome section
+              // User welcome section with enhanced design
               Container(
                 padding:
                     const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
@@ -93,18 +93,37 @@ class _HomeScreenState extends State<HomeScreen> {
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDarkMode
+                          ? Colors.black.withOpacity(0.3)
+                          : Colors.grey.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        Icons.person,
-                        size: 36,
-                        color: isDarkMode
-                            ? Colors.blue.shade200
-                            : Colors.blue.shade700,
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.5),
+                          width: 2,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.white.withOpacity(0.9),
+                        child: Icon(
+                          Icons.person,
+                          size: 36,
+                          color: isDarkMode
+                              ? Colors.blue.shade200
+                              : Colors.blue.shade700,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -134,139 +153,148 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Quick action buttons
+              // Quick action buttons with enhanced design
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
                   'Quick Actions',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: isDarkMode ? Colors.white : Colors.grey.shade800,
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 3,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 0.85,
                 children: [
-                  HomeWidgets.buildQuickActionButton(
+                  HomeWidgets.buildEnhancedActionCard(
+                    context: context,
                     icon: Icons.add_box_outlined,
                     label: 'Add Shipment',
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const AddShipmentScreen()));
-                    },
+                    description: 'Create new shipment',
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AddShipmentScreen())),
                     isDarkMode: isDarkMode,
                   ),
-                  HomeWidgets.buildQuickActionButton(
+                  HomeWidgets.buildEnhancedActionCard(
+                    context: context,
                     icon: Icons.track_changes,
-                    label: 'Change Status',
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const TrackOrderScreen()));
-                    },
+                    label: 'Track Order',
+                    description: 'Track status',
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const TrackOrderScreen())),
                     isDarkMode: isDarkMode,
                   ),
-                  HomeWidgets.buildQuickActionButton(
-                    icon: Icons.barcode_reader,
-                    label: 'Scan',
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const BarcodeReaderScreen()));
-                    },
+                  HomeWidgets.buildEnhancedActionCard(
+                    context: context,
+                    icon: Icons.qr_code_scanner,
+                    label: 'Scan QR',
+                    description: 'Scan QR code',
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const BarcodeReaderScreen())),
                     isDarkMode: isDarkMode,
                   ),
+                  // HomeWidgets.buildEnhancedActionCard(
+                  //   context: context,
+                  //   icon: Icons.analytics_outlined,
+                  //   label: 'Reports',
+                  //   description: 'View reports',
+                  //   onTap: () => Navigator.pushNamed(context, '/reports'),
+                  //   isDarkMode: isDarkMode,
+                  // ),
+                  // HomeWidgets.buildEnhancedActionCard(
+                  //   context: context,
+                  //   icon: Icons.settings,
+                  //   label: 'Settings',
+                  //   description: 'App settings',
+                  //   onTap: () => Navigator.pushNamed(context, '/settings'),
+                  //   isDarkMode: isDarkMode,
+                  // ),
+                  // HomeWidgets.buildEnhancedActionCard(
+                  //   context: context,
+                  //   icon: Icons.help_outline,
+                  //   label: 'Help',
+                  //   description: 'Get support',
+                  //   onTap: () => Navigator.pushNamed(context, '/help'),
+                  //   isDarkMode: isDarkMode,
+                  // ),
                 ],
               ),
               const SizedBox(height: 32),
 
-              // Active deliveries section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Statistics Section
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? Colors.grey[850]!.withOpacity(0.5)
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDarkMode
+                          ? Colors.black.withOpacity(0.2)
+                          : Colors.grey.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Active Deliveries',
+                      'Today\'s Statistics',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: isDarkMode ? Colors.white : Colors.grey.shade800,
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        // Handle view all
-                      },
-                      child: Text(
-                        'View All',
-                        style: TextStyle(
-                          color: isDarkMode
-                              ? Colors.blue.shade200
-                              : Colors.blue.shade700,
-                          fontWeight: FontWeight.w600,
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        HomeWidgets.buildStatisticItem(
+                          icon: Icons.local_shipping,
+                          label: 'Deliveries',
+                          value: '24',
+                          isDarkMode: isDarkMode,
                         ),
-                      ),
+                        HomeWidgets.buildStatisticItem(
+                          icon: Icons.pending_actions,
+                          label: 'Pending',
+                          value: '12',
+                          isDarkMode: isDarkMode,
+                        ),
+                        HomeWidgets.buildStatisticItem(
+                          icon: Icons.done_all,
+                          label: 'Completed',
+                          value: '36',
+                          isDarkMode: isDarkMode,
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              HomeWidgets.buildDeliveryCard(
-                orderNumber: 'ORDER #1234',
-                status: 'In Transit',
-                address: '123 Main St, City',
-                date: '2024-03-20',
-                isDarkMode: isDarkMode,
-              ),
-              const SizedBox(height: 16),
-              HomeWidgets.buildDeliveryCard(
-                orderNumber: 'ORDER #5678',
-                status: 'Pending Pickup',
-                address: '456 Oak Ave, Town',
-                date: '2024-03-21',
-                isDarkMode: isDarkMode,
-              ),
             ],
           ),
         ),
-        // bottomNavigationBar: Theme(
-        //   data: Theme.of(context).copyWith(
-        //     splashColor: Colors.transparent,
-        //     highlightColor: Colors.transparent,
-        //   ),
-        //   child: BottomNavigationBar(
-        //     currentIndex: 0,
-        //     backgroundColor: isDarkMode ? const Color(0xFF1F1F1F) : Colors.white,
-        //     selectedItemColor: isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
-        //     unselectedItemColor: isDarkMode ? Colors.grey.shade600 : Colors.grey.shade400,
-        //     items: const [
-        //       BottomNavigationBarItem(
-        //         icon: Icon(Icons.home_rounded),
-        //         label: 'Home',
-        //       ),
-        //       BottomNavigationBarItem(
-        //         icon: Icon(Icons.map_rounded),
-        //         label: 'Map',
-        //       ),
-        //       BottomNavigationBarItem(
-        //         icon: Icon(Icons.person_rounded),
-        //         label: 'Profile',
-        //       ),
-        //     ],
-        //     onTap: (index) {
-        //       // Handle navigation
-        //     },
       ),
     );
-    // );
   }
 }

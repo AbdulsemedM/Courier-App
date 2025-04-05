@@ -186,4 +186,97 @@ class HomeWidgets {
       },
     );
   }
+
+  static Widget buildEnhancedActionCard({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required String description,
+    required VoidCallback onTap,
+    required bool isDarkMode,
+  }) {
+    return Card(
+      elevation: 0,
+      color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 24,
+                color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.grey[800],
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Widget buildStatisticItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    required bool isDarkMode,
+  }) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          size: 32,
+          color: isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.grey.shade800,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.grey.shade800,
+          ),
+        ),
+      ],
+    );
+  }
 }
