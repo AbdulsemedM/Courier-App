@@ -1,5 +1,6 @@
 import 'package:courier_app/features/add_shipment/presentation/screens/add_shipment_screen.dart';
 import 'package:courier_app/features/barcode_reader/presentation/screen/barcode_reader_screen.dart';
+import 'package:courier_app/features/other_settings/presentation/screens/options_screen.dart';
 import 'package:courier_app/features/track_order/presentation/screens/track_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -198,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   HomeWidgets.buildEnhancedActionCard(
                     context: context,
-                    icon: Icons.qr_code_scanner,
+                    icon: Icons.barcode_reader,
                     label: 'Scan QR',
                     description: 'Scan QR code',
                     onTap: () => Navigator.push(
@@ -224,6 +225,50 @@ class _HomeScreenState extends State<HomeScreen> {
                   //   isDarkMode: isDarkMode,
                   // ),
                 ],
+              ),
+              const SizedBox(height: 32),
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const OptionsScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    backgroundColor:
+                        isDarkMode ? Colors.blue[700] : Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    elevation: 5,
+                    shadowColor: isDarkMode ? Colors.black54 : Colors.blue[200],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.settings,
+                        size: 24,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Other Settings',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 32),
 
