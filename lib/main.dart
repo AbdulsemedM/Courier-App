@@ -9,6 +9,9 @@ import 'package:courier_app/features/branches/data/repository/branches_repositor
 import 'package:courier_app/features/countries/bloc/countries_bloc.dart';
 import 'package:courier_app/features/countries/data/data_provider/countries_data_provider.dart';
 import 'package:courier_app/features/countries/data/repository/countries_repository.dart';
+import 'package:courier_app/features/currency/bloc/currency_bloc.dart';
+import 'package:courier_app/features/currency/data/data_provider/currency_data_provider.dart';
+import 'package:courier_app/features/currency/data/repository/currency_repository.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
 import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
 import 'package:courier_app/features/login/data/repository/login_repository.dart';
@@ -92,7 +95,10 @@ void main() async {
                 ShipmentTypesRepository(ShipmentTypesDataProvider()))),
         BlocProvider(
             create: (context) => ServicesModeBloc(
-                ServicesModeRepository(ServicesModeDataProvider())))
+                ServicesModeRepository(ServicesModeDataProvider()))),
+        BlocProvider(
+            create: (context) =>
+                CurrencyBloc(CurrencyRepository(CurrencyDataProvider()))),
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),

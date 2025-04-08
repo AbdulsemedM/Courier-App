@@ -1,96 +1,171 @@
 import 'package:courier_app/features/branches/presentation/screen/branches_screen.dart';
 import 'package:courier_app/features/countries/presentation/screen/countries_screen.dart';
+import 'package:courier_app/features/currency/presentation/screen/currency_screen.dart';
 import 'package:courier_app/features/payment_method/presentation/screen/payment_methods_screen.dart';
 import 'package:courier_app/features/services_mode/presentation/screen/services_mode_screen.dart';
 import 'package:courier_app/features/shipment_types/presentation/screen/shipment_types_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/options_widget.dart';
 
-class OptionsScreen extends StatefulWidget {
+class OptionsScreen extends StatelessWidget {
   const OptionsScreen({super.key});
 
-  @override
-  State<OptionsScreen> createState() => _OptionsScreenState();
-}
-
-class _OptionsScreenState extends State<OptionsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Options'),
-      ),
-      body: ListView(
-        children: [
-          OptionItem(
-            icon: Icons.account_tree_outlined,
-            title: 'Branches',
-            onTap: () => _handleOptionTap(context, 'Branches'),
-            isDarkMode: isDarkMode,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDarkMode
+                ? [
+                    const Color(0xFF1A1C2E),
+                    const Color(0xFF2D3250),
+                  ]
+                : [
+                    const Color(0xFFF0F4FF),
+                    const Color(0xFFFFFFFF),
+                  ],
           ),
-          OptionItem(
-            icon: Icons.public,
-            title: 'Countries',
-            onTap: () => _handleOptionTap(context, 'Countries'),
-            isDarkMode: isDarkMode,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom App Bar
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Options',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Main Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Main Options Grid
+                      GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        childAspectRatio: 1.1,
+                        children: [
+                          OptionCard(
+                            icon: Icons.account_tree_outlined,
+                            title: 'Branches',
+                            subtitle: 'Manage branches',
+                            color: Colors.blue,
+                            isDarkMode: isDarkMode,
+                            onTap: () => _handleOptionTap(context, 'Branches'),
+                          ),
+                          OptionCard(
+                            icon: Icons.public,
+                            title: 'Countries',
+                            subtitle: 'Manage locations',
+                            color: Colors.green,
+                            isDarkMode: isDarkMode,
+                            onTap: () => _handleOptionTap(context, 'Countries'),
+                          ),
+                          OptionCard(
+                            icon: Icons.payment,
+                            title: 'Payment Methods',
+                            subtitle: 'Configure options',
+                            color: Colors.orange,
+                            isDarkMode: isDarkMode,
+                            onTap: () =>
+                                _handleOptionTap(context, 'Payment methods'),
+                          ),
+                          OptionCard(
+                            icon: Icons.local_shipping_outlined,
+                            title: 'Shipment Types',
+                            subtitle: 'Manage types',
+                            color: Colors.purple,
+                            isDarkMode: isDarkMode,
+                            onTap: () =>
+                                _handleOptionTap(context, 'Shipment types'),
+                          ),
+                          OptionCard(
+                            icon: Icons.miscellaneous_services_outlined,
+                            title: 'Services Modes',
+                            subtitle: 'Configure services',
+                            color: Colors.teal,
+                            isDarkMode: isDarkMode,
+                            onTap: () =>
+                                _handleOptionTap(context, 'Services modes'),
+                          ),
+                          OptionCard(
+                            icon: Icons.currency_exchange,
+                            title: 'Currency',
+                            subtitle: 'Set currency options',
+                            color: Colors.indigo,
+                            isDarkMode: isDarkMode,
+                            onTap: () => _handleOptionTap(context, 'Currency'),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Additional Settings Section
+                      Text(
+                        'Additional Settings',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ListOptionCard(
+                        icon: Icons.directions_bus_filled_outlined,
+                        title: 'Transport Modes',
+                        subtitle: 'Configure transportation options',
+                        color: Colors.amber,
+                        isDarkMode: isDarkMode,
+                        onTap: () =>
+                            _handleOptionTap(context, 'Transport modes'),
+                      ),
+                      ListOptionCard(
+                        icon: Icons.people_outline,
+                        title: 'User Management',
+                        subtitle: 'Manage user access and permissions',
+                        color: Colors.cyan,
+                        isDarkMode: isDarkMode,
+                        onTap: () =>
+                            _handleOptionTap(context, 'User management'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          OptionItem(
-            icon: Icons.payment,
-            title: 'Payment methods',
-            onTap: () => _handleOptionTap(context, 'Payment methods'),
-            isDarkMode: isDarkMode,
-          ),
-          OptionItem(
-            icon: Icons.local_shipping_outlined,
-            title: 'Shipment types',
-            onTap: () => _handleOptionTap(context, 'Shipment types'),
-            isDarkMode: isDarkMode,
-          ),
-          OptionItem(
-            icon: Icons.miscellaneous_services_outlined,
-            title: 'Services modes',
-            onTap: () => _handleOptionTap(context, 'Services modes'),
-            isDarkMode: isDarkMode,
-          ),
-          OptionItem(
-            icon: Icons.currency_exchange,
-            title: 'Currency',
-            onTap: () => _handleOptionTap(context, 'Currency'),
-            isDarkMode: isDarkMode,
-          ),
-          OptionItem(
-            icon: Icons.directions_bus_filled_outlined,
-            title: 'Transport modes',
-            onTap: () => _handleOptionTap(context, 'Transport modes'),
-            isDarkMode: isDarkMode,
-          ),
-          OptionItem(
-            icon: Icons.currency_exchange_outlined,
-            title: 'Exchange Rates',
-            onTap: () => _handleOptionTap(context, 'Exchange Rates'),
-            isDarkMode: isDarkMode,
-          ),
-          OptionItem(
-            icon: Icons.people_outline,
-            title: 'Manage Users',
-            onTap: () => _handleOptionTap(context, 'Manage Users'),
-            isDarkMode: isDarkMode,
-          ),
-          OptionItem(
-            icon: Icons.support_agent,
-            title: 'Manage Agents',
-            onTap: () => _handleOptionTap(context, 'Manage Agents'),
-            isDarkMode: isDarkMode,
-          ),
-          OptionItem(
-            icon: Icons.groups_outlined,
-            title: 'Manage Customers',
-            onTap: () => _handleOptionTap(context, 'Manage Customers'),
-            isDarkMode: isDarkMode,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -115,6 +190,10 @@ class _OptionsScreenState extends State<OptionsScreen> {
     } else if (option == "Services modes") {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => const ServicesModeScreen()),
+      );
+    } else if (option == "Currency") {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const CurrencyScreen()),
       );
     }
   }
