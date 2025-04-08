@@ -4,6 +4,7 @@ import 'package:courier_app/features/currency/presentation/screen/currency_scree
 import 'package:courier_app/features/payment_method/presentation/screen/payment_methods_screen.dart';
 import 'package:courier_app/features/services_mode/presentation/screen/services_mode_screen.dart';
 import 'package:courier_app/features/shipment_types/presentation/screen/shipment_types_screen.dart';
+import 'package:courier_app/features/transport_modes/presentation/screen/transport_modes_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/options_widget.dart';
 
@@ -194,6 +195,10 @@ class OptionsScreen extends StatelessWidget {
     } else if (option == "Currency") {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => const CurrencyScreen()),
+      );
+    } else if (option == "Transport modes") {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const TransportModesScreen()),
       );
     }
   }

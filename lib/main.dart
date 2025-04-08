@@ -40,6 +40,9 @@ import 'package:courier_app/features/track_order/data/repository/track_order_rep
 import 'package:courier_app/features/track_shipment/bloc/track_shipment_bloc.dart';
 import 'package:courier_app/features/track_shipment/data/data_provider/track_shipment_data_provider.dart';
 import 'package:courier_app/features/track_shipment/data/repository/track_shipment_repository.dart';
+import 'package:courier_app/features/transport_modes/bloc/transport_modes_bloc.dart';
+import 'package:courier_app/features/transport_modes/data/data_provider/transport_modes_data_provider.dart';
+import 'package:courier_app/features/transport_modes/data/repository/transport_modes_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -99,6 +102,9 @@ void main() async {
         BlocProvider(
             create: (context) =>
                 CurrencyBloc(CurrencyRepository(CurrencyDataProvider()))),
+        BlocProvider(
+            create: (context) => TransportModesBloc(
+                TransportModesRepository(TransportModesDataProvider()))),
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
