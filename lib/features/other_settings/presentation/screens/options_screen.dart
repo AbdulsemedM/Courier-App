@@ -214,6 +214,181 @@ class OptionsScreen extends StatelessWidget {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => const ExchangeRateScreen()),
       );
+    } else if (option == 'User management') {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        builder: (context) {
+          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.5,
+            decoration: BoxDecoration(
+              color: isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                // Handle bar
+                Container(
+                  margin: const EdgeInsets.only(top: 12),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? Colors.grey[600] : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Title
+                Text(
+                  'User Management',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Select a category to manage',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 40),
+                // Options Grid
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildUserOption(
+                        context: context,
+                        icon: Icons.admin_panel_settings,
+                        title: 'Manage Users',
+                        subtitle: 'Staff & Admins',
+                        color: Colors.blue,
+                        gradient: const LinearGradient(
+                          colors: [Colors.blue, Colors.blueAccent],
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          // Navigate to user management screen
+                        },
+                      ),
+                      _buildUserOption(
+                        context: context,
+                        icon: Icons.people,
+                        title: 'Manage Customer',
+                        subtitle: 'Client Accounts',
+                        color: Colors.purple,
+                        gradient: const LinearGradient(
+                          colors: [Colors.purple, Colors.purpleAccent],
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          // Navigate to customer management screen
+                        },
+                      ),
+                      _buildUserOption(
+                        context: context,
+                        icon: Icons.support_agent,
+                        title: 'Manage Agents',
+                        subtitle: 'Field Staff',
+                        color: Colors.orange,
+                        gradient: const LinearGradient(
+                          colors: [Colors.orange, Colors.deepOrange],
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          // Navigate to agent management screen
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
     }
+  }
+
+  Widget _buildUserOption({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required Gradient gradient,
+    required VoidCallback onTap,
+  }) {
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.25,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                size: 32,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.8),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
