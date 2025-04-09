@@ -63,15 +63,15 @@ class BranchesModel {
 
   factory BranchesModel.fromMap(Map<String, dynamic> map) {
     return BranchesModel(
-      id: map['id'] as int,
-      name: map['name'] as String,
-      phone: map['phone'] as String,
-      code: map['code'] as String,
-      isAgent: map['isAgent'] as bool,
-      settlementAccount: map['settlementAccount'] as String,
-      balance: map['balance'] as double,
-      createdAt: map['createdAt'] as String,
-      currency: map['currency']['code'] as String,
+      id: map['id'] as int? ?? 0,
+      name: map['name'] as String? ?? '',
+      phone: map['phone'] as String? ?? '',
+      code: map['code'] as String? ?? '',
+      isAgent: map['isAgent'] as bool? ?? false,
+      settlementAccount: map['settlementAccount'] as String? ?? '',
+      balance: map['balance'] as double? ?? 0.0,
+      createdAt: map['createdAt'] as String? ?? '',
+      currency: map['currency']['code'] as String? ?? '',
     );
   }
 
