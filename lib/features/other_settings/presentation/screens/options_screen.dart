@@ -2,6 +2,7 @@ import 'package:courier_app/features/branches/presentation/screen/branches_scree
 import 'package:courier_app/features/countries/presentation/screen/countries_screen.dart';
 import 'package:courier_app/features/currency/presentation/screen/currency_screen.dart';
 import 'package:courier_app/features/exchange_rate/presentation/screen/exchange_rate_screen.dart';
+import 'package:courier_app/features/manage_agent/presentation/screen/manage_agent_screen.dart';
 import 'package:courier_app/features/manage_customers/presentation/screen/manage_customers_screen.dart';
 import 'package:courier_app/features/payment_method/presentation/screen/payment_methods_screen.dart';
 import 'package:courier_app/features/services_mode/presentation/screen/services_mode_screen.dart';
@@ -315,6 +316,8 @@ class OptionsScreen extends StatelessWidget {
                         ),
                         onTap: () {
                           Navigator.pop(context);
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const ManageAgentScreen()));
                           // Navigate to agent management screen
                         },
                       ),

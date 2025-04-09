@@ -19,6 +19,9 @@ import 'package:courier_app/features/login/bloc/login_bloc.dart';
 import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
 import 'package:courier_app/features/login/data/repository/login_repository.dart';
 import 'package:courier_app/features/login/presentation/screen/login_screen.dart';
+import 'package:courier_app/features/manage_agent/bloc/manage_agent_bloc.dart';
+import 'package:courier_app/features/manage_agent/data/data_provider/manage_agent_data_provider.dart';
+import 'package:courier_app/features/manage_agent/data/repository/manage_agent_repository.dart';
 import 'package:courier_app/features/manage_customers/bloc/manage_customers_bloc.dart';
 import 'package:courier_app/features/manage_customers/data/data_provider/manage_customers_data_provider.dart';
 import 'package:courier_app/features/manage_customers/data/repository/manage_customers_repository.dart';
@@ -117,6 +120,9 @@ void main() async {
         BlocProvider(
             create: (context) => ManageCustomersBloc(
                 ManageCustomersRepository(ManageCustomersDataProvider()))),
+        BlocProvider(
+            create: (context) => ManageAgentBloc(
+                ManageAgentRepository(ManageAgentDataProvider()))),
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
