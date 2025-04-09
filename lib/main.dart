@@ -25,6 +25,9 @@ import 'package:courier_app/features/manage_agent/data/repository/manage_agent_r
 import 'package:courier_app/features/manage_customers/bloc/manage_customers_bloc.dart';
 import 'package:courier_app/features/manage_customers/data/data_provider/manage_customers_data_provider.dart';
 import 'package:courier_app/features/manage_customers/data/repository/manage_customers_repository.dart';
+import 'package:courier_app/features/manage_user/bloc/manage_user_bloc.dart';
+import 'package:courier_app/features/manage_user/data/data_provider/manage_user_data_provider.dart';
+import 'package:courier_app/features/manage_user/data/repository/manage_user_repository.dart';
 import 'package:courier_app/features/miles_configuration/bloc/miles_configuration_bloc.dart';
 import 'package:courier_app/features/miles_configuration/data/data_provider/miles_configuration_data_provider.dart';
 import 'package:courier_app/features/miles_configuration/data/repository/miles_configuration_repository.dart';
@@ -123,6 +126,9 @@ void main() async {
         BlocProvider(
             create: (context) => ManageAgentBloc(
                 ManageAgentRepository(ManageAgentDataProvider()))),
+        BlocProvider(
+            create: (context) => ManageUserBloc(
+                ManageUsersRepository(ManageUsersDataProvider()))),
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
