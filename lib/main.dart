@@ -12,6 +12,9 @@ import 'package:courier_app/features/countries/data/repository/countries_reposit
 import 'package:courier_app/features/currency/bloc/currency_bloc.dart';
 import 'package:courier_app/features/currency/data/data_provider/currency_data_provider.dart';
 import 'package:courier_app/features/currency/data/repository/currency_repository.dart';
+import 'package:courier_app/features/exchange_rate/bloc/exchange_rate_bloc.dart';
+import 'package:courier_app/features/exchange_rate/data/data_provider/exchange_rate_data_provider.dart';
+import 'package:courier_app/features/exchange_rate/data/repository/exchange_rate_repository.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
 import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
 import 'package:courier_app/features/login/data/repository/login_repository.dart';
@@ -105,6 +108,9 @@ void main() async {
         BlocProvider(
             create: (context) => TransportModesBloc(
                 TransportModesRepository(TransportModesDataProvider()))),
+        BlocProvider(
+            create: (context) => ExchangeRateBloc(
+                ExchangeRateRepository(ExchangeRateDataProvider()))),
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),

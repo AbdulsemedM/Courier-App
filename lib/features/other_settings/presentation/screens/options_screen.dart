@@ -1,6 +1,7 @@
 import 'package:courier_app/features/branches/presentation/screen/branches_screen.dart';
 import 'package:courier_app/features/countries/presentation/screen/countries_screen.dart';
 import 'package:courier_app/features/currency/presentation/screen/currency_screen.dart';
+import 'package:courier_app/features/exchange_rate/presentation/screen/exchange_rate_screen.dart';
 import 'package:courier_app/features/payment_method/presentation/screen/payment_methods_screen.dart';
 import 'package:courier_app/features/services_mode/presentation/screen/services_mode_screen.dart';
 import 'package:courier_app/features/shipment_types/presentation/screen/shipment_types_screen.dart';
@@ -152,6 +153,15 @@ class OptionsScreen extends StatelessWidget {
                             _handleOptionTap(context, 'Transport modes'),
                       ),
                       ListOptionCard(
+                        icon: Icons.currency_exchange,
+                        title: 'Exchange Rates',
+                        subtitle: 'Configure exchange rates',
+                        color: Colors.deepPurpleAccent,
+                        isDarkMode: isDarkMode,
+                        onTap: () =>
+                            _handleOptionTap(context, 'Exchange rates'),
+                      ),
+                      ListOptionCard(
                         icon: Icons.people_outline,
                         title: 'User Management',
                         subtitle: 'Manage user access and permissions',
@@ -199,6 +209,10 @@ class OptionsScreen extends StatelessWidget {
     } else if (option == "Transport modes") {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => const TransportModesScreen()),
+      );
+    } else if (option == "Exchange rates") {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const ExchangeRateScreen()),
       );
     }
   }
