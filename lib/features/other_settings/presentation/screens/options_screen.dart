@@ -166,6 +166,15 @@ class OptionsScreen extends StatelessWidget {
                       ),
                       ListOptionCard(
                         icon: Icons.people_outline,
+                        title: 'Accounts Management',
+                        subtitle: 'Manage accounts',
+                        color: Colors.deepOrange,
+                        isDarkMode: isDarkMode,
+                        onTap: () =>
+                            _handleOptionTap(context, 'Account management'),
+                      ),
+                      ListOptionCard(
+                        icon: Icons.people_outline,
                         title: 'User Management',
                         subtitle: 'Manage user access and permissions',
                         color: Colors.cyan,
@@ -332,6 +341,112 @@ class OptionsScreen extends StatelessWidget {
           );
         },
       );
+    } else if (option == 'Account management') {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        builder: (context) {
+          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.5,
+            decoration: BoxDecoration(
+              color: isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                // Handle bar
+                Container(
+                  margin: const EdgeInsets.only(top: 12),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? Colors.grey[600] : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Title
+                Text(
+                  'User Management',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Select a category to manage',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // List Tiles
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      _buildManagementTile(
+                        context: context,
+                        icon: Icons.admin_panel_settings,
+                        title: 'Manage Users',
+                        subtitle: 'Staff & Admins',
+                        color: Colors.blue,
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ManageUserScreen(),
+                          ));
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _buildManagementTile(
+                        context: context,
+                        icon: Icons.people,
+                        title: 'Manage Customers',
+                        subtitle: 'Client Accounts',
+                        color: Colors.purple,
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ManageCustomersScreen(),
+                          ));
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _buildManagementTile(
+                        context: context,
+                        icon: Icons.support_agent,
+                        title: 'Manage Agents',
+                        subtitle: 'Field Staff',
+                        color: Colors.orange,
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ManageAgentScreen(),
+                          ));
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
     }
   }
 
@@ -397,6 +512,73 @@ class OptionsScreen extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildManagementTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.black12 : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDarkMode ? Colors.white10 : Colors.grey.shade200,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ListTile(
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            color: color,
+            size: 28,
+          ),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: isDarkMode ? Colors.grey[600] : Colors.grey[400],
+          size: 16,
         ),
       ),
     );
