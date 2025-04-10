@@ -8,6 +8,7 @@ import 'package:courier_app/features/manage_user/presentation/screen/manage_user
 import 'package:courier_app/features/payment_method/presentation/screen/payment_methods_screen.dart';
 import 'package:courier_app/features/services_mode/presentation/screen/services_mode_screen.dart';
 import 'package:courier_app/features/shipment_types/presentation/screen/shipment_types_screen.dart';
+import 'package:courier_app/features/tellers/presentation/screen/teller_screen.dart';
 import 'package:courier_app/features/transport_modes/presentation/screen/transport_modes_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/options_widget.dart';
@@ -348,8 +349,9 @@ class OptionsScreen extends StatelessWidget {
         isScrollControlled: true,
         builder: (context) {
           final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-          return Container(
-            height: MediaQuery.of(context).size.height * 0.5,
+          return SingleChildScrollView(
+              child: Container(
+            height: MediaQuery.of(context).size.height * 0.8,
             decoration: BoxDecoration(
               color: isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
               borderRadius:
@@ -401,13 +403,13 @@ class OptionsScreen extends StatelessWidget {
                       _buildManagementTile(
                         context: context,
                         icon: Icons.admin_panel_settings,
-                        title: 'Manage Users',
+                        title: 'Teller List',
                         subtitle: 'Staff & Admins',
                         color: Colors.blue,
                         onTap: () {
                           Navigator.pop(context);
                           Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const ManageUserScreen(),
+                            builder: (context) => const TellerScreen(),
                           ));
                         },
                       ),
@@ -415,7 +417,7 @@ class OptionsScreen extends StatelessWidget {
                       _buildManagementTile(
                         context: context,
                         icon: Icons.people,
-                        title: 'Manage Customers',
+                        title: 'Assign Tellers',
                         subtitle: 'Client Accounts',
                         color: Colors.purple,
                         onTap: () {
@@ -428,10 +430,38 @@ class OptionsScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       _buildManagementTile(
                         context: context,
-                        icon: Icons.support_agent,
-                        title: 'Manage Agents',
+                        icon: Icons.account_box_outlined,
+                        title: 'Accounts',
                         subtitle: 'Field Staff',
                         color: Colors.orange,
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ManageAgentScreen(),
+                          ));
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _buildManagementTile(
+                        context: context,
+                        icon: Icons.filter_list,
+                        title: 'Filter by Branch',
+                        subtitle: 'Field Staff',
+                        color: Colors.red,
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ManageAgentScreen(),
+                          ));
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _buildManagementTile(
+                        context: context,
+                        icon: Icons.filter,
+                        title: 'Filter by Status',
+                        subtitle: 'Field Staff',
+                        color: Colors.green,
                         onTap: () {
                           Navigator.pop(context);
                           Navigator.of(context).push(MaterialPageRoute(
@@ -444,7 +474,7 @@ class OptionsScreen extends StatelessWidget {
                 ),
               ],
             ),
-          );
+          ));
         },
       );
     }

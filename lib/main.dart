@@ -46,6 +46,9 @@ import 'package:courier_app/features/shipment_invoice/data/repository/shipment_i
 import 'package:courier_app/features/shipment_types/bloc/shipment_types_bloc.dart';
 import 'package:courier_app/features/shipment_types/data/data_provider/shipment_types_data_provider.dart';
 import 'package:courier_app/features/shipment_types/data/repository/shipment_types_repository.dart';
+import 'package:courier_app/features/tellers/bloc/tellers_bloc.dart';
+import 'package:courier_app/features/tellers/data/data_provider/teller_data_provider.dart';
+import 'package:courier_app/features/tellers/data/repository/teller_repository.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/data/data_provider/track_order_data_provider.dart';
 import 'package:courier_app/features/track_order/data/repository/track_order_repository.dart';
@@ -129,6 +132,9 @@ void main() async {
         BlocProvider(
             create: (context) => ManageUserBloc(
                 ManageUsersRepository(ManageUsersDataProvider()))),
+        BlocProvider(
+            create: (context) =>
+                TellersBloc(TellerRepository(TellerDataProvider()))),
       ],
       child: ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
