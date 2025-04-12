@@ -205,16 +205,7 @@ class _TellerScreenState extends State<TellerScreen> {
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
-          // TextButton(
-          //   onPressed: () {
-          //     Navigator.pop(context);
-          //     context.read<ManageUserBloc>().add(DeleteUserEvent(user.id));
-          //   },
-          //   child: const Text(
-          //     'Delete',
-          //     style: TextStyle(color: Colors.red),
-          //   ),
-          // ),
+        
         ],
       ),
     );
