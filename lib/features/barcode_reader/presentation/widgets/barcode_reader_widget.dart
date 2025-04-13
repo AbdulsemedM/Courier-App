@@ -1,6 +1,7 @@
 import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
 // import 'package:provider/provider.dart';
 // import '../../../../core/theme/theme_provider.dart';
 
@@ -283,6 +284,106 @@ class BarcodeReaderWidgets {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class BarcodeReaderScreen extends StatefulWidget {
+  const BarcodeReaderScreen({super.key});
+
+  @override
+  State<BarcodeReaderScreen> createState() => _BarcodeReaderScreenState();
+}
+
+class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
+  bool _hasCameraPermission = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestCameraPermission();
+  }
+
+  Future<void> _requestCameraPermission() async {
+    final status = await Permission.camera.status;
+
+    if (status.isDenied || status.isRestricted) {
+      // Show a dialog explaining why the permission is needed
+      _showPermissionExplanationDialog();
+    } else if (status.isGranted) {
+      setState(() {
+        _hasCameraPermission = true;
+      });
+    } else if (status.isPermanentlyDenied) {
+      // Inform the user that they need to enable the permission in settings
+      _showSettingsRedirectDialog();
+    }
+  }
+
+  void _showPermissionExplanationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Camera Permission Required'),
+        content: const Text(
+          'This app requires camera access to scan barcodes. Please grant camera permission to continue.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final result = await Permission.camera.request();
+              setState(() {
+                _hasCameraPermission = result.isGranted;
+              });
+            },
+            child: const Text('Allow'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Deny'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSettingsRedirectDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Permission Required'),
+        content: const Text(
+          'Camera permission is permanently denied. Please enable it in settings to use the barcode scanner.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Barcode Reader'),
+      ),
+      body: Center(
+        child: _hasCameraPermission
+            ? const Text('Camera is ready to use.')
+            : const Text('Camera permission is required.'),
       ),
     );
   }

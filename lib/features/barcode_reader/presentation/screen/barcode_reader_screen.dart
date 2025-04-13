@@ -28,7 +28,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   @override
   void initState() {
     super.initState();
-    _checkCameraPermission();
+    _requestCameraPermission();
     context.read<TrackOrderBloc>().add(FetchStatuses());
   }
 
@@ -38,69 +38,71 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
     super.dispose();
   }
 
-  Future<void> _checkCameraPermission() async {
+  Future<void> _requestCameraPermission() async {
     final status = await Permission.camera.status;
-    setState(() {
-      _hasCameraPermission = status.isGranted;
-    });
 
-    if (!status.isGranted) {
-      final result = await Permission.camera.request();
+    if (status.isDenied || status.isRestricted) {
+      // Show a dialog explaining why the permission is needed
+      _showPermissionExplanationDialog();
+    } else if (status.isGranted) {
       setState(() {
-        _hasCameraPermission = result.isGranted;
+        _hasCameraPermission = true;
       });
+    } else if (status.isPermanentlyDenied) {
+      // Inform the user that they need to enable the permission in settings
+      _showSettingsRedirectDialog();
     }
   }
 
-  Widget _buildCameraPermissionDenied(bool isDarkMode) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.camera_alt_outlined,
-              size: 64,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Camera Permission Required',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Please grant camera permission to scan barcodes',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () async {
-                await openAppSettings();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isDarkMode ? Colors.blue[700] : Colors.blue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text('Open Settings'),
-            ),
-          ],
+  void _showPermissionExplanationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Camera Permission Required'),
+        content: const Text(
+          'This app requires camera access to scan barcodes. Please grant camera permission to continue.',
         ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final result = await Permission.camera.request();
+              setState(() {
+                _hasCameraPermission = result.isGranted;
+              });
+            },
+            child: const Text('Allow'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Deny'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSettingsRedirectDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Permission Required'),
+        content: const Text(
+          'Camera permission is permanently denied. Please enable it in settings to use the barcode scanner.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
       ),
     );
   }
@@ -471,7 +473,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                           isDarkMode: isDarkMode,
                           onBarcodeDetected: _onBarcodeDetected,
                         )
-                      : _buildCameraPermissionDenied(isDarkMode)
+                      : const Text('Camera permission is required.')
                   : BarcodeReaderWidgets.buildManualEntry(
                       isDarkMode: isDarkMode,
                       controller: _trackingController,

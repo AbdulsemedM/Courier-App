@@ -200,8 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   HomeWidgets.buildEnhancedActionCard(
                     context: context,
                     icon: Icons.barcode_reader,
-                    label: 'Scan QR',
-                    description: 'Scan QR code',
+                    label: 'Scan Barcode',
+                    description: 'Scan Bar code',
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
