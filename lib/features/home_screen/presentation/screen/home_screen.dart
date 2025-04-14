@@ -140,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          'Abdu M.',
+                          'Amin M.',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,

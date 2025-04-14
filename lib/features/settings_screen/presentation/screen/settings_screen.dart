@@ -42,8 +42,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         body: ListView(
           children: [
             SettingsWidgets.buildProfileCard(
-              name: 'Abdulsemed M.',
-              email: 'abdulsemed.m@gmail.com',
+              name: 'Amin Muhamed',
+              email: 'aminmuhamed@gmail.com',
               imageUrl:
                   'https://www.shutterstock.com/image-vector/businessman-icon-can-be-used-260nw-247098721.jpg',
               onTap: () {
