@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
           elevation: 0,
           backgroundColor: isDarkMode
               ? const Color.fromARGB(255, 91, 19, 207)
-              : const Color.fromARGB(255, 91, 19, 207),
+              : const Color(0xFF5b3895),
           title: Text(
             'Courier App',
             style: TextStyle(

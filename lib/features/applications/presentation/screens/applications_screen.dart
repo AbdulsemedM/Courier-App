@@ -19,9 +19,8 @@ class ApplicationsScreen extends StatelessWidget {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode
-          ? const Color.fromARGB(255, 75, 23, 160)
-          : const Color.fromARGB(255, 75, 23, 160),
+      backgroundColor:
+          isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
