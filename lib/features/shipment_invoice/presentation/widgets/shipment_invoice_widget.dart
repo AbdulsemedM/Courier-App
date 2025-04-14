@@ -44,12 +44,16 @@ class ShipmentInvoiceWidgets {
           ElevatedButton(
             onPressed: onSearch,
             style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF5a00),
               padding: const EdgeInsets.all(16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Search'),
+            child: const Text('Search',
+                style: TextStyle(
+                  color: Colors.white,
+                )),
           ),
         ],
       ),
@@ -130,7 +134,7 @@ class ShipmentInvoiceWidgets {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        color: isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -147,7 +151,9 @@ class ShipmentInvoiceWidgets {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDarkMode ? const Color(0xFF0F172A) : Colors.blue[50],
+              color: isDarkMode
+                  ? const Color.fromARGB(255, 73, 4, 185)
+                  : const Color.fromARGB(255, 73, 4, 185),
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(16)),
             ),
@@ -235,7 +241,9 @@ class ShipmentInvoiceWidgets {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDarkMode ? const Color(0xFF0F172A) : Colors.grey[50],
+              color: isDarkMode
+                  ? const Color.fromARGB(255, 73, 4, 185)
+                  : const Color.fromARGB(255, 73, 4, 185),
               borderRadius:
                   const BorderRadius.vertical(bottom: Radius.circular(16)),
             ),
@@ -280,7 +288,9 @@ class ShipmentInvoiceWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF0F172A) : Colors.grey[50],
+        color: isDarkMode
+            ? const Color.fromARGB(255, 73, 4, 185)
+            : const Color.fromARGB(255, 73, 4, 185),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,

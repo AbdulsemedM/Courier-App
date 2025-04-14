@@ -324,7 +324,7 @@ class ShipmentCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF152642) : Colors.white,
+        color: isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -335,7 +335,7 @@ class ShipmentCard extends StatelessWidget {
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: const Color(0xFF5b3895),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),

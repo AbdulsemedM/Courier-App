@@ -19,7 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    final customColors = Theme.of(context).extension<CustomColors>()!;
+    // final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return Container(
       decoration: BoxDecoration(
@@ -27,8 +27,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            customColors.backgroundGradientStart,
-            customColors.backgroundGradientEnd,
+           const Color.fromARGB(255, 75, 23, 160),
+            const Color(0xFF5b3895),
           ],
         ),
       ),

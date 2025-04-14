@@ -44,7 +44,9 @@ class _CountriesScreenState extends State<CountriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF5b3895),
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 75, 23, 160),
         title: const Text('Countries'),
         actions: [
           IconButton(

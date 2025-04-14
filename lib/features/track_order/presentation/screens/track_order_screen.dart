@@ -262,8 +262,8 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
       return AppBar(
         elevation: 0,
         backgroundColor: isDarkMode
-            ? const Color(0xFF0A1931).withOpacity(0.95)
-            : Colors.blue,
+            ? const Color.fromARGB(255, 75, 23, 160)
+            : const Color.fromARGB(255, 75, 23, 160),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () {
@@ -331,7 +331,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
         ),
       ],
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFF5b3895),
         appBar: _buildAppBar(isDarkMode),
         body: RefreshIndicator(
           onRefresh: _loadShipments,

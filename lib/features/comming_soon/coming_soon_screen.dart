@@ -44,12 +44,12 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
             end: Alignment.bottomRight,
             colors: isDarkMode
                 ? [
-                    const Color(0xFF1A237E),
-                    const Color(0xFF0D47A1),
+                    const Color.fromARGB(255, 75, 23, 160),
+                    const Color(0xFF5b3895),
                   ]
                 : [
-                    const Color(0xFFE3F2FD),
-                    const Color(0xFFBBDEFB),
+                    const Color.fromARGB(255, 75, 23, 160),
+                    const Color(0xFF5b3895),
                   ],
           ),
         ),
@@ -154,8 +154,9 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isDarkMode ? Colors.blue.shade700 : Colors.blue.shade600,
+                  backgroundColor: isDarkMode
+                      ? const Color(0xFFFF5A00)
+                      : const Color(0xFFFF5A00),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
                     vertical: 16,
@@ -169,6 +170,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
                 child: const Text(
                   'Go Back',
                   style: TextStyle(
+                    color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,

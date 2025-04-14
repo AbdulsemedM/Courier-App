@@ -27,6 +27,7 @@ class _CurrencyScreenState extends State<CurrencyScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: const Color(0xFF5b3895),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -34,12 +35,12 @@ class _CurrencyScreenState extends State<CurrencyScreen> {
             end: Alignment.bottomRight,
             colors: isDarkMode
                 ? [
-                    const Color(0xFF1A1C2E),
-                    const Color(0xFF2D3250),
+                    const Color.fromARGB(255, 75, 23, 160),
+                    const Color(0xFF5b3895),
                   ]
                 : [
-                    const Color(0xFFF0F4FF),
-                    const Color(0xFFFFFFFF),
+                    const Color.fromARGB(255, 75, 23, 160),
+                    const Color(0xFF5b3895),
                   ],
           ),
         ),
@@ -73,7 +74,7 @@ class _CurrencyScreenState extends State<CurrencyScreen> {
                       icon: const Icon(Icons.add),
                       label: const Text('Add Currency'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: const Color(0xFFFF5a00),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         shape: RoundedRectangleBorder(
@@ -152,14 +153,16 @@ class _CurrencyScreenState extends State<CurrencyScreen> {
     }
   }
 
-    Future<void> _showAddCurrencyModal(BuildContext context) async {
-    final success = await showDialog<bool>(  // Specify the return type as bool
+  Future<void> _showAddCurrencyModal(BuildContext context) async {
+    final success = await showDialog<bool>(
+      // Specify the return type as bool
       context: context,
       builder: (context) => const AddCurrencyModal(),
     );
 
-    if (success == true && mounted) {  // Check if the result is true
-      context.read<CurrencyBloc>().add(FetchCurrencies());  // Refresh the list
+    if (success == true && mounted) {
+      // Check if the result is true
+      context.read<CurrencyBloc>().add(FetchCurrencies()); // Refresh the list
     }
   }
 

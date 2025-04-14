@@ -27,7 +27,13 @@ class _MilesConfigurationScreenState extends State<MilesConfigurationScreen> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
+      backgroundColor: isDarkMode
+          ? const Color.fromARGB(255, 75, 23, 160)
+          : const Color.fromARGB(255, 75, 23, 160),
       appBar: AppBar(
+        backgroundColor: isDarkMode
+          ? const Color.fromARGB(255, 75, 23, 160)
+          : const Color.fromARGB(255, 75, 23, 160),
         title: const Text('Miles Configuration'),
       ),
       body: BlocBuilder<MilesConfigurationBloc, MilesConfigurationState>(

@@ -1,5 +1,5 @@
 // import 'package:courier_app/app/app_button.dart';
-import 'package:courier_app/app/utils/app_colors.dart';
+// import 'package:courier_app/app/utils/app_colors.dart';
 // import 'package:courier_app/app/utils/app_themes.dart';
 import 'package:courier_app/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
@@ -440,16 +440,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                     onPressed: _isLoading ? null : _handleLogin,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: isDarkMode
-                                          ? Colors.blue.shade700
-                                          : AppColors.primaryColor,
+                                          ? const Color(0xFFFF5A00)
+                                          : const Color(0xFFFF5A00),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       elevation: _isLoading ? 0 : 8,
-                                      shadowColor: (isDarkMode
-                                              ? Colors.blue.shade700
-                                              : AppColors.primaryColor)
-                                          .withOpacity(0.5),
+                                      shadowColor: isDarkMode
+                                          ? const Color(0xFFFF5A00)
+                                          : const Color(0xFFFF5A00),
                                     ),
                                     child: _isLoading
                                         ? const SizedBox(

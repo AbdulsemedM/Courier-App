@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final customColors = Theme.of(context).extension<CustomColors>()!;
+    // final customColors = Theme.of(context).extension<CustomColors>()!;
     final isDarkMode = themeProvider.isDarkMode;
 
     return Container(
@@ -38,12 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFF5b3895),
         appBar: AppBar(
           elevation: 0,
           backgroundColor: isDarkMode
-              ? const Color(0xFF0A1931).withOpacity(0.95)
-              : Colors.white.withOpacity(0.8),
+              ? const Color.fromARGB(255, 91, 19, 207)
+              : const Color.fromARGB(255, 91, 19, 207),
           title: Text(
             'Courier App',
             style: TextStyle(
@@ -87,8 +87,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      customColors.gradientStart,
-                      customColors.gradientEnd,
+                      const Color.fromARGB(255, 239, 146, 96),
+                      const Color(0xFFFF5A00),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -239,8 +239,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 15),
-                    backgroundColor:
-                        isDarkMode ? Colors.blue[700] : Colors.blue,
+                    backgroundColor: isDarkMode
+                        ? const Color(0xFFFF5A00)
+                        : const Color(0xFFFF5A00),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),

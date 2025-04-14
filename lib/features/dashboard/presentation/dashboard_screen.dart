@@ -69,7 +69,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: isDarkMode ? const Color(0xFF0A1931) : Colors.white,
+            color: isDarkMode ? const Color(0xFF5b3895) : Colors.white,
             boxShadow: [
               BoxShadow(
                 color: isDarkMode
@@ -83,9 +83,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: BottomNavyBar(
             selectedIndex: _currentIndex,
             showElevation: false,
-            backgroundColor: isDarkMode
-                ? const Color.fromARGB(255, 1, 38, 67)
-                : Colors.transparent,
+            backgroundColor:
+                isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
             onItemSelected: (index) {
               setState(() => _currentIndex = index);
               _pageController.jumpToPage(index);
@@ -94,8 +93,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               BottomNavyBarItem(
                 icon: const Icon(Icons.home),
                 title: const Text('Home'),
-                activeColor:
-                    isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
+                activeColor: isDarkMode
+                    ? const Color(0xFFFF5A00)
+                    : const Color(0xFFFF5A00),
                 inactiveColor:
                     isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
                 textAlign: TextAlign.center,
@@ -103,8 +103,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               BottomNavyBarItem(
                 icon: const Icon(Icons.app_shortcut_rounded),
                 title: const Text('Application'),
-                activeColor:
-                    isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
+                activeColor: isDarkMode
+                    ? const Color(0xFFFF5A00)
+                    : const Color(0xFFFF5A00),
                 inactiveColor:
                     isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
                 textAlign: TextAlign.center,
@@ -112,8 +113,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               BottomNavyBarItem(
                 icon: const Icon(Icons.settings),
                 title: const Text('Settings'),
-                activeColor:
-                    isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
+                activeColor: isDarkMode
+                    ? const Color(0xFFFF5A00)
+                    : const Color(0xFFFF5A00),
                 inactiveColor:
                     isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
                 textAlign: TextAlign.center,

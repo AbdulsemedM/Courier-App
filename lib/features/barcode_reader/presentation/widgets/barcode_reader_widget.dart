@@ -147,7 +147,9 @@ class BarcodeReaderWidgets {
               controller.clear();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDarkMode ? Colors.blue[700] : Colors.blue,
+              backgroundColor: isDarkMode
+                  ? const Color(0xFFFF5A00)
+                  : const Color(0xFFFF5A00),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(
                 horizontal: 32,
@@ -177,7 +179,8 @@ class BarcodeReaderWidgets {
   }) {
     return FloatingActionButton.extended(
       onPressed: onToggle,
-      backgroundColor: isDarkMode ? Colors.blue[700] : Colors.blue,
+      backgroundColor:
+          isDarkMode ? const Color(0xFFFF5A00) : const Color(0xFFFF5A00),
       icon: Icon(
         isScanning ? Icons.edit : Icons.qr_code_scanner,
         color: Colors.white,

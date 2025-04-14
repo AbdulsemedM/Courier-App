@@ -20,7 +20,9 @@ class MilesConfigurationWidgets {
             child: Container(
               margin: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                color: isDarkMode
+                    ? const Color.fromARGB(255, 75, 23, 160)
+                    : const Color.fromARGB(255, 75, 23, 160),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
@@ -49,8 +51,8 @@ class MilesConfigurationWidgets {
                   Container(
                     decoration: BoxDecoration(
                       color: isDarkMode
-                          ? const Color(0xFF0F172A)
-                          : Colors.grey[100],
+                          ? const Color.fromARGB(255, 75, 23, 160)
+                          : const Color.fromARGB(255, 75, 23, 160),
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(12),
                         topRight: Radius.circular(12),
@@ -139,7 +141,7 @@ class MilesConfigurationWidgets {
         text,
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: isDarkMode ? Colors.blue[300] : Colors.blue[700],
+          color: isDarkMode ? Colors.white : Colors.white,
         ),
       ),
     );

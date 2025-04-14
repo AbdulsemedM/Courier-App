@@ -73,7 +73,13 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
+      backgroundColor: isDarkMode
+          ? const Color(0xFF5b3895)
+          : const Color(0xFF5b3895),
       appBar: AppBar(
+        backgroundColor: isDarkMode
+            ? const Color(0xFF5b3895)
+            : const Color(0xFF5b3895),
         title: const Text('Shipments'),
       ),
       body: Column(

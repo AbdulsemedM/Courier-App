@@ -6,10 +6,10 @@ class SettingsWidgets {
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Colors.grey.shade800,
+          color: Colors.white,
           letterSpacing: 0.5,
         ),
       ),
@@ -31,7 +31,7 @@ class SettingsWidgets {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardTheme.color,
+            color:const Color.fromARGB(255, 86, 2, 221),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -112,7 +112,10 @@ class SettingsWidgets {
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.blue.shade500, Colors.blue.shade700],
+          colors: [
+            const Color.fromARGB(255, 239, 146, 96),
+            const Color(0xFFFF5A00),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

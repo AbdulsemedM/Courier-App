@@ -21,6 +21,8 @@ class OptionsScreen extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor:
+          isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -28,12 +30,12 @@ class OptionsScreen extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: isDarkMode
                 ? [
-                    const Color(0xFF1A1C2E),
-                    const Color(0xFF2D3250),
+                    const Color.fromARGB(255, 75, 23, 160),
+                    const Color(0xFF5b3895),
                   ]
                 : [
-                    const Color(0xFFF0F4FF),
-                    const Color(0xFFFFFFFF),
+                    const Color(0xFF5b3895),
+                    const Color(0xFF5b3895),
                   ],
           ),
         ),
@@ -230,14 +232,16 @@ class OptionsScreen extends StatelessWidget {
     } else if (option == 'User management') {
       showModalBottomSheet(
         context: context,
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color.fromARGB(255, 75, 23, 160),
         isScrollControlled: true,
         builder: (context) {
           final isDarkMode = Theme.of(context).brightness == Brightness.dark;
           return Container(
             height: MediaQuery.of(context).size.height * 0.5,
             decoration: BoxDecoration(
-              color: isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+              color: isDarkMode
+                  ? const Color.fromARGB(255, 75, 23, 160)
+                  : const Color.fromARGB(255, 75, 23, 160),
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(24)),
               boxShadow: [
@@ -256,7 +260,9 @@ class OptionsScreen extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[600] : Colors.grey[300],
+                    color: isDarkMode
+                        ? const Color(0xFF5b3895)
+                        : const Color(0xFF5b3895),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -345,7 +351,7 @@ class OptionsScreen extends StatelessWidget {
     } else if (option == 'Account management') {
       showModalBottomSheet(
         context: context,
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color.fromARGB(255, 75, 23, 160),
         isScrollControlled: true,
         builder: (context) {
           final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -353,7 +359,9 @@ class OptionsScreen extends StatelessWidget {
               child: Container(
             height: MediaQuery.of(context).size.height * 0.8,
             decoration: BoxDecoration(
-              color: isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+              color: isDarkMode
+                  ? const Color.fromARGB(255, 75, 23, 160)
+                  : const Color.fromARGB(255, 75, 23, 160),
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(24)),
               boxShadow: [
@@ -372,14 +380,16 @@ class OptionsScreen extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[600] : Colors.grey[300],
+                    color: isDarkMode
+                        ? const Color.fromARGB(255, 75, 23, 160)
+                        : const Color.fromARGB(255, 75, 23, 160),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 const SizedBox(height: 20),
                 // Title
                 Text(
-                  'User Management',
+                  'Account Management',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

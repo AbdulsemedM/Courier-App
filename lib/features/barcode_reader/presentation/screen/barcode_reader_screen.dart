@@ -38,7 +38,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
     super.dispose();
   }
 
-  Future<void> _requestCameraPermission() async {
+   Future<void> _requestCameraPermission() async {
     final status = await Permission.camera.status;
 
     if (status.isDenied || status.isRestricted) {
@@ -438,10 +438,10 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       ],
       child: Scaffold(
         backgroundColor:
-            isDarkMode ? const Color(0xFF0A1931) : Colors.grey[100],
+            isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.transparent,
+          backgroundColor: const Color.fromARGB(255, 75, 23, 160),
           title: Text(
             'Track Shipment',
             style: TextStyle(

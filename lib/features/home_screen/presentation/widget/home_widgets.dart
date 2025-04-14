@@ -213,7 +213,9 @@ class HomeWidgets {
               Icon(
                 icon,
                 size: 24,
-                color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
+                color: isDarkMode
+                    ? const Color(0xFFFF5A00)
+                    : const Color(0xFFFF5A00),
               ),
               const SizedBox(height: 8),
               Text(
@@ -256,7 +258,7 @@ class HomeWidgets {
         Icon(
           icon,
           size: 32,
-          color: isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
+          color: isDarkMode ? const Color(0xFFFF5A00) : const Color(0xFFFF5A00),
         ),
         const SizedBox(height: 8),
         Text(

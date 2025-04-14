@@ -164,8 +164,9 @@ class SecondPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: onNext,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isDarkMode ? Colors.blue[700] : Colors.blue,
+                    backgroundColor: isDarkMode
+                        ? const Color(0xFFFF5A00)
+                        : const Color(0xFFFF5A00),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(

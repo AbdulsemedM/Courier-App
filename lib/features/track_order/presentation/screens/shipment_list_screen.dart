@@ -45,8 +45,8 @@ class _ShipmentListScreenState extends State<ShipmentListScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: isDarkMode
-            ? const Color(0xFF0A1931).withOpacity(0.95)
-            : Colors.white.withOpacity(0.8),
+            ? const Color.fromARGB(255, 75, 23, 160)
+            : const Color.fromARGB(255, 75, 23, 160),
         title: Text(
           'Shipments',
           style: TextStyle(

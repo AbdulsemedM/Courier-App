@@ -69,7 +69,7 @@ class FirstPage extends StatelessWidget {
               // TODO: Implement receiver check
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: const Color(0xFFFF5A00),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -107,7 +107,7 @@ class FirstPage extends StatelessWidget {
               // TODO: Implement sender check
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: const Color(0xFFFF5A00),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -152,7 +152,9 @@ class FirstPage extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onNext,
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDarkMode ? Colors.blue[700] : Colors.blue,
+                backgroundColor: isDarkMode
+                    ? const Color(0xFFFF5A00)
+                    : const Color(0xFFFF5A00),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(

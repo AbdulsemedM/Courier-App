@@ -33,12 +33,12 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
             end: Alignment.bottomRight,
             colors: isDarkMode
                 ? [
-                    const Color(0xFF1A1C2E),
-                    const Color(0xFF2D3250),
+                    const Color.fromARGB(255, 75, 23, 160),
+                    const Color(0xFF5b3895),
                   ]
                 : [
-                    const Color(0xFFF0F4FF),
-                    const Color(0xFFFFFFFF),
+                    const Color.fromARGB(255, 75, 23, 160),
+                    const Color(0xFF5b3895),
                   ],
           ),
         ),

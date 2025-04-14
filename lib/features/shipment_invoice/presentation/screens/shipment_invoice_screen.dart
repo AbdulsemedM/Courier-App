@@ -34,7 +34,13 @@ class _ShipmentInvoiceScreenState extends State<ShipmentInvoiceScreen> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
+      backgroundColor: isDarkMode
+          ? const Color.fromARGB(255, 75, 23, 160)
+          : const Color.fromARGB(255, 75, 23, 160),
       appBar: AppBar(
+        backgroundColor: isDarkMode
+          ? const Color.fromARGB(255, 75, 23, 160)
+          : const Color.fromARGB(255, 75, 23, 160),
         title: const Text('Shipment Invoice'),
       ),
       body: Column(

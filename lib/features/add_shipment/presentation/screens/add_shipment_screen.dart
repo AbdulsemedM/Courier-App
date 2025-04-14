@@ -16,7 +16,6 @@ import 'third_page.dart';
 
 class AddShipmentScreen extends StatefulWidget {
   const AddShipmentScreen({super.key});
-  
 
   @override
   State<AddShipmentScreen> createState() => _AddShipmentScreenState();
@@ -292,13 +291,14 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
 
           if (hasAllData) {
             return Scaffold(
-              backgroundColor:
-                  isDarkMode ? const Color(0xFF0A1931) : Colors.grey[100],
+              backgroundColor: isDarkMode
+                  ? const Color(0xFF5b3895)
+                  : const Color(0xFF5b3895),
               appBar: AppBar(
                 elevation: 0,
                 backgroundColor: isDarkMode
-                    ? const Color(0xFF0A1931).withOpacity(0.95)
-                    : Colors.white.withOpacity(0.8),
+                    ? const Color.fromARGB(255, 75, 23, 160)
+                    : const Color.fromARGB(255, 75, 23, 160),
                 title: Text(
                   'Add Shipment',
                   style: TextStyle(
