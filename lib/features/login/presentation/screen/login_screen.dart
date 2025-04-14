@@ -79,14 +79,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   end: Alignment.bottomRight,
                   colors: isDarkMode
                       ? [
-                          const Color(0xFF1A237E), // Deep Indigo
-                          const Color(0xFF0D47A1), // Deep Blue
-                          const Color(0xFF01579B), // Light Blue
+                          const Color.fromARGB(255, 103, 21, 234),
+                          const Color.fromARGB(255, 75, 23, 160),
+                          const Color(0xFF5b3895),
+                          // const Color(0xFF1A237E), // Deep Indigo
+                          // const Color(0xFF0D47A1), // Deep Blue
+                          // const Color(0xFF01579B), // Light Blue
                         ]
                       : [
-                          const Color(0xFFE3F2FD),
-                          const Color(0xFFBBDEFB),
-                          const Color(0xFF90CAF9),
+                          const Color.fromARGB(255, 103, 21, 234),
+                          const Color.fromARGB(255, 75, 23, 160),
+                          const Color(0xFF5b3895),
+                          // const Color(0xFFE3F2FD),
+                          // const Color(0xFFBBDEFB),
+                          // const Color(0xFF90CAF9),
                         ],
                 ),
               ),
@@ -100,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: (isDarkMode ? Colors.white : Colors.blue)
+                  color: (isDarkMode ? Colors.white : const Color(0xFF5b3895))
                       .withOpacity(0.1),
                 ),
               ),
@@ -113,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 150,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: (isDarkMode ? Colors.white : Colors.blue)
+                  color: (isDarkMode ? Colors.white : const Color(0xFF5b3895))
                       .withOpacity(0.1),
                 ),
               ),
@@ -166,12 +172,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: BoxDecoration(
                                   color: isDarkMode
                                       ? Colors.white.withOpacity(0.1)
-                                      : Colors.blue.withOpacity(0.1),
+                                      : const Color(0xFF5b3895).withOpacity(0.1),
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
                                       color: (isDarkMode
-                                              ? Colors.blue
+                                              ? const Color(0xFF5b3895)
                                               : Colors.blue.shade200)
                                           .withOpacity(0.3),
                                       blurRadius: 15,
@@ -190,8 +196,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   colors: isDarkMode
                                       ? [Colors.white, Colors.white70]
                                       : [
-                                          Colors.blue.shade700,
-                                          Colors.blue.shade900
+                                          const Color(0xFF5b3895),
+                                          const Color.fromARGB(255, 75, 23, 160)
                                         ],
                                 ).createShader(bounds),
                                 child: const Text(
@@ -306,8 +312,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       borderRadius: BorderRadius.circular(16),
                                       borderSide: BorderSide(
                                         color: isDarkMode
-                                            ? Colors.blue.shade200
-                                            : Colors.blue.shade700,
+                                            ? const Color(0xFF5b3895)
+                                            : const Color.fromARGB(255, 75, 23, 160),
                                         width: 2,
                                       ),
                                     ),
@@ -421,7 +427,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     style: TextButton.styleFrom(
                                       foregroundColor: isDarkMode
                                           ? Colors.white70
-                                          : Colors.blue.shade700,
+                                          : const Color(0xFF5b3895),
                                     ),
                                     child: const Text(
                                       'Forgot Password?',
