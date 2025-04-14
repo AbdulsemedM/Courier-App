@@ -27,7 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-           const Color.fromARGB(255, 75, 23, 160),
+           const Color(0xFF5b3895),
             const Color(0xFF5b3895),
           ],
         ),

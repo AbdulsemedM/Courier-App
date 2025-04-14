@@ -31,7 +31,7 @@ class SettingsWidgets {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color:const Color.fromARGB(255, 83, 11, 199),
+            color:const Color.fromARGB(255, 75, 23, 160),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
