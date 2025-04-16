@@ -160,7 +160,7 @@ class BarcodeReaderWidgets {
               ),
             ),
             child: const Text(
-              'Track Shipment(s)',
+              'Change Status(es)',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -182,7 +182,7 @@ class BarcodeReaderWidgets {
       backgroundColor:
           isDarkMode ? const Color(0xFFFF5A00) : const Color(0xFFFF5A00),
       icon: Icon(
-        isScanning ? Icons.edit : Icons.qr_code_scanner,
+        isScanning ? Icons.edit : Icons.barcode_reader,
         color: Colors.white,
       ),
       label: Text(

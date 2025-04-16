@@ -38,21 +38,52 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
     super.dispose();
   }
 
-   Future<void> _requestCameraPermission() async {
+  Future<void> _requestCameraPermission() async {
     final status = await Permission.camera.status;
 
-    if (status.isDenied || status.isRestricted) {
-      // Show a dialog explaining why the permission is needed
-      _showPermissionExplanationDialog();
-    } else if (status.isGranted) {
+    if (status == PermissionStatus.granted) {
       setState(() {
         _hasCameraPermission = true;
       });
-    } else if (status.isPermanentlyDenied) {
-      // Inform the user that they need to enable the permission in settings
-      _showSettingsRedirectDialog();
+      // Permission is already granted
+      print('Camera permission is already granted');
+      // Use the camera
+    } else {
+      // Request permission
+      final permission = await Permission.camera.request();
+      if (permission == PermissionStatus.granted) {
+        print('Camera permission granted');
+        setState(() {
+          _hasCameraPermission = true;
+        });
+        // Use the camera
+      } else {
+        print('Camera permission denied');
+        _showSettingsRedirectDialog();
+        // Handle the case where permission is denied
+      }
     }
   }
+
+  // Future<void> _requestCameraPermission() async {
+  //   final status = await Permission.camera.status;
+
+  //   if (status.isDenied || status.isRestricted) {
+  //     final result = await Permission.camera.request();
+  //     setState(() {
+  //       _hasCameraPermission = result.isGranted;
+  //     });
+  //     // // Show a dialog explaining why the permission is needed
+  //     // _showPermissionExplanationDialog();
+  //   } else if (status.isGranted) {
+  //     setState(() {
+  //       _hasCameraPermission = true;
+  //     });
+  //   } else if (status.isPermanentlyDenied) {
+  //     // Inform the user that they need to enable the permission in settings
+  //     _showSettingsRedirectDialog();
+  //   }
+  // }
 
   void _showPermissionExplanationDialog() {
     showDialog(
