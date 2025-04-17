@@ -746,6 +746,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  urovo_scanner:
+    dependency: "direct main"
+    description:
+      name: urovo_scanner
+      sha256: "60127d84b908a543a222bb328b585ecb7ba2034ce49fee5e979a6381c437fe45"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   vector_graphics:
     dependency: transitive
     description:

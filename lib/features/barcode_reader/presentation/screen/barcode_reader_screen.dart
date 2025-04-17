@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:courier_app/features/barcode_reader/bloc/barcode_reader_bloc.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/model/statuses_model.dart';
@@ -7,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../widgets/barcode_reader_widget.dart';
+import 'package:urovo_scanner/urovo_scanner.dart';
+import 'package:flutter/services.dart';
 
 class BarcodeReaderScreen extends StatefulWidget {
   const BarcodeReaderScreen({super.key});
@@ -18,16 +22,20 @@ class BarcodeReaderScreen extends StatefulWidget {
 class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   bool _isScanning = true;
   bool _hasCameraPermission = false;
+  bool _isUrovoDevice = false;
+  String _deviceName = 'Unknown';
   final _trackingController = TextEditingController();
   String? _error;
   final Set<String> _scannedBarcodes = {}; // Using Set to ensure uniqueness
   bool _isPaused = false;
   List<StatusModel> statuses = [];
   String? selectedStatus;
+  StreamSubscription<String?>? _barcodeStreamSubscription;
 
   @override
   void initState() {
     super.initState();
+    _initializeScanner();
     _requestCameraPermission();
     context.read<TrackOrderBloc>().add(FetchStatuses());
   }
@@ -35,7 +43,37 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   @override
   void dispose() {
     _trackingController.dispose();
+    _barcodeStreamSubscription?.cancel();
     super.dispose();
+  }
+
+  Future<void> _initializeScanner() async {
+    try {
+      final isUrovo = await UrovoScanner.isUrovoDevice ?? false;
+      final deviceName = await UrovoScanner.deviceName ?? 'Unknown device';
+      print('Device name: $deviceName');
+      setState(() {
+        _isUrovoDevice = isUrovo;
+        _deviceName = deviceName;
+      });
+
+      if (_isUrovoDevice) {
+        // Initialize Urovo scanner
+        _barcodeStreamSubscription =
+            UrovoScanner.barcodeStream.listen((barcode) {
+          if (barcode != null) {
+            _onBarcodeDetected(barcode);
+          }
+        });
+      } else {
+        // Initialize regular camera scanner
+        _requestCameraPermission();
+      }
+    } on PlatformException catch (e) {
+      print('Error initializing scanner: ${e.message}');
+      // Fallback to regular camera scanner
+      _requestCameraPermission();
+    }
   }
 
   Future<void> _requestCameraPermission() async {
@@ -507,12 +545,48 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
             if (_scannedBarcodes.isNotEmpty) _buildScannedList(isDarkMode),
             Expanded(
               child: _isScanning
-                  ? _hasCameraPermission
-                      ? BarcodeReaderWidgets.buildScanner(
-                          isDarkMode: isDarkMode,
-                          onBarcodeDetected: _onBarcodeDetected,
+                  ? _isUrovoDevice
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Text(
+                              //   'Urovo Scanner Active',
+                              //   style: TextStyle(
+                              //     color: isDarkMode
+                              //         ? Colors.white
+                              //         : Colors.black87,
+                              //     fontSize: 18,
+                              //     fontWeight: FontWeight.bold,
+                              //   ),
+                              // ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Device: $_deviceName',
+                                style: TextStyle(
+                                  color: isDarkMode
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Press the scan button on your device',
+                                style: TextStyle(
+                                  color: isDarkMode
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
                         )
-                      : const Text('Camera permission is required.')
+                      : _hasCameraPermission
+                          ? BarcodeReaderWidgets.buildScanner(
+                              isDarkMode: isDarkMode,
+                              onBarcodeDetected: _onBarcodeDetected,
+                            )
+                          : const Text('Camera permission is required.')
                   : BarcodeReaderWidgets.buildManualEntry(
                       isDarkMode: isDarkMode,
                       controller: _trackingController,

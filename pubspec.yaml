@@ -47,6 +47,7 @@ dependencies:
   shadcn_ui: ^0.16.3
   lottie: ^3.0.0
   image_picker: ^1.0.7
+  urovo_scanner: ^1.0.3
 
 dev_dependencies:
   flutter_test:
