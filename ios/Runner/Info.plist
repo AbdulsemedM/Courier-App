@@ -44,12 +44,9 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<!-- <key>NSFaceIDUsageDescription</key>
-	<string>Why is my app authenticating using face id?</string> -->
-
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to scan barcodes</string>
+	<string>This app needs camera access to scan barcodes.</string>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
 </dict>
