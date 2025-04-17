@@ -58,8 +58,16 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
         });
         // Use the camera
       } else {
-        print('Camera permission denied');
-        _showSettingsRedirectDialog();
+        final permission = await Permission.camera.request();
+        if (permission == PermissionStatus.granted) {
+          print('Camera permission granted');
+          setState(() {
+            _hasCameraPermission = true;
+          });
+          // Use the camera
+        }
+        // print('Camera permission denied');
+        // _showSettingsRedirectDialog();
         // Handle the case where permission is denied
       }
     }
