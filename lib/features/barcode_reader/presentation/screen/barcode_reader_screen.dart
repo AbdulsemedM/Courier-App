@@ -118,7 +118,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //     setState(() {
   //       _hasCameraPermission = result.isGranted;
   //     });
-  //     // // Show a dialog explaining why the permission is needed
+
   //     // _showPermissionExplanationDialog();
   //   } else if (status.isGranted) {
   //     setState(() {
