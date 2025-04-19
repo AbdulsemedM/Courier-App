@@ -104,7 +104,6 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
           });
           // Use the camera
         }
-        // print('Camera permission denied');
         // _showSettingsRedirectDialog();
         // Handle the case where permission is denied
       }
