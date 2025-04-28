@@ -1,3 +1,4 @@
+import 'package:courier_app/app/utils/app_colors.dart';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:courier_app/features/roles/model/roles_model.dart';
@@ -67,7 +68,7 @@ class RoleCard extends StatelessWidget {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: isDarkMode ? Colors.grey[800] : Colors.white,
+      color: AppColors.primaryColor,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
@@ -75,8 +76,8 @@ class RoleCard extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [Colors.grey[800]!, Colors.grey[900]!]
-                : [Colors.blue[50]!, Colors.blue[100]!],
+                ? [AppColors.primaryColor, AppColors.primaryDarkColor]
+                : [AppColors.primaryColor, AppColors.primaryDarkColor],
           ),
         ),
         child: Padding(
@@ -88,7 +89,7 @@ class RoleCard extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.badge_outlined,
-                    color: isDarkMode ? Colors.blue[300] : Colors.blue[700],
+                    color: isDarkMode ? AppColors.secondaryDarkColor : Colors.blue[700],
                   ),
                   const SizedBox(width: 8),
                   Expanded(

@@ -36,7 +36,9 @@ class _RolesScreenState extends State<RolesScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: const Color(0xFF5b3895),
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 75, 23, 160),
         title: const Text('Roles Management'),
         actions: [
           IconButton(
