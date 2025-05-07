@@ -171,5 +171,14 @@ class AddShipmentRepository {
       rethrow;
     }
   }
-  
+
+  Future<String> addShipment(Map<String, dynamic> body) async {
+    try {
+      final response = await addShipmentDataProvider.addNewShipment(body);
+      return response;
+    } catch (e) {
+      print('Error in addShipment: ${e.toString()}');
+      rethrow;
+    }
+  }
 }

@@ -22,6 +22,7 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
     on<FetchServices>(_fetchServices);
     on<FetchShipmentTypes>(_fetchShipmentTypes);
     on<FetchTransportModes>(_fetchTransportModes);
+    on<AddShipment>(_addShipment);
   }
 
   void _fetchBranches(
@@ -105,6 +106,16 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
       emit(FetchTransportModesSuccess(transportModes: transportModes));
     } catch (e) {
       emit(FetchTransportModesFailure(errorMessage: e.toString()));
+    }
+  }
+
+  void _addShipment(AddShipment event, Emitter<AddShipmentState> emit) async {
+    emit(AddShipmentLoading());
+    try {
+      final response = await addShipmentRepository.addShipment(event.body);
+      emit(AddShipmentSuccess(message: response));
+    } catch (e) {
+      emit(AddShipmentFailure(errorMessage: e.toString()));
     }
   }
 }

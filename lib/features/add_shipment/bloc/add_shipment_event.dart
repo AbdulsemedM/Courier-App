@@ -14,4 +14,10 @@ class FetchPaymentModes extends AddShipmentEvent {}
 class FetchServices extends AddShipmentEvent {}
 
 class FetchShipmentTypes extends AddShipmentEvent {}
+
 class FetchTransportModes extends AddShipmentEvent {}
+
+class AddShipment extends AddShipmentEvent {
+  final Map<String, dynamic> body;
+  AddShipment({required this.body});
+}

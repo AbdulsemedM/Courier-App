@@ -44,9 +44,9 @@ class SecondPage extends StatelessWidget {
               Expanded(
                 child: _buildTextField(
                   label: 'Quantity',
-                  value: formData['qty']?.toString() ?? '',
+                  value: formData['quantity']?.toString() ?? '',
                   onChanged: (value) =>
-                      formData['qty'] = int.tryParse(value) ?? 0,
+                      formData['quantity'] = int.tryParse(value) ?? 0,
                   isDarkMode: isDarkMode,
                   keyboardType: TextInputType.number,
                 ),
@@ -99,7 +99,7 @@ class SecondPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildDropdownField(
             label: 'Service Mode',
-            value: formData['serviceMode']?.toString(),
+            value: null,
             items: serviceModes
                 .map((mode) => DropdownMenuItem<String>(
                       value: mode.id?.toString(),
@@ -112,25 +112,25 @@ class SecondPage extends StatelessWidget {
                   (mode) => mode.id?.toString() == value,
                   orElse: () => ServiceModeModel(),
                 );
-                formData['serviceMode'] = selectedMode.id;
-                formData['serviceModeObject'] = selectedMode;
+                formData['serviceModeId'] = selectedMode.id;
+                // formData['serviceModeObject'] = selectedMode;
               }
             },
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: 16),
           _buildDropdownField(
-            label: 'Transport Mode',
-            value: formData['transportMode']?.toString(),
-            items: const ['Road', 'Air', 'Rail']
+            label: 'Shipment Type',
+            value: null,
+            items: shipmentTypes
                 .map((mode) => DropdownMenuItem<String>(
-                      value: mode,
-                      child: Text(mode),
+                      value: mode.id?.toString(),
+                      child: Text(mode.description ?? ''),
                     ))
                 .toList(),
             onChanged: (value) {
               if (value != null) {
-                formData['transportMode'] = value;
+                formData['shipmentTypeId'] = value;
               }
             },
             isDarkMode: isDarkMode,
@@ -315,7 +315,8 @@ class SecondPage extends StatelessWidget {
   }) {
     const units = ['KG', 'Box', 'Piece'];
     // Ensure value is null if it's empty or not in the list
-    final validValue = (value?.isNotEmpty == true && units.contains(value)) ? value : null;
+    final validValue =
+        (value?.isNotEmpty == true && units.contains(value)) ? value : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,7 +330,8 @@ class SecondPage extends StatelessWidget {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.white,
+            color:
+                isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
@@ -339,7 +341,7 @@ class SecondPage extends StatelessWidget {
             child: ButtonTheme(
               alignedDropdown: true,
               child: DropdownButton<String>(
-                value: validValue,  // Use validated value
+                value: validValue, // Use validated value
                 isExpanded: true,
                 dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
                 style: TextStyle(
@@ -352,7 +354,8 @@ class SecondPage extends StatelessWidget {
                     color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   ),
                 ),
-                items: units.map((String unit) {  // Use const list
+                items: units.map((String unit) {
+                  // Use const list
                   return DropdownMenuItem<String>(
                     value: unit,
                     child: Text(unit),

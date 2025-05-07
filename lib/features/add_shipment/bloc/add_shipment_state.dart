@@ -102,3 +102,17 @@ final class FetchTransportModesFailure extends AddShipmentState {
 
   FetchTransportModesFailure({required this.errorMessage});
 }
+
+final class AddShipmentLoading extends AddShipmentState {}
+
+final class AddShipmentSuccess extends AddShipmentState {
+  final String message;
+
+  AddShipmentSuccess({required this.message});
+}
+
+final class AddShipmentFailure extends AddShipmentState {
+  final String errorMessage;
+
+  AddShipmentFailure({required this.errorMessage});
+}

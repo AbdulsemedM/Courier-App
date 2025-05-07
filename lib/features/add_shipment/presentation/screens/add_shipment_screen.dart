@@ -1,3 +1,4 @@
+import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
 import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:courier_app/features/add_shipment/model/delivery_types_model.dart';
@@ -46,21 +47,22 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
     "shipmentTypeId": 1,
     "quantity": 1,
     "unit": "",
-    "netFee": 1,
+    // "netFee": 1,
     "numPcs": 0,
     "numBoxes": 0,
-    "rate": 50.75,
+    "rate": 0,
     "serviceModeId": 1,
   };
+  final authService = AuthService();
   final Map<String, dynamic> formData3 = {
-    "paymentMethodId": 1,
+    // "paymentMethodId": 1,
     "deliveryTypeId": 1,
     "transportModeId": 1,
     "hudhudPercent": 0,
     "hudhudNet": 0,
     "creditAccount": "",
     // "paymentModeId": 1,
-    "addedBy": 1,
+    "addedBy": "",
   };
   void _nextPage() {
     if (_currentPage < 2) {
@@ -83,7 +85,15 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeUserId();
     _fetchAllData();
+  }
+
+  Future<void> _initializeUserId() async {
+    final userId = await authService.getUserId();
+    setState(() {
+      formData3['addedBy'] = userId.toString();
+    });
   }
 
   void _fetchAllData() {
@@ -355,7 +365,15 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                             transportModes: transportModes,
                             onSubmit: () {
                               if (_formKey.currentState!.validate()) {
-                                print(formData3);
+                                final Map<String, dynamic> completeFormData = {
+                                  ...formData1,
+                                  ...formData2,
+                                  ...formData3,
+                                };
+                                print(completeFormData);
+                                context
+                                    .read<AddShipmentBloc>()
+                                    .add(AddShipment(body: completeFormData));
                               }
                             },
                           ),

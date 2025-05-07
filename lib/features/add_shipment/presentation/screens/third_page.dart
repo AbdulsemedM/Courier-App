@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
 
-class ThirdPage extends StatelessWidget {
+class ThirdPage extends StatefulWidget {
   final Map<String, dynamic> formData;
   final VoidCallback onPrevious;
   final VoidCallback onSubmit;
@@ -15,7 +15,7 @@ class ThirdPage extends StatelessWidget {
   final List<DeliveryTypeModel> deliveryTypes;
   final List<TransportModeModel> transportModes;
 
-  const ThirdPage({
+  ThirdPage({
     super.key,
     required this.formData,
     required this.onPrevious,
@@ -25,7 +25,12 @@ class ThirdPage extends StatelessWidget {
     required this.deliveryTypes,
     required this.transportModes,
   });
+  @override
+  State<ThirdPage> createState() => _ThirdPageState();
+}
 
+class _ThirdPageState extends State<ThirdPage> {
+  var selectedPaymentMode;
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -66,11 +71,11 @@ class ThirdPage extends StatelessWidget {
                       size: 24,
                     ),
                     const SizedBox(width: 12),
-          Text(
+                    Text(
                       'SHIPMENT INFORMATION',
-            style: TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
-              fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                         color: Colors.red[400],
                       ),
                     ),
@@ -79,8 +84,8 @@ class ThirdPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildDropdownField(
                   label: 'Payment Mode',
-                  value: formData['paymentModeId']?.toString(),
-                  items: paymentModes
+                  value: widget.formData['paymentModeId']?.toString(),
+                  items: widget.paymentModes
                       .map((mode) => DropdownMenuItem(
                             value: mode.code?.toString(),
                             child: Text(mode.code ?? mode.description ?? ''),
@@ -88,45 +93,58 @@ class ThirdPage extends StatelessWidget {
                       .toList(),
                   onChanged: (value) {
                     if (value != null) {
-                      final selectedMode = paymentModes.firstWhere(
-                        (mode) => mode.id?.toString() == value,
-                        orElse: () => PaymentModeModel(),
-                      );
-                      formData['paymentModeId'] =
-                          selectedMode.id; // Store the ID
+                      setState(() {
+                        final selectedMode = widget.paymentModes.firstWhere(
+                          (mode) => mode.code?.toString() == value,
+                          orElse: () => PaymentModeModel(),
+                        );
+                        print(selectedMode);
+                        selectedPaymentMode = selectedMode.code;
+                        widget.formData['paymentModeId'] =
+                            selectedMode.id; // Store the ID
+                      });
                     }
                   },
                   isDarkMode: isDarkMode,
                   icon: Icons.payment,
                 ),
                 const SizedBox(height: 24),
-                _buildDropdownField(
-                  label: 'Payment Method',
-                  value: formData['paymentMethodId']?.toString(),
-                  items: paymentMethods
-                      .map((method) => DropdownMenuItem(
-                            value: method.description?.toString(),
-                            child: Text(method.description ?? ''),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      final selectedMethod = paymentMethods.firstWhere(
-                        (method) => method.description?.toString() == value,
-                        orElse: () => PaymentMethodModel(),
-                      );
-                      formData['paymentMethodId'] =
-                          selectedMethod.id; // Store the ID
-                    }
-                  },
-                  isDarkMode: isDarkMode,
-                  icon: Icons.account_balance_wallet,
-                ),
-                const SizedBox(height: 24),
+                selectedPaymentMode == 'CASH' || selectedPaymentMode == 'CREDIT'
+                    ? _buildDropdownField(
+                        label: 'Payment Method',
+                        value: null,
+                        items: widget.paymentMethods
+                            .map((method) => DropdownMenuItem(
+                                  value: method.description?.toString(),
+                                  child: Text(method.description ?? ''),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            final selectedMethod =
+                                widget.paymentMethods.firstWhere(
+                              (method) =>
+                                  method.description?.toString() == value,
+                              orElse: () => PaymentMethodModel(),
+                            );
+                            // setState(() {
+                            //   selectedPaymentMode = selectedMethod.description;
+                            // });
+                            widget.formData['paymentMethodId'] =
+                                selectedMethod.id; // Store the ID
+                          }
+                        },
+                        isDarkMode: isDarkMode,
+                        icon: Icons.account_balance_wallet,
+                      )
+                    : const SizedBox(height: 0),
+                selectedPaymentMode == 'CASH' || selectedPaymentMode == 'CREDIT'
+                    ? const SizedBox(height: 24)
+                    : const SizedBox(height: 0),
                 _buildDropdownField(
                   label: 'Delivery Type',
-                  value: formData['deliveryTypeId']?.toString(),
-                  items: deliveryTypes
+                  value: widget.formData['deliveryTypeId']?.toString(),
+                  items: widget.deliveryTypes
                       .map((type) => DropdownMenuItem(
                             value: type.type?.toString(),
                             child: Text(type.type ?? ''),
@@ -134,11 +152,11 @@ class ThirdPage extends StatelessWidget {
                       .toList(),
                   onChanged: (value) {
                     if (value != null) {
-                      final selectedType = deliveryTypes.firstWhere(
+                      final selectedType = widget.deliveryTypes.firstWhere(
                         (type) => type.description?.toString() == value,
                         orElse: () => DeliveryTypeModel(),
                       );
-                      formData['deliveryTypeId'] =
+                      widget.formData['deliveryTypeId'] =
                           selectedType.id; // Store the ID
                     }
                   },
@@ -148,8 +166,8 @@ class ThirdPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildDropdownField(
                   label: 'Transport Mode',
-                  value: formData['transportModeId']?.toString(),
-                  items: transportModes
+                  value: widget.formData['transportModeId']?.toString(),
+                  items: widget.transportModes
                       .map((mode) => DropdownMenuItem(
                             value: mode.description?.toString(),
                             child: Text(mode.description ?? ''),
@@ -157,11 +175,11 @@ class ThirdPage extends StatelessWidget {
                       .toList(),
                   onChanged: (value) {
                     if (value != null) {
-                      final selectedMode = transportModes.firstWhere(
+                      final selectedMode = widget.transportModes.firstWhere(
                         (mode) => mode.description?.toString() == value,
                         orElse: () => TransportModeModel(),
                       );
-                      formData['transportModeId'] =
+                      widget.formData['transportModeId'] =
                           selectedMode.id; // Store the ID
                     }
                   },
@@ -173,84 +191,89 @@ class ThirdPage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           // Credit Account Section
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: isDarkMode
-                  ? const Color(0xFF1A1F37).withOpacity(0.5)
-                  : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.account_balance,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                      size: 24,
+          selectedPaymentMode == 'CREDIT'
+              ? Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? const Color(0xFF1A1F37).withOpacity(0.5)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Credit Account',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-            ),
-          ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-          _buildTextField(
-                  label: 'Credit Account',
-                  value: formData['creditAccount'] ?? '',
-                  onChanged: (value) => formData['creditAccount'] = value,
-            isDarkMode: isDarkMode,
-                  hintText: 'Type something...',
-                  icon: Icons.credit_card,
-                ),
-                const SizedBox(height: 24),
-                _buildTextField(
-                  label: 'Hudhud Percent',
-                  value: formData['hudhudPercent']?.toString() ?? '',
-                  onChanged: (value) =>
-                      formData['hudhudPercent'] = double.tryParse(value) ?? 0.0,
-            isDarkMode: isDarkMode,
-                  keyboardType: TextInputType.number,
-                  icon: Icons.percent,
-                ),
-                const SizedBox(height: 24),
-                _buildTextField(
-                  label: 'HudHudNet',
-                  value: formData['hudHudNet']?.toString() ?? '',
-                  onChanged: (value) =>
-                      formData['hudHudNet'] = double.tryParse(value) ?? 0.0,
-            isDarkMode: isDarkMode,
-                  keyboardType: TextInputType.number,
-                  icon: Icons.attach_money,
-                ),
-              ],
-            ),
-          ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.account_balance,
+                            color: isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.grey[600],
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Credit Account',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode
+                                  ? Colors.grey[400]
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                      _buildTextField(
+                        label: 'Credit Account',
+                        value: widget.formData['creditAccount'] ?? '',
+                        onChanged: (value) =>
+                            widget.formData['creditAccount'] = value,
+                        isDarkMode: isDarkMode,
+                        hintText: 'Type something...',
+                        icon: Icons.credit_card,
+                      ),
+                      const SizedBox(height: 24),
+                      //     _buildTextField(
+                      //       label: 'Hudhud Percent',
+                      //       value: formData['hudhudPercent']?.toString() ?? '',
+                      //       onChanged: (value) =>
+                      //           formData['hudhudPercent'] = double.tryParse(value) ?? 0.0,
+                      // isDarkMode: isDarkMode,
+                      //       keyboardType: TextInputType.number,
+                      //       icon: Icons.percent,
+                      //     ),
+                      //     const SizedBox(height: 24),
+                      //     _buildTextField(
+                      //       label: 'HudHudNet',
+                      //       value: formData['hudHudNet']?.toString() ?? '',
+                      //       onChanged: (value) =>
+                      //           formData['hudHudNet'] = double.tryParse(value) ?? 0.0,
+                      // isDarkMode: isDarkMode,
+                      //       keyboardType: TextInputType.number,
+                      //       icon: Icons.attach_money,
+                      //     ),
+                    ],
+                  ))
+              : const SizedBox(height: 0),
           const SizedBox(height: 40),
           // Navigation Buttons
           Row(
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: onPrevious,
+                  onPressed: widget.onPrevious,
                   icon: const Icon(Icons.arrow_back),
                   label: const Text('Previous'),
                   style: ElevatedButton.styleFrom(
@@ -271,7 +294,7 @@ class ThirdPage extends StatelessWidget {
               const SizedBox(width: 24),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: onSubmit,
+                  onPressed: widget.onSubmit,
                   icon: const Icon(Icons.check_circle),
                   label: const Text('Submit'),
                   style: ElevatedButton.styleFrom(
