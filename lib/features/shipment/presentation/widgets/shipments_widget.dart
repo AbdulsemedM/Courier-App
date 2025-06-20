@@ -168,7 +168,7 @@ class ShipmentsWidgets {
               return DataRow(
                 cells: [
                   DataCell(Text(
-                    shipment.awb,
+                    shipment.awb ?? '',
                     style: TextStyle(
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),
@@ -180,11 +180,11 @@ class ShipmentsWidgets {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(shipment.shipmentStatus.code),
+                        color: _getStatusColor(shipment.shipmentStatus?.code ?? ''),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        shipment.shipmentStatus.code,
+                        shipment.shipmentStatus?.code ?? '',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -199,13 +199,13 @@ class ShipmentsWidgets {
                     ),
                   )),
                   DataCell(Text(
-                    shipment.senderName,
+                    shipment.senderName ?? '',
                     style: TextStyle(
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   )),
                   DataCell(Text(
-                    shipment.receiverName,
+                    shipment.receiverName ?? '',
                     style: TextStyle(
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),

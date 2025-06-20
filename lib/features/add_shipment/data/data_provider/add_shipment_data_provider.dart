@@ -97,4 +97,26 @@ class AddShipmentDataProvider {
       throw e.toString();
     }
   }
+
+  Future<String> fetchCustomerByPhone(String phone) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider
+          .getRequest("/api/v1/customer", params: {"phone": phone});
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<String> fetchEstimatedRate(int originId, int destinationId) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider.getRequest("/api/v1/rate",
+          params: {"originId": originId, "destinationId": destinationId});
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }

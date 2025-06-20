@@ -106,13 +106,55 @@ final class FetchTransportModesFailure extends AddShipmentState {
 final class AddShipmentLoading extends AddShipmentState {}
 
 final class AddShipmentSuccess extends AddShipmentState {
-  final String message;
+  final String trackingNumber;
 
-  AddShipmentSuccess({required this.message});
+  AddShipmentSuccess({required this.trackingNumber});
 }
 
 final class AddShipmentFailure extends AddShipmentState {
   final String errorMessage;
 
   AddShipmentFailure({required this.errorMessage});
+}
+
+final class FetchCustomerByPhoneLoading extends AddShipmentState {}
+
+final class FetchCustomerByPhoneSuccess extends AddShipmentState {
+  final CustomerByPhone customer;
+
+  FetchCustomerByPhoneSuccess({required this.customer});
+}
+
+final class FetchCustomerByPhoneFailure extends AddShipmentState {
+  final String errorMessage;
+
+  FetchCustomerByPhoneFailure({required this.errorMessage});
+}
+
+final class FetchSenderByPhoneLoading extends AddShipmentState {}
+
+final class FetchSenderByPhoneSuccess extends AddShipmentState {
+  final CustomerByPhone customer;
+
+  FetchSenderByPhoneSuccess({required this.customer});
+}
+
+final class FetchSenderByPhoneFailure extends AddShipmentState {
+  final String errorMessage;
+
+  FetchSenderByPhoneFailure({required this.errorMessage});
+}
+
+final class FetchEstimatedRateLoading extends AddShipmentState {}
+
+final class FetchEstimatedRateSuccess extends AddShipmentState {
+  final EstimatedRateModel estimatedRate;
+
+  FetchEstimatedRateSuccess({required this.estimatedRate});
+}
+
+final class FetchEstimatedRateFailure extends AddShipmentState {
+  final String errorMessage;
+
+  FetchEstimatedRateFailure({required this.errorMessage});
 }

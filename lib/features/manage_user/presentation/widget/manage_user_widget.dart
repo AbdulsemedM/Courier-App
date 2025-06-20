@@ -150,25 +150,25 @@ class UsersTable extends StatelessWidget {
             return DataRow(
               cells: [
                 DataCell(Text(
-                  user.firstName,
+                  user.firstName ?? '',
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 )),
                 DataCell(Text(
-                  user.lastName,
+                  user.lastName ?? '',
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 )),
                 DataCell(Text(
-                  user.email,
+                  user.email ?? '',
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 )),
                 DataCell(Text(
-                  user.phone,
+                  user.phone ?? '',
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
@@ -184,7 +184,7 @@ class UsersTable extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      user.role,
+                      user.role ?? '',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -193,14 +193,14 @@ class UsersTable extends StatelessWidget {
                   ),
                 ),
                 DataCell(Text(
-                  user.branchName,
+                  user.branchName ?? '',
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 )),
                 DataCell(Text(
                   DateFormat('MMM-dd-yyyy')
-                      .format(DateTime.parse(user.createdAt)),
+                      .format(DateTime.parse(user.createdAt ?? '')),
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),

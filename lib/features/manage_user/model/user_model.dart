@@ -3,24 +3,24 @@ import 'dart:convert';
 
 class UserModel {
   final int id;
-  final String firstName;
-  final String lastName;
-  final String phone;
-  final String email;
-  final String branchName;
-  final String branchCode;
-  final String role;
-  final String createdAt;
+  final String? firstName;
+  final String? lastName;
+  final String? phone;
+  final String? email;
+  final String? branchName;
+  final String? branchCode;
+  final String? role;
+  final String? createdAt;
   UserModel({
     required this.id,
-    required this.firstName,
-    required this.lastName,
-    required this.phone,
-    required this.email,
-    required this.branchName,
-    required this.branchCode,
-    required this.role,
-    required this.createdAt,
+    this.firstName,
+    this.lastName,
+    this.phone,
+    this.email,
+    this.branchName,
+    this.branchCode,
+    this.role,
+    this.createdAt,
   });
 
   UserModel copyWith({
@@ -36,14 +36,14 @@ class UserModel {
   }) {
     return UserModel(
       id: id ?? this.id,
-      firstName: firstName ?? this.firstName,
-      lastName: lastName ?? this.lastName,
-      phone: phone ?? this.phone,
-      email: email ?? this.email,
-      branchName: branchName ?? this.branchName,
-      branchCode: branchCode ?? this.branchCode,
-      role: role ?? this.role,
-      createdAt: createdAt ?? this.createdAt,
+      firstName: firstName,
+      lastName: lastName,
+      phone: phone,
+      email: email,
+      branchName: branchName,
+      branchCode: branchCode,
+      role: role,
+      createdAt: createdAt,
     );
   }
 
@@ -64,14 +64,14 @@ class UserModel {
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       id: map['id'] as int? ?? 0,
-      firstName: map['firstName'] as String? ?? '',
-      lastName: map['lastName'] as String? ?? '',
-      phone: map['phone'] as String? ?? '',
-      email: map['email'] as String? ?? '',
-      branchName: map['branch']['name'] as String? ?? '',
-      branchCode: map['branch']['code'] as String? ?? '',
-      role: map['role']['role'] as String? ?? '',
-      createdAt: map['createdAt'] as String? ?? '',
+      firstName: map['firstName'] as String? ?? null,
+      lastName: map['lastName'] as String? ?? null,
+      phone: map['phone'] as String? ?? null,
+      email: map['email'] as String? ?? null,
+      branchName: map['branch']?['name'] as String? ?? null,
+      branchCode: map['branch']?['code'] as String? ?? null,
+      role: map['role']?['role'] as String? ?? null,
+      createdAt: map['createdAt'] as String? ?? null,
     );
   }
 

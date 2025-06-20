@@ -1,7 +1,8 @@
 import 'package:courier_app/features/add_shipment/presentation/screens/add_shipment_screen.dart';
 import 'package:courier_app/features/barcode_reader/presentation/screen/barcode_reader_screen.dart';
 import 'package:courier_app/features/other_settings/presentation/screens/options_screen.dart';
-import 'package:courier_app/features/track_order/presentation/screens/track_order_screen.dart';
+// import 'package:courier_app/features/track_order/presentation/screens/track_order_screen.dart';
+import 'package:courier_app/features/track_shipment/presentation/screens/track_shipment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
@@ -194,14 +195,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const TrackOrderScreen())),
+                            builder: (context) => const TrackShipmentScreen())),
                     isDarkMode: isDarkMode,
                   ),
                   HomeWidgets.buildEnhancedActionCard(
                     context: context,
                     icon: Icons.barcode_reader,
-                    label: 'Scan Barcode',
-                    description: 'Scan Bar code',
+                    label: 'Change Status',
+                    description: 'Change status of shipment',
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(

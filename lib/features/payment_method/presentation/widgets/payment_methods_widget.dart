@@ -119,13 +119,13 @@ class PaymentMethodsTable extends StatelessWidget {
             return DataRow(
               cells: [
                 DataCell(Text(
-                  method.method,
+                  method.method ?? '',
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 )),
                 DataCell(Text(
-                  method.description,
+                  method.description ?? '',
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
@@ -134,7 +134,7 @@ class PaymentMethodsTable extends StatelessWidget {
                   // ignore: unnecessary_null_comparison
                   method.createdAt != null
                       ? DateFormat('MMM-dd-yyyy')
-                          .format(DateTime.parse(method.createdAt))
+                          .format(DateTime.parse(method.createdAt ?? ''))
                       : '',
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,

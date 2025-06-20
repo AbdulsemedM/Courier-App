@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class LoginRepository {
   final LoginDataProvider loginDataProvider;
@@ -26,8 +27,10 @@ class LoginRepository {
 
       // Store the token if the login is successful
       await authService.storeToken(data['token']);
+
       await authService.storeUserId(data['userId'].toString());
-      // await userManager.setKYCStatus(data['response']['kycStatus']);
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(data['token']);
+      await authService.storeBranch(decodedToken['user']['branch'].toString());
 
       return data['message'];
     } catch (e) {

@@ -163,16 +163,16 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
       setState(() {
         _filteredUsers = state.users
             .where((user) =>
-                user.firstName.toLowerCase().contains(query.toLowerCase()) ==
+                user.firstName?.toLowerCase().contains(query.toLowerCase()) ==
                     true ||
-                user.lastName.toLowerCase().contains(query.toLowerCase()) ==
+                user.lastName?.toLowerCase().contains(query.toLowerCase()) ==
                     true ||
-                user.email.toLowerCase().contains(query.toLowerCase()) ==
+                user.email?.toLowerCase().contains(query.toLowerCase()) ==
                     true ||
-                user.phone.toLowerCase().contains(query.toLowerCase()) ==
+                user.phone?.toLowerCase().contains(query.toLowerCase()) ==
                     true ||
-                user.role.toLowerCase().contains(query.toLowerCase()) == true ||
-                user.branchName.toLowerCase().contains(query.toLowerCase()) ==
+                user.role?.toLowerCase().contains(query.toLowerCase()) == true ||
+                user.branchName?.toLowerCase().contains(query.toLowerCase()) ==
                     true)
             .toList();
       });

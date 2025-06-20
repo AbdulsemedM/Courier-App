@@ -3,14 +3,14 @@ import 'dart:convert';
 
 class PaymentMethodModel {
   final int id;
-  final String method;
-  final String description;
-  final String createdAt;
+  final String? method;
+  final String? description;
+  final String? createdAt;
   PaymentMethodModel({
     required this.id,
-    required this.method,
-    required this.description,
-    required this.createdAt,
+    this.method,
+    this.description,
+    this.createdAt,
   });
 
   PaymentMethodModel copyWith({
@@ -39,15 +39,17 @@ class PaymentMethodModel {
   factory PaymentMethodModel.fromMap(Map<String, dynamic> map) {
     return PaymentMethodModel(
       id: map['id'] as int,
-      method: map['method'] as String,
-      description: map['description'] as String,
-      createdAt: map['createdAt'] as String,
+      method: map['method'] != null ? map['method'] as String : null,
+      description:
+          map['description'] != null ? map['description'] as String : null,
+      createdAt: map['createdAt'] != null ? map['createdAt'] as String : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory PaymentMethodModel.fromJson(String source) => PaymentMethodModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory PaymentMethodModel.fromJson(String source) =>
+      PaymentMethodModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -57,19 +59,18 @@ class PaymentMethodModel {
   @override
   bool operator ==(covariant PaymentMethodModel other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.method == method &&
-      other.description == description &&
-      other.createdAt == createdAt;
+
+    return other.id == id &&
+        other.method == method &&
+        other.description == description &&
+        other.createdAt == createdAt;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      method.hashCode ^
-      description.hashCode ^
-      createdAt.hashCode;
+        method.hashCode ^
+        description.hashCode ^
+        createdAt.hashCode;
   }
 }

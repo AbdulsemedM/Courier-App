@@ -38,9 +38,9 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     setState(() {
       _filteredShipments = shipments.where((shipment) {
         final matchesSearch = searchTerm.isEmpty ||
-            shipment.awb.toLowerCase().contains(searchTerm);
+            (shipment.awb?.toLowerCase().contains(searchTerm) ?? false);
         final matchesStatus = _selectedStatus == 'All' ||
-            shipment.shipmentStatus.code == _selectedStatus;
+            (shipment.shipmentStatus?.code == _selectedStatus);
         return matchesSearch && matchesStatus;
       }).toList();
     });

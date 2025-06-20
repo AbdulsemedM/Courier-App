@@ -1,4 +1,5 @@
 import 'package:courier_app/configuration/auth_service.dart';
+import 'package:courier_app/configuration/payment_service.dart';
 import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
 import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:courier_app/features/add_shipment/model/delivery_types_model.dart';
@@ -7,6 +8,8 @@ import 'package:courier_app/features/add_shipment/model/payment_mode_model.dart'
 import 'package:courier_app/features/add_shipment/model/service_modes_model.dart';
 import 'package:courier_app/features/add_shipment/model/shipment_type_model.dart';
 import 'package:courier_app/features/add_shipment/model/transport_mode_model.dart';
+import 'package:courier_app/features/add_shipment/presentation/screens/payment_screen.dart';
+import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +18,7 @@ import 'first_page.dart';
 import 'second_page.dart';
 import 'third_page.dart';
 
+//////////ETAA73844Shipment
 class AddShipmentScreen extends StatefulWidget {
   const AddShipmentScreen({super.key});
 
@@ -35,33 +39,37 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
   List<TransportModeModel> transportModes = [];
 
   final Map<String, dynamic> formData1 = {
-    "senderName": "",
-    "senderMobile": "",
-    "receiverName": "",
-    "receiverMobile": "",
-    "senderBranchId": 1,
-    "receiverBranchId": 1,
+    "senderName": null,
+    "senderMobile": null,
+    "receiverName": null,
+    "receiverMobile": null,
+    "senderBranchId": null,
+    "receiverBranchId": null,
   };
   final Map<String, dynamic> formData2 = {
-    "extraFeeDescription": "",
-    "shipmentTypeId": 1,
+    "shipmentDescription": null,
+    "shipmentTypeId": null,
     "quantity": 1,
-    "unit": "",
+    "unit": null,
     // "netFee": 1,
     "numPcs": 0,
     "numBoxes": 0,
-    "rate": 0,
-    "serviceModeId": 1,
+    // "rate": 0,
+    "rate": 50.75,
+    "serviceModeId": null,
+    "extraFee": 300,
+    "extraFeeDescription": "null",
   };
   final authService = AuthService();
   final Map<String, dynamic> formData3 = {
     // "paymentMethodId": 1,
-    "deliveryTypeId": 1,
-    "transportModeId": 1,
-    "hudhudPercent": 0,
-    "hudhudNet": 0,
+    "deliveryTypeId": "",
+    "transportModeId": "",
+    "hudhudPercent": 10.5,
+    "hudhudNet": 95.75,
     "creditAccount": "",
-    // "paymentModeId": 1,
+    "paymentModeId": "",
+    "paymentMethodId": "",
     "addedBy": "",
   };
   void _nextPage() {
@@ -70,6 +78,12 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
+    }
+    if (_currentPage == 0) {
+      final bloc = context.read<AddShipmentBloc>();
+      bloc.add(FetchEstimatedRate(
+          originId: formData1['senderBranchId'],
+          destinationId: formData1['receiverBranchId']));
     }
   }
 
@@ -86,24 +100,51 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
   void initState() {
     super.initState();
     _initializeUserId();
-    _fetchAllData();
+    _fetchAllData(false);
   }
 
   Future<void> _initializeUserId() async {
     final userId = await authService.getUserId();
+    final branch = await authService.getBranch();
     setState(() {
-      formData3['addedBy'] = userId.toString();
+      formData3['addedBy'] = int.parse(userId.toString());
+      formData1['senderBranchId'] = int.parse(branch.toString());
     });
   }
 
-  void _fetchAllData() {
-    context.read<AddShipmentBloc>().add(FetchBranches());
-    context.read<AddShipmentBloc>().add(FetchDeliveryTypes());
-    context.read<AddShipmentBloc>().add(FetchPaymentMethods());
-    context.read<AddShipmentBloc>().add(FetchPaymentModes());
-    context.read<AddShipmentBloc>().add(FetchServices());
-    context.read<AddShipmentBloc>().add(FetchShipmentTypes());
-    context.read<AddShipmentBloc>().add(FetchTransportModes());
+  Future<void> _fetchAllData(bool sync) async {
+    try {
+      // Fetch data in batches to avoid overwhelming the server
+      // Batch 1: Essential data
+      final bloc = context.read<AddShipmentBloc>();
+      bloc.add(FetchBranches(sync));
+      bloc.add(FetchDeliveryTypes(sync));
+
+      // Small delay between batches
+      await Future.delayed(const Duration(milliseconds: 500));
+      // Batch 2: Payment related data
+      // final bloc = context.read<AddShipmentBloc>();
+      bloc.add(FetchPaymentMethods(sync));
+      bloc.add(FetchPaymentModes(sync));
+
+      // Small delay between batches
+      await Future.delayed(const Duration(milliseconds: 500));
+      // Batch 3: Shipment related data
+      bloc.add(FetchServices(sync));
+      bloc.add(FetchShipmentTypes(sync));
+      bloc.add(FetchTransportModes(sync));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error loading data: ${e.toString()}'),
+          action: SnackBarAction(
+            label: 'Retry',
+            onPressed: () => _fetchAllData(false),
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -272,10 +313,49 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                 content: Text('Error: ${(state as dynamic).error}'),
                 action: SnackBarAction(
                   label: 'Retry',
-                  onPressed: _fetchAllData,
+                  onPressed: () => _fetchAllData(false),
                 ),
               ),
             );
+          },
+        ),
+        BlocListener<AddShipmentBloc, AddShipmentState>(
+          listenWhen: (previous, current) => current is AddShipmentSuccess,
+          listener: (context, state) {
+            if (state is AddShipmentSuccess) {
+              final Map<String, dynamic> completeFormData = {
+                ...formData1,
+                ...formData2,
+                ...formData3,
+              };
+              final paymentService =
+                  Provider.of<PaymentService>(context, listen: false);
+              String info = paymentService.paymentInfo;
+              if (info != "CASH ON DELIVERY") {
+                String method = paymentService.paymentMethod;
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentScreen(
+                      formData: completeFormData,
+                      trackingNumber: state.trackingNumber,
+                      paymentInfo: method,
+                    ),
+                  ),
+                );
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ),
+                );
+              }
+            } else if (state is AddShipmentFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.errorMessage.toString())),
+              );
+            }
           },
         ),
       ],
@@ -330,6 +410,12 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                     }
                   },
                 ),
+                actions: [
+                  IconButton(
+                    icon: Icon(Icons.sync),
+                    onPressed: () => _fetchAllData(true),
+                  ),
+                ],
               ),
               body: Form(
                 key: _formKey,
@@ -363,6 +449,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                             paymentMethods: paymentMethods,
                             deliveryTypes: deliveryTypes,
                             transportModes: transportModes,
+                            quantity: formData2,
                             onSubmit: () {
                               if (_formKey.currentState!.validate()) {
                                 final Map<String, dynamic> completeFormData = {
@@ -374,7 +461,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                                 context
                                     .read<AddShipmentBloc>()
                                     .add(AddShipment(body: completeFormData));
-                              }
+                              } else {}
                             },
                           ),
                         ],
@@ -390,5 +477,16 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
         },
       ),
     );
+  }
+
+  void _handlePaymentInfo(String info) {
+    // Use Provider.of with listen: false for event handlers
+    Provider.of<PaymentService>(context, listen: false).setPaymentInfo(info);
+  }
+
+  void _handlePaymentMethod(String method) {
+    // Use Provider.of with listen: false for event handlers
+    Provider.of<PaymentService>(context, listen: false)
+        .setPaymentMethod(method);
   }
 }

@@ -163,7 +163,7 @@ class MilesConfigurationWidgets {
   static Future<void> showAddMilesConfigModal(BuildContext context) async {
     final addShipmentBloc = context.read<AddShipmentBloc>();
     // final milesConfigBloc = context.read<MilesConfigurationBloc>();
-    addShipmentBloc.add(FetchBranches());
+    addShipmentBloc.add(FetchBranches(true));
 
     final TextEditingController unitController = TextEditingController();
     final TextEditingController milesPerUnitController =

@@ -32,8 +32,8 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       setState(() {
         _filteredMethods = state.paymentMethods.where((method) {
           final searchLower = query.toLowerCase();
-          return (method.method.toLowerCase().contains(searchLower)) ||
-              (method.description.toLowerCase().contains(searchLower));
+          return (method.method?.toLowerCase().contains(searchLower) ?? false) ||
+              (method.description?.toLowerCase().contains(searchLower) ?? false);
         }).toList();
       });
     }

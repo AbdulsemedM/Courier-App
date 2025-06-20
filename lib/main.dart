@@ -1,4 +1,5 @@
 import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
+import 'package:courier_app/features/add_shipment/data/data_provider/add_shipment_data_provider.dart';
 import 'package:courier_app/features/add_shipment/data/repository/add_shipment_repository.dart';
 import 'package:courier_app/features/barcode_reader/bloc/barcode_reader_bloc.dart';
 import 'package:courier_app/features/barcode_reader/data/data_provider/barcode_data_provider.dart';
@@ -61,22 +62,28 @@ import 'package:courier_app/features/track_shipment/data/repository/track_shipme
 import 'package:courier_app/features/transport_modes/bloc/transport_modes_bloc.dart';
 import 'package:courier_app/features/transport_modes/data/data_provider/transport_modes_data_provider.dart';
 import 'package:courier_app/features/transport_modes/data/repository/transport_modes_repository.dart';
+import 'package:courier_app/providers/provider_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/theme_provider.dart';
+import 'package:courier_app/configuration/payment_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Required for SharedPreferences
   runApp(
-    MultiBlocProvider(
+    MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentService()),
         BlocProvider(
           create: (context) =>
               TrackOrderBloc(TrackOrderRepository(TrackOrderDataProvider())),
         ),
         BlocProvider(
-          create: (context) => AddShipmentBloc(AddShipmentRepository()),
+          create: (context) => AddShipmentBloc(AddShipmentRepository(
+              addShipmentDataProvider: AddShipmentDataProvider(),
+              cacheService: ProviderSetup.getCacheService())),
         ),
         BlocProvider(
           create: (context) => BarcodeReaderBloc(
@@ -142,10 +149,7 @@ void main() async {
             create: (context) =>
                 RolesBloc(RolesRepository(RolesDataProvider()))),
       ],
-      child: ChangeNotifierProvider(
-        create: (_) => ThemeProvider(),
-        child: const MyApp(),
-      ),
+      child: const MyApp(),
     ),
   );
 }
@@ -155,18 +159,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return MaterialApp(
-            title: 'Courier App',
-            debugShowCheckedModeBanner: false,
-            theme: themeProvider.currentTheme,
-            home: const LoginScreen(),
-          );
-        },
-      ),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Courier App',
+          debugShowCheckedModeBanner: false,
+          theme: themeProvider.currentTheme,
+          home: const LoginScreen(),
+        );
+      },
     );
   }
 }

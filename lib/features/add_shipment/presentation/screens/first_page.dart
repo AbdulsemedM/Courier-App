@@ -1,9 +1,11 @@
+import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
 import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class FirstPage extends StatelessWidget {
+class FirstPage extends StatefulWidget {
   final Map<String, dynamic> formData;
   final VoidCallback onNext;
   final List<BranchModel> branch;
@@ -14,6 +16,55 @@ class FirstPage extends StatelessWidget {
     required this.onNext,
     required this.branch,
   });
+
+  @override
+  State<FirstPage> createState() => _FirstPageState();
+}
+
+class _FirstPageState extends State<FirstPage> {
+  String? receiverName;
+  String? senderName;
+  final TextEditingController _receiverNameController = TextEditingController();
+  final TextEditingController _senderNameController = TextEditingController();
+  // String _lastFetchType = ''; // 'receiver' or 'sender'
+
+  @override
+  void initState() {
+    super.initState();
+    receiverName = widget.formData['receiverName'];
+    senderName = widget.formData['senderName'];
+    _receiverNameController.text = receiverName ?? '';
+    _senderNameController.text = senderName ?? '';
+  }
+
+  @override
+  void dispose() {
+    _receiverNameController.dispose();
+    _senderNameController.dispose();
+    super.dispose();
+  }
+
+  void _updateReceiverName(String value) {
+    setState(() {
+      receiverName = value;
+      widget.formData['receiverName'] = value;
+      _receiverNameController.text = value;
+      _receiverNameController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _receiverNameController.text.length),
+      );
+    });
+  }
+
+  void _updateSenderName(String value) {
+    setState(() {
+      senderName = value;
+      widget.formData['senderName'] = value;
+      _senderNameController.text = value;
+      _senderNameController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _senderNameController.text.length),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,22 +87,23 @@ class FirstPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildDropdownField(
             label: 'Receiver Branch',
-            value: formData['receiverBranchId']?.toString(),
-            items: branch
+            value: widget.formData['receiverBranchId']?.toString(),
+            items: widget.branch
                 .map((branch) => DropdownMenuItem(
                       value: branch.id?.toString(),
                       child: Text(branch.name ?? ''),
                     ))
-                .where((item) => item.value != null)
+                .where((item) => item.value != null && item.value!.isNotEmpty)
                 .toList(),
             onChanged: (value) {
               if (value != null) {
-                final selectedBranch = branch.firstWhere(
+                final selectedBranch = widget.branch.firstWhere(
                   (b) => b.id?.toString() == value,
                   orElse: () => BranchModel(),
                 );
-                formData['receiverBranchId'] = selectedBranch.id;
-                // formData['receiverBranchObject'] = selectedBranch;
+                setState(() {
+                  widget.formData['receiverBranchId'] = selectedBranch.id;
+                });
               }
             },
             isDarkMode: isDarkMode,
@@ -59,14 +111,31 @@ class FirstPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildTextField(
             label: 'Receiver Mobile',
-            value: formData['receiverMobile'],
-            onChanged: (value) => formData['receiverMobile'] = value,
+            value: widget.formData['receiverMobile'],
+            onChanged: (value) => setState(() {
+              widget.formData['receiverMobile'] = value;
+            }),
             isDarkMode: isDarkMode,
             keyboardType: TextInputType.phone,
           ),
           ElevatedButton(
             onPressed: () {
-              // TODO: Implement receiver check
+              final phoneNumber = widget.formData['receiverMobile']?.toString();
+              if (phoneNumber == null || phoneNumber.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a phone number'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              context.read<AddShipmentBloc>().add(
+                    FetchCustomerByPhone(
+                      phoneNumber: phoneNumber,
+                    ),
+                  );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF5A00),
@@ -76,14 +145,60 @@ class FirstPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('CHECK RECEIVER'),
+            child: BlocBuilder<AddShipmentBloc, AddShipmentState>(
+              builder: (context, state) {
+                if (state is FetchCustomerByPhoneLoading) {
+                  return const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  );
+                }
+                return const Text('CHECK RECEIVER');
+              },
+            ),
+          ),
+          BlocListener<AddShipmentBloc, AddShipmentState>(
+            listener: (context, state) {
+              if (state is FetchCustomerByPhoneSuccess) {
+                if (state.customer.fullname != null) {
+                  _updateReceiverName(state.customer.fullname!);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Customer found!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } else if (state is FetchCustomerByPhoneFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const SizedBox.shrink(),
           ),
           const SizedBox(height: 16),
-          _buildTextField(
-            label: 'Receiver Name',
-            value: formData['receiverName'],
-            onChanged: (value) => formData['receiverName'] = value,
-            isDarkMode: isDarkMode,
+          BlocBuilder<AddShipmentBloc, AddShipmentState>(
+            builder: (context, state) {
+              if (state is FetchCustomerByPhoneSuccess &&
+                  state.customer.fullname != null) {
+                _receiverNameController.text = state.customer.fullname!;
+              }
+
+              return _buildTextField(
+                label: 'Receiver Name',
+                controller: _receiverNameController,
+                onChanged: _updateReceiverName,
+                isDarkMode: isDarkMode,
+              );
+            },
           ),
           const SizedBox(height: 32),
           Text(
@@ -97,14 +212,31 @@ class FirstPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildTextField(
             label: 'Sender Mobile',
-            value: formData['senderMobile'],
-            onChanged: (value) => formData['senderMobile'] = value,
+            value: widget.formData['senderMobile'],
+            onChanged: (value) => setState(() {
+              widget.formData['senderMobile'] = value;
+            }),
             isDarkMode: isDarkMode,
             keyboardType: TextInputType.phone,
           ),
           ElevatedButton(
             onPressed: () {
-              // TODO: Implement sender check
+              final phoneNumber = widget.formData['senderMobile']?.toString();
+              if (phoneNumber == null || phoneNumber.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a phone number'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              context.read<AddShipmentBloc>().add(
+                    FetchSenderByPhone(
+                      phoneNumber: phoneNumber,
+                    ),
+                  );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF5A00),
@@ -114,43 +246,105 @@ class FirstPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('CHECK SENDER'),
+            child: BlocBuilder<AddShipmentBloc, AddShipmentState>(
+              builder: (context, state) {
+                if (state is FetchSenderByPhoneLoading) {
+                  return const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  );
+                }
+                return const Text('CHECK SENDER');
+              },
+            ),
           ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            label: 'Sender Name',
-            value: formData['senderName'],
-            onChanged: (value) => formData['senderName'] = value,
-            isDarkMode: isDarkMode,
-          ),
-          const SizedBox(height: 16),
-          _buildDropdownField(
-            label: 'Sender Branch',
-            value: formData['senderBranchId']?.toString(),
-            items: branch
-                .map((branch) => DropdownMenuItem(
-                      value: branch.id?.toString(),
-                      child: Text(branch.name ?? ''),
-                    ))
-                .where((item) => item.value != null)
-                .toList(),
-            onChanged: (value) {
-              if (value != null) {
-                final selectedBranch = branch.firstWhere(
-                  (b) => b.id?.toString() == value,
-                  orElse: () => BranchModel(),
+          BlocListener<AddShipmentBloc, AddShipmentState>(
+            listener: (context, state) {
+              if (state is FetchSenderByPhoneSuccess) {
+                if (state.customer.fullname != null) {
+                  _updateSenderName(state.customer.fullname!);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Customer found!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } else if (state is FetchCustomerByPhoneFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage),
+                    backgroundColor: Colors.red,
+                  ),
                 );
-                formData['senderBranchId'] = selectedBranch.id;
-                // formData['senderBranchObject'] = selectedBranch;
               }
             },
-            isDarkMode: isDarkMode,
+            child: const SizedBox.shrink(),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
+          BlocBuilder<AddShipmentBloc, AddShipmentState>(
+            builder: (context, state) {
+              if (state is FetchSenderByPhoneSuccess &&
+                  state.customer.fullname != null) {
+                _senderNameController.text = state.customer.fullname!;
+              }
+
+              return _buildTextField(
+                label: 'Sender Name',
+                controller: _senderNameController,
+                onChanged: _updateSenderName,
+                isDarkMode: isDarkMode,
+              );
+            },
+          ),
+          // const SizedBox(height: 16),
+          // _buildTextField(
+          //   label: 'Sender Name',
+          //   value: widget.formData['senderName'],
+          //   onChanged: (value) => setState(() {
+          //     widget.formData['senderName'] = value;
+          //   }),
+          //   isDarkMode: isDarkMode,
+          // ),
+          const SizedBox(height: 16),
+          // _buildDropdownField(
+          //   label: 'Sender Branch',
+          //   value: widget.formData['senderBranchId']?.toString(),
+          //   items: widget.branch
+          //       .map((branch) => DropdownMenuItem(
+          //             value: branch.id?.toString(),
+          //             child: Text(branch.name ?? ''),
+          //           ))
+          //       .where((item) => item.value != null && item.value!.isNotEmpty)
+          //       .toList(),
+          //   onChanged: (value) {
+          //     if (value != null) {
+          //       final selectedBranch = widget.branch.firstWhere(
+          //         (b) => b.id?.toString() == value,
+          //         orElse: () => BranchModel(),
+          //       );
+          //       setState(() {
+          //         widget.formData['senderBranchId'] = selectedBranch.id;
+          //       });
+          //     }
+          //   },
+          //   isDarkMode: isDarkMode,
+          // ),
+          // const SizedBox(height: 32),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: onNext,
+              onPressed: (widget.formData['receiverName'] == null ||
+                      widget.formData['receiverName'] == '' ||
+                      widget.formData['senderName'] == null ||
+                      widget.formData['senderName'] == '' ||
+                      widget.formData['receiverBranchId'] == null)
+                  ? null
+                  : widget.onNext,
               style: ElevatedButton.styleFrom(
                 backgroundColor: isDarkMode
                     ? const Color(0xFFFF5A00)
@@ -177,7 +371,8 @@ class FirstPage extends StatelessWidget {
 
   Widget _buildTextField({
     required String label,
-    required String value,
+    String? value,
+    TextEditingController? controller,
     required Function(String) onChanged,
     required bool isDarkMode,
     TextInputType? keyboardType,
@@ -193,7 +388,8 @@ class FirstPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextFormField(
-          initialValue: value,
+          controller: controller,
+          initialValue: controller == null ? value : null,
           onChanged: onChanged,
           keyboardType: keyboardType,
           style: TextStyle(
@@ -240,6 +436,9 @@ class FirstPage extends StatelessWidget {
     required Function(String?) onChanged,
     required bool isDarkMode,
   }) {
+    // Ensure value is null if it's not in the available items
+    final validValue = items.any((item) => item.value == value) ? value : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -251,7 +450,7 @@ class FirstPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: value,
+          value: validValue,
           items: items,
           onChanged: onChanged,
           style: TextStyle(

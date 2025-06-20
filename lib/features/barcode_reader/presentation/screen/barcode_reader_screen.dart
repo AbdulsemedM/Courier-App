@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:courier_app/features/barcode_reader/bloc/barcode_reader_bloc.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/model/statuses_model.dart';
+import 'package:courier_app/features/track_order/presentation/screens/track_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -594,10 +595,31 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
             ),
           ],
         ),
-        floatingActionButton: BarcodeReaderWidgets.buildToggleButton(
-          isDarkMode: isDarkMode,
-          isScanning: _isScanning,
-          onToggle: _toggleScanMode,
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BarcodeReaderWidgets.buildToggleButton(
+              isDarkMode: isDarkMode,
+              isScanning: _isScanning,
+              onToggle: _toggleScanMode,
+            ),
+            const SizedBox(width: 16),
+            FloatingActionButton(
+              backgroundColor: const Color(0xFFFF5A00),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const TrackOrderScreen()),
+                );
+              },
+              child: const Icon(
+                Icons.radar_rounded,
+                size: 30,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),

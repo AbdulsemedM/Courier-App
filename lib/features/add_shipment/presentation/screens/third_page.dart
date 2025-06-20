@@ -1,8 +1,11 @@
+import 'package:courier_app/configuration/payment_service.dart';
+import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
 import 'package:courier_app/features/add_shipment/model/delivery_types_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_method_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_mode_model.dart';
 import 'package:courier_app/features/add_shipment/model/transport_mode_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
 
@@ -10,6 +13,7 @@ class ThirdPage extends StatefulWidget {
   final Map<String, dynamic> formData;
   final VoidCallback onPrevious;
   final VoidCallback onSubmit;
+  final Map<String, dynamic> quantity;
   final List<PaymentModeModel> paymentModes;
   final List<PaymentMethodModel> paymentMethods;
   final List<DeliveryTypeModel> deliveryTypes;
@@ -24,6 +28,7 @@ class ThirdPage extends StatefulWidget {
     required this.paymentMethods,
     required this.deliveryTypes,
     required this.transportModes,
+    required this.quantity,
   });
   @override
   State<ThirdPage> createState() => _ThirdPageState();
@@ -31,17 +36,86 @@ class ThirdPage extends StatefulWidget {
 
 class _ThirdPageState extends State<ThirdPage> {
   var selectedPaymentMode;
+  double? rate;
+
   @override
   Widget build(BuildContext context) {
+    final paymentService = Provider.of<PaymentService>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-
+    widget.formData['paymentMethodId'] = widget.paymentMethods[0].id;
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Shipment Information Section
+          // Total Fee Card
+          BlocListener<AddShipmentBloc, AddShipmentState>(
+            listenWhen: (previous, current) =>
+                current is FetchEstimatedRateSuccess,
+            listener: (context, state) {
+              if (state is FetchEstimatedRateSuccess) {
+                print("estimation received");
+                // Optional: You can remove setState() and handle in BlocBuilder instead
+              }
+            },
+            child: BlocBuilder<AddShipmentBloc, AddShipmentState>(
+              builder: (context, state) {
+                double totalFee = 0;
+
+                if (state is FetchEstimatedRateSuccess) {
+                  final rate = state.estimatedRate.rate;
+                  final quantity =
+                      (widget.quantity['quantity'] as num?)?.toDouble() ?? 1.0;
+                  totalFee = rate * quantity;
+                }
+
+                return Center(
+                  child: Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple[600],
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Total Fee',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "${totalFee.toStringAsFixed(2)} ETB",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+// Shipment Information Section
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -84,7 +158,7 @@ class _ThirdPageState extends State<ThirdPage> {
                 const SizedBox(height: 24),
                 _buildDropdownField(
                   label: 'Payment Mode',
-                  value: widget.formData['paymentModeId']?.toString(),
+                  value: widget.paymentModes[0].id?.toString(),
                   items: widget.paymentModes
                       .map((mode) => DropdownMenuItem(
                             value: mode.code?.toString(),
@@ -98,10 +172,12 @@ class _ThirdPageState extends State<ThirdPage> {
                           (mode) => mode.code?.toString() == value,
                           orElse: () => PaymentModeModel(),
                         );
-                        print(selectedMode);
                         selectedPaymentMode = selectedMode.code;
                         widget.formData['paymentModeId'] =
                             selectedMode.id; // Store the ID
+                        print(selectedMode.description);
+                        paymentService
+                            .setPaymentInfo(selectedMode.description!);
                       });
                     }
                   },
@@ -115,23 +191,26 @@ class _ThirdPageState extends State<ThirdPage> {
                         value: null,
                         items: widget.paymentMethods
                             .map((method) => DropdownMenuItem(
-                                  value: method.description?.toString(),
-                                  child: Text(method.description ?? ''),
+                                  value: method.id?.toString(),
+                                  child: Text(method.method ?? ''),
                                 ))
                             .toList(),
                         onChanged: (value) {
                           if (value != null) {
-                            final selectedMethod =
-                                widget.paymentMethods.firstWhere(
-                              (method) =>
-                                  method.description?.toString() == value,
-                              orElse: () => PaymentMethodModel(),
-                            );
-                            // setState(() {
-                            //   selectedPaymentMode = selectedMethod.description;
-                            // });
-                            widget.formData['paymentMethodId'] =
-                                selectedMethod.id; // Store the ID
+                            setState(() {
+                              widget.formData['paymentMethodId'] =
+                                  int.parse(value); // Store the ID
+                              final selectedMethod = widget.paymentMethods
+                                  .firstWhere(
+                                      (method) =>
+                                          method.id?.toString() == value,
+                                      orElse: () => PaymentMethodModel());
+                              paymentService
+                                  .setPaymentMethod(selectedMethod.method!);
+                              // print(selectedMethod.method);
+                              // print(widget.formData['paymentMethodId']);
+                              // selectedPaymentMethod = selectedMethod.description;
+                            });
                           }
                         },
                         isDarkMode: isDarkMode,
@@ -143,21 +222,24 @@ class _ThirdPageState extends State<ThirdPage> {
                     : const SizedBox(height: 0),
                 _buildDropdownField(
                   label: 'Delivery Type',
-                  value: widget.formData['deliveryTypeId']?.toString(),
+                  value: widget.deliveryTypes[0].id?.toString(),
                   items: widget.deliveryTypes
                       .map((type) => DropdownMenuItem(
-                            value: type.type?.toString(),
+                            value: type.id?.toString(),
                             child: Text(type.type ?? ''),
                           ))
                       .toList(),
                   onChanged: (value) {
+                    print(value);
                     if (value != null) {
-                      final selectedType = widget.deliveryTypes.firstWhere(
-                        (type) => type.description?.toString() == value,
-                        orElse: () => DeliveryTypeModel(),
-                      );
-                      widget.formData['deliveryTypeId'] =
-                          selectedType.id; // Store the ID
+                      setState(() {
+                        widget.formData['deliveryTypeId'] =
+                            int.parse(value); // Store the ID
+                        // final selectedType = widget.deliveryTypes.firstWhere(
+                        //   (type) => type.description?.toString() == value,
+                        //   orElse: () => DeliveryTypeModel(),
+                        // );
+                      });
                     }
                   },
                   isDarkMode: isDarkMode,
@@ -166,21 +248,19 @@ class _ThirdPageState extends State<ThirdPage> {
                 const SizedBox(height: 24),
                 _buildDropdownField(
                   label: 'Transport Mode',
-                  value: widget.formData['transportModeId']?.toString(),
+                  value: widget.transportModes[0].id?.toString(),
                   items: widget.transportModes
                       .map((mode) => DropdownMenuItem(
-                            value: mode.description?.toString(),
+                            value: mode.id?.toString(),
                             child: Text(mode.description ?? ''),
                           ))
                       .toList(),
                   onChanged: (value) {
                     if (value != null) {
-                      final selectedMode = widget.transportModes.firstWhere(
-                        (mode) => mode.description?.toString() == value,
-                        orElse: () => TransportModeModel(),
-                      );
-                      widget.formData['transportModeId'] =
-                          selectedMode.id; // Store the ID
+                      setState(() {
+                        widget.formData['transportModeId'] =
+                            int.parse(value); // Store the ID
+                      });
                     }
                   },
                   isDarkMode: isDarkMode,
@@ -238,8 +318,9 @@ class _ThirdPageState extends State<ThirdPage> {
                       _buildTextField(
                         label: 'Credit Account',
                         value: widget.formData['creditAccount'] ?? '',
-                        onChanged: (value) =>
-                            widget.formData['creditAccount'] = value,
+                        onChanged: (value) => setState(() {
+                          widget.formData['creditAccount'] = value;
+                        }),
                         isDarkMode: isDarkMode,
                         hintText: 'Type something...',
                         icon: Icons.credit_card,
@@ -294,7 +375,16 @@ class _ThirdPageState extends State<ThirdPage> {
               const SizedBox(width: 24),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: widget.onSubmit,
+                  onPressed: (widget.formData['paymentModeId'] == null ||
+                          widget.formData['paymentModeId'] == '' ||
+                          // widget.formData['deliveryTypeId'] == null ||
+                          widget.formData['deliveryTypeId'] == '' ||
+                          widget.formData['transportModeId'] == null ||
+                          widget.formData['transportModeId'] == '')
+                      ? null
+                      :
+                      // print(widget.quantity['quantity']);
+                      widget.onSubmit,
                   icon: const Icon(Icons.check_circle),
                   label: const Text('Submit'),
                   style: ElevatedButton.styleFrom(
@@ -395,10 +485,10 @@ class _ThirdPageState extends State<ThirdPage> {
     IconData? icon,
   }) {
     // Ensure value is null if it's empty or not in the valid items list
-    final validValue =
-        value?.isNotEmpty == true && items.any((item) => item.value == value)
-            ? value
-            : null;
+    // final validValue =
+    //     value?.isNotEmpty == true && items.any((item) => item.value == value)
+    //         ? value
+    //         : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,7 +503,7 @@ class _ThirdPageState extends State<ThirdPage> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: validValue, // Use validated value
+          // value: validValue, // Use validated value
           items: items,
           onChanged: onChanged,
           style: TextStyle(

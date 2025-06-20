@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
 
-class SecondPage extends StatelessWidget {
+class SecondPage extends StatefulWidget {
   final Map<String, dynamic> formData;
   final VoidCallback onNext;
   final VoidCallback onPrevious;
@@ -19,6 +19,19 @@ class SecondPage extends StatelessWidget {
     required this.serviceModes,
     required this.shipmentTypes,
   });
+
+  @override
+  State<SecondPage> createState() => _SecondPageState();
+}
+
+class _SecondPageState extends State<SecondPage> {
+  String? selectedUnit;
+
+  @override
+  void initState() {
+    super.initState();
+    // selectedUnit = widget.formData['unit'] as String?;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +57,9 @@ class SecondPage extends StatelessWidget {
               Expanded(
                 child: _buildTextField(
                   label: 'Quantity',
-                  value: formData['quantity']?.toString() ?? '',
+                  value: widget.formData['quantity']?.toString() ?? '',
                   onChanged: (value) =>
-                      formData['quantity'] = int.tryParse(value) ?? 0,
+                      widget.formData['quantity'] = int.tryParse(value) ?? 0,
                   isDarkMode: isDarkMode,
                   keyboardType: TextInputType.number,
                 ),
@@ -55,8 +68,13 @@ class SecondPage extends StatelessWidget {
               Expanded(
                 child: _buildUnitDropdown(
                   label: 'Unit',
-                  value: formData['unit'] as String?,
-                  onChanged: (value) => formData['unit'] = value,
+                  value: selectedUnit,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedUnit = value;
+                      widget.formData['unit'] = value;
+                    });
+                  },
                   isDarkMode: isDarkMode,
                 ),
               ),
@@ -68,9 +86,10 @@ class SecondPage extends StatelessWidget {
               Expanded(
                 child: _buildTextField(
                   label: 'Number of Pieces',
-                  value: formData['numPcs']?.toString() ?? '',
-                  onChanged: (value) =>
-                      formData['numPcs'] = int.tryParse(value) ?? 0,
+                  value: widget.formData['numPcs']?.toString() ?? '',
+                  onChanged: (value) => setState(() {
+                    widget.formData['numPcs'] = int.tryParse(value) ?? 0;
+                  }),
                   isDarkMode: isDarkMode,
                   keyboardType: TextInputType.number,
                 ),
@@ -79,9 +98,10 @@ class SecondPage extends StatelessWidget {
               Expanded(
                 child: _buildTextField(
                   label: 'Number of Boxes',
-                  value: formData['numBoxes']?.toString() ?? '',
-                  onChanged: (value) =>
-                      formData['numBoxes'] = int.tryParse(value) ?? 0,
+                  value: widget.formData['numBoxes']?.toString() ?? '',
+                  onChanged: (value) => setState(() {
+                    widget.formData['numBoxes'] = int.tryParse(value) ?? 0;
+                  }),
                   isDarkMode: isDarkMode,
                   keyboardType: TextInputType.number,
                 ),
@@ -91,8 +111,10 @@ class SecondPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildTextField(
             label: 'Description',
-            value: formData['shipmentDescription'] ?? '',
-            onChanged: (value) => formData['shipmentDescription'] = value,
+            value: widget.formData['shipmentDescription'] ?? '',
+            onChanged: (value) => setState(() {
+              widget.formData['shipmentDescription'] = value;
+            }),
             isDarkMode: isDarkMode,
             maxLines: 3,
           ),
@@ -100,7 +122,7 @@ class SecondPage extends StatelessWidget {
           _buildDropdownField(
             label: 'Service Mode',
             value: null,
-            items: serviceModes
+            items: widget.serviceModes
                 .map((mode) => DropdownMenuItem<String>(
                       value: mode.id?.toString(),
                       child: Text(mode.description ?? ''),
@@ -108,12 +130,14 @@ class SecondPage extends StatelessWidget {
                 .toList(),
             onChanged: (value) {
               if (value != null) {
-                final selectedMode = serviceModes.firstWhere(
-                  (mode) => mode.id?.toString() == value,
-                  orElse: () => ServiceModeModel(),
-                );
-                formData['serviceModeId'] = selectedMode.id;
-                // formData['serviceModeObject'] = selectedMode;
+                setState(() {
+                  final selectedMode = widget.serviceModes.firstWhere(
+                    (mode) => mode.id?.toString() == value,
+                    orElse: () => ServiceModeModel(),
+                  );
+                  widget.formData['serviceModeId'] = selectedMode.id;
+                  // widget.formData['serviceModeObject'] = selectedMode;
+                });
               }
             },
             isDarkMode: isDarkMode,
@@ -122,7 +146,7 @@ class SecondPage extends StatelessWidget {
           _buildDropdownField(
             label: 'Shipment Type',
             value: null,
-            items: shipmentTypes
+            items: widget.shipmentTypes
                 .map((mode) => DropdownMenuItem<String>(
                       value: mode.id?.toString(),
                       child: Text(mode.description ?? ''),
@@ -130,7 +154,9 @@ class SecondPage extends StatelessWidget {
                 .toList(),
             onChanged: (value) {
               if (value != null) {
-                formData['shipmentTypeId'] = value;
+                setState(() {
+                  widget.formData['shipmentTypeId'] = int.parse(value);
+                });
               }
             },
             isDarkMode: isDarkMode,
@@ -140,7 +166,7 @@ class SecondPage extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: onPrevious,
+                  onPressed: widget.onPrevious,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         isDarkMode ? Colors.grey[800] : Colors.grey[200],
@@ -162,7 +188,22 @@ class SecondPage extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: onNext,
+                  onPressed: (widget.formData['quantity'] == null ||
+                          widget.formData['quantity'] == 0 ||
+                          widget.formData['unit'] == null ||
+                          widget.formData['unit'] == '' ||
+                          // widget.formData['numPcs'] == null ||
+                          // widget.formData['numPcs'] == 0 ||
+                          // widget.formData['numBoxes'] == null ||
+                          // widget.formData['numBoxes'] == 0 ||
+                          widget.formData['serviceModeId'] == null ||
+                          widget.formData['serviceModeId'] == 1 ||
+                          widget.formData['shipmentTypeId'] == null ||
+                          widget.formData['shipmentTypeId'] == 1 ||
+                          widget.formData['shipmentDescription'] == null ||
+                          widget.formData['shipmentDescription'] == '')
+                      ? null
+                      : widget.onNext,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDarkMode
                         ? const Color(0xFFFF5A00)
@@ -313,10 +354,7 @@ class SecondPage extends StatelessWidget {
     required Function(String?) onChanged,
     required bool isDarkMode,
   }) {
-    const units = ['KG', 'Box', 'Piece'];
-    // Ensure value is null if it's empty or not in the list
-    final validValue =
-        (value?.isNotEmpty == true && units.contains(value)) ? value : null;
+    const units = ['Kg', 'CBM'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +379,7 @@ class SecondPage extends StatelessWidget {
             child: ButtonTheme(
               alignedDropdown: true,
               child: DropdownButton<String>(
-                value: validValue, // Use validated value
+                value: value,
                 isExpanded: true,
                 dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
                 style: TextStyle(
@@ -355,7 +393,6 @@ class SecondPage extends StatelessWidget {
                   ),
                 ),
                 items: units.map((String unit) {
-                  // Use const list
                   return DropdownMenuItem<String>(
                     value: unit,
                     child: Text(unit),

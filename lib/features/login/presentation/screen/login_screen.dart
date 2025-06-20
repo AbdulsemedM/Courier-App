@@ -2,6 +2,7 @@
 // import 'package:courier_app/app/utils/app_colors.dart';
 // import 'package:courier_app/app/utils/app_themes.dart';
 import 'package:courier_app/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:courier_app/features/forgot_password/presentation/screen/forgot_pass_screen.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -172,7 +173,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: BoxDecoration(
                                   color: isDarkMode
                                       ? Colors.white.withOpacity(0.1)
-                                      : const Color(0xFF5b3895).withOpacity(0.1),
+                                      : const Color(0xFF5b3895)
+                                          .withOpacity(0.1),
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
@@ -313,7 +315,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       borderSide: BorderSide(
                                         color: isDarkMode
                                             ? const Color(0xFF5b3895)
-                                            : const Color.fromARGB(255, 75, 23, 160),
+                                            : const Color.fromARGB(
+                                                255, 75, 23, 160),
                                         width: 2,
                                       ),
                                     ),
@@ -423,6 +426,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ? null
                                         : () {
                                             // Handle forgot password
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ForgotPasswordScreen(),
+                                              ),
+                                            );
                                           },
                                     style: TextButton.styleFrom(
                                       foregroundColor: isDarkMode

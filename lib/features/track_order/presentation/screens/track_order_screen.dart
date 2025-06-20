@@ -253,7 +253,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
   List<ShipmentModel> _filterShipments(List<ShipmentModel> shipments) {
     if (selectedStatus == null) return shipments;
     return shipments
-        .where((shipment) => shipment.shipmentStatus.code == selectedStatus)
+        .where((shipment) => shipment.shipmentStatus?.code == selectedStatus)
         .toList();
   }
 

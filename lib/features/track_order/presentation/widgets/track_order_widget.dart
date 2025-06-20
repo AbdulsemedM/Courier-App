@@ -132,7 +132,7 @@ class TrackOrderWidgets {
                             ),
                           ),
                         buildStatusChip(
-                          shipment.shipmentStatus.code,
+                          shipment.shipmentStatus?.code ?? '',
                           isDarkMode,
                         ),
                       ],
@@ -141,14 +141,14 @@ class TrackOrderWidgets {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'From: ${shipment.senderBranch.name}',
+                  'From: ${shipment.senderBranch?.name}',
                   style: TextStyle(
                     color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'To: ${shipment.receiverBranch.name}',
+                  'To: ${shipment.receiverBranch?.name}',
                   style: TextStyle(
                     color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   ),
@@ -164,7 +164,7 @@ class TrackOrderWidgets {
                       ),
                     ),
                     Text(
-                      'Fee: ${shipment.netFee} ${shipment.senderBranch.currency.code}',
+                      'Fee: ${shipment.netFee} ${shipment.senderBranch?.currency?.code}',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
@@ -172,13 +172,13 @@ class TrackOrderWidgets {
                     ),
                   ],
                 ),
-                if (shipment.extraFee > 0) ...[
+                if (shipment.extraFee != null && shipment.extraFee! > 0) ...[
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        'Extra: ${shipment.extraFee} ${shipment.senderBranch.currency.code}',
+                        'Extra: ${shipment.extraFee} ${shipment.senderBranch?.currency?.code}',
                         style: TextStyle(
                           fontSize: 12,
                           color: isDarkMode
@@ -356,21 +356,21 @@ class ShipmentCard extends StatelessWidget {
                       ),
                     ),
                     TrackOrderWidgets.buildStatusChip(
-                      shipment.shipmentStatus.code,
+                      shipment.shipmentStatus?.code ?? '',
                       isDarkMode,
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'From: ${shipment.senderBranch.name}',
+                  'From: ${shipment.senderBranch?.name}',
                   style: TextStyle(
                     color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'To: ${shipment.receiverBranch.name}',
+                  'To: ${shipment.receiverBranch?.name}',
                   style: TextStyle(
                     color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   ),
@@ -386,7 +386,7 @@ class ShipmentCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Fee: ${shipment.netFee} ${shipment.senderBranch.currency.code}',
+                      'Fee: ${shipment.netFee} ${shipment.senderBranch?.currency?.code}',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
