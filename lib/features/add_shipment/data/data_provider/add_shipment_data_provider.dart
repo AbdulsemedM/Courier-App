@@ -119,4 +119,20 @@ class AddShipmentDataProvider {
       throw e.toString();
     }
   }
+
+  Future<String> initiatePayment(
+      String awb, String paymentMethod, int addedBy) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response =
+          await apiProvider.postRequest("/api/v1/payment/initiate", {
+        "awb": awb,
+        "paymentMethod": paymentMethod,
+        "addedBy": addedBy,
+      });
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }

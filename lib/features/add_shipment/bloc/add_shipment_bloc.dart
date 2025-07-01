@@ -30,6 +30,7 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
     on<FetchCustomerByPhone>(_fetchCustomerByPhone);
     on<FetchSenderByPhone>(_fetchSenderByPhone);
     on<FetchEstimatedRate>(_fetchEstimatedRate);
+    on<InitiatePaymentEvent>(_initiatePayment);
   }
 
   // Helper method to handle retries
@@ -194,6 +195,20 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
       emit(FetchEstimatedRateSuccess(estimatedRate: response));
     } catch (e) {
       emit(FetchEstimatedRateFailure(errorMessage: e.toString()));
+    }
+  }
+
+  void _initiatePayment(
+      InitiatePaymentEvent event, Emitter<AddShipmentState> emit) async {
+    emit(InitiatePaymentLoading());
+    try {
+      final response = await _retryOperation(
+          () => addShipmentRepository.initiatePayment(
+              event.awb, event.paymentMethod, event.addedBy),
+          'initiatePayment');
+      emit(InitiatePaymentSuccess(message: response));
+    } catch (e) {
+      emit(InitiatePaymentFailure(errorMessage: e.toString()));
     }
   }
 }

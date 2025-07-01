@@ -58,3 +58,14 @@ class FetchEstimatedRate extends AddShipmentEvent {
   final int destinationId;
   FetchEstimatedRate({required this.originId, required this.destinationId});
 }
+
+class InitiatePaymentEvent extends AddShipmentEvent {
+  final String awb;
+  final String paymentMethod;
+  final int addedBy;
+  InitiatePaymentEvent({
+    required this.awb,
+    required this.paymentMethod,
+    required this.addedBy,
+  });
+}

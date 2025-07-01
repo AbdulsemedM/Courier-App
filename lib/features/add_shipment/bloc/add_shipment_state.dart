@@ -158,3 +158,16 @@ final class FetchEstimatedRateFailure extends AddShipmentState {
 
   FetchEstimatedRateFailure({required this.errorMessage});
 }
+
+final class InitiatePaymentLoading extends AddShipmentState {}
+
+final class InitiatePaymentSuccess extends AddShipmentState {
+  final String message;
+
+  InitiatePaymentSuccess({required this.message});
+}
+
+final class InitiatePaymentFailure extends AddShipmentState {
+  final String errorMessage;
+  InitiatePaymentFailure({required this.errorMessage});
+}

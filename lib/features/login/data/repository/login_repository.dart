@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:courier_app/configuration/auth_service.dart';
+import 'package:courier_app/configuration/phone_number_manager.dart';
 import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -31,7 +32,10 @@ class LoginRepository {
       await authService.storeUserId(data['userId'].toString());
       Map<String, dynamic> decodedToken = JwtDecoder.decode(data['token']);
       await authService.storeBranch(decodedToken['user']['branch'].toString());
-
+      await authService.storeRoleId(decodedToken['user']['role']);
+      final permissions =
+          await loginDataProvider.getPermissions(decodedToken['user']['role']);
+      await PermissionManager().setPermission(permissions.permissions ?? []);
       return data['message'];
     } catch (e) {
       // Print and re-throw the exception for the message only

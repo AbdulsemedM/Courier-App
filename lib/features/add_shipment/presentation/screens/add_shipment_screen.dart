@@ -55,9 +55,9 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
     "numPcs": 0,
     "numBoxes": 0,
     // "rate": 0,
-    "rate": 50.75,
+    "rate": 0,
     "serviceModeId": null,
-    "extraFee": 300,
+    "extraFee": 0,
     "extraFeeDescription": "null",
   };
   final authService = AuthService();

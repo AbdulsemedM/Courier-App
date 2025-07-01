@@ -325,4 +325,20 @@ class AddShipmentRepository {
       rethrow;
     }
   }
+
+  Future<String> initiatePayment(
+      String awb, String paymentMethod, int addedBy) async {
+    try {
+      final response = await addShipmentDataProvider.initiatePayment(
+          awb, paymentMethod, addedBy);
+      final data = jsonDecode(response);
+      if (data['status'] != 200) {
+        throw data['message'];
+      }
+      return data['message'];
+    } catch (e) {
+      print('Error in initiatePayment: ${e.toString()}');
+      rethrow;
+    }
+  }
 }
