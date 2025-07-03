@@ -232,7 +232,7 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
   void _fetchShipmentDetails(
       FetchShipmentDetailsEvent event, Emitter<AddShipmentState> emit) async {
     try {
-      emit(AddShipmentLoading());
+      emit(FetchShipmentDetailsLoading());
       final details = await addShipmentRepository
           .fetchShipmentDetailsByTracking(event.trackingNumber);
       emit(ShipmentDetailsFetched(shipmentDetails: details));

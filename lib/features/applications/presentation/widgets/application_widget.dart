@@ -1,6 +1,7 @@
-import 'package:courier_app/features/add_shipment/presentation/screens/payment_screen.dart';
+// import 'package:courier_app/features/add_shipment/presentation/screens/payment_screen.dart';
 import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
+import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
 import 'package:courier_app/features/roles/presentation/screen/roles_screen.dart';
 // import 'package:courier_app/features/other_settings/presentation/screens/options_screen.dart';
 import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
@@ -163,11 +164,7 @@ final List<MenuOption> defaultMenuOptions = [
     subtitle: 'Pay shipment by AWB',
     icon: Icons.account_balance,
     color: Colors.blue,
-    screen: PaymentScreen(
-      formData: {},
-      trackingNumber: '',
-      paymentInfo: '',
-    ),
+    screen: PayByAwbScreen(),
   ),
   const MenuOption(
     title: 'Miles Configuration',
