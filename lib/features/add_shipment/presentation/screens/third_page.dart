@@ -43,7 +43,7 @@ class _ThirdPageState extends State<ThirdPage> {
     final paymentService = Provider.of<PaymentService>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    widget.formData['paymentMethodId'] = widget.paymentMethods[0].id;
+    // widget.formData['paymentMethodId'] = widget.paymentMethods[0].id;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
       child: Column(
@@ -197,6 +197,7 @@ class _ThirdPageState extends State<ThirdPage> {
                             .toList(),
                         onChanged: (value) {
                           if (value != null) {
+                            print(value);
                             setState(() {
                               widget.formData['paymentMethodId'] =
                                   int.parse(value); // Store the ID
@@ -207,7 +208,7 @@ class _ThirdPageState extends State<ThirdPage> {
                                       orElse: () => PaymentMethodModel());
                               paymentService
                                   .setPaymentMethod(selectedMethod.method!);
-                              // print(selectedMethod.method);
+                              print(selectedMethod.id);
                               // print(widget.formData['paymentMethodId']);
                               // selectedPaymentMethod = selectedMethod.description;
                             });

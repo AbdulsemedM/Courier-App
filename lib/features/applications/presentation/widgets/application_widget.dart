@@ -1,10 +1,11 @@
+import 'package:courier_app/features/add_shipment/presentation/screens/payment_screen.dart';
 import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
 import 'package:courier_app/features/roles/presentation/screen/roles_screen.dart';
 // import 'package:courier_app/features/other_settings/presentation/screens/options_screen.dart';
 import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
 import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
-import 'package:courier_app/features/track_shipment/presentation/screens/track_shipment_screen.dart';
+// import 'package:courier_app/features/track_shipment/presentation/screens/track_shipment_screen.dart';
 import 'package:flutter/material.dart';
 
 class ApplicationWidgets {
@@ -158,11 +159,15 @@ class MenuOption {
 
 final List<MenuOption> defaultMenuOptions = [
   const MenuOption(
-    title: 'Track Shipment',
-    subtitle: 'Track your packages',
-    icon: Icons.local_shipping,
+    title: 'Pay by AWB',
+    subtitle: 'Pay shipment by AWB',
+    icon: Icons.account_balance,
     color: Colors.blue,
-    screen: TrackShipmentScreen(),
+    screen: PaymentScreen(
+      formData: {},
+      trackingNumber: '',
+      paymentInfo: '',
+    ),
   ),
   const MenuOption(
     title: 'Miles Configuration',

@@ -6,6 +6,7 @@ import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:courier_app/features/add_shipment/model/customer_by_phone.dart';
 import 'package:courier_app/features/add_shipment/model/delivery_types_model.dart';
 import 'package:courier_app/features/add_shipment/model/estimated_rate_model.dart';
+import 'package:courier_app/features/add_shipment/model/payment_invoice_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_method_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_mode_model.dart';
 import 'package:courier_app/features/add_shipment/model/service_modes_model.dart';
@@ -339,6 +340,50 @@ class AddShipmentRepository {
     } catch (e) {
       print('Error in initiatePayment: ${e.toString()}');
       rethrow;
+    }
+  }
+
+  Future<String> checkPaymentStatus(String awb) async {
+    try {
+      final response = await addShipmentDataProvider.checkPaymentStatus(awb);
+
+      final data = jsonDecode(response);
+      if (data['message'] != "SUCCESS") {
+        throw data['message'];
+      }
+      return data['message'];
+    } catch (e) {
+      print('Error in checkPaymentStatus: ${e.toString()}');
+      rethrow;
+    }
+  }
+
+  Future<PaymentInvoiceModel> fetchShipmentDetails(String awb) async {
+    try {
+      final response = await addShipmentDataProvider.fetchShipmentDetails(awb);
+      final data = jsonDecode(response);
+      if (data['status'] != 200) {
+        throw data['message'];
+      }
+      return PaymentInvoiceModel.fromJson(data['data']);
+    } catch (e) {
+      print('Error in fetchShipmentDetails: ${e.toString()}');
+      rethrow;
+    }
+  }
+
+  Future<PaymentInvoiceModel> fetchShipmentDetailsByTracking(
+      String trackingNumber) async {
+    try {
+      final response = await addShipmentDataProvider
+          .fetchShipmentDetailsByTracking(trackingNumber);
+      final data = jsonDecode(response);
+      if (data['status'] != 200) {
+        throw data['message'];
+      }
+      return PaymentInvoiceModel.fromMap(data['data']);
+    } catch (e) {
+      throw Exception('Failed to fetch shipment details: ${e.toString()}');
     }
   }
 }

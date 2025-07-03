@@ -9,7 +9,8 @@ import 'package:courier_app/features/add_shipment/model/service_modes_model.dart
 import 'package:courier_app/features/add_shipment/model/shipment_type_model.dart';
 import 'package:courier_app/features/add_shipment/model/transport_mode_model.dart';
 import 'package:courier_app/features/add_shipment/presentation/screens/payment_screen.dart';
-import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
+import 'package:courier_app/features/add_shipment/presentation/screens/print_shipment_screen.dart';
+// import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -331,27 +332,37 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
               final paymentService =
                   Provider.of<PaymentService>(context, listen: false);
               String info = paymentService.paymentInfo;
-              if (info != "CASH ON DELIVERY") {
-                String method = paymentService.paymentMethod;
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PaymentScreen(
-                      formData: completeFormData,
-                      trackingNumber: state.trackingNumber,
-                      paymentInfo: method,
+
+              // Use Future.microtask to ensure navigation happens after the current frame
+              Future.microtask(() {
+                // Check if the widget is still mounted before navigating
+                if (!mounted) return;
+
+                if (info == "CASH") {
+                  String method = paymentService.paymentMethod;
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentScreen(
+                        formData: completeFormData,
+                        trackingNumber: state.trackingNumber,
+                        paymentInfo: method,
+                      ),
                     ),
-                  ),
-                );
-              } else {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ),
-                );
-              }
+                  );
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PrintShipmentScreen(
+                        trackingNumber: state.trackingNumber,
+                      ),
+                    ),
+                  );
+                }
+              });
             } else if (state is AddShipmentFailure) {
+              if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.errorMessage.toString())),
               );

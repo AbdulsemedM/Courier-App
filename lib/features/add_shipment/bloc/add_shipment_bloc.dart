@@ -3,13 +3,15 @@ import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:courier_app/features/add_shipment/model/customer_by_phone.dart';
 import 'package:courier_app/features/add_shipment/model/delivery_types_model.dart';
 import 'package:courier_app/features/add_shipment/model/estimated_rate_model.dart';
+import 'package:courier_app/features/add_shipment/model/payment_invoice_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_method_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_mode_model.dart';
 import 'package:courier_app/features/add_shipment/model/service_modes_model.dart';
 import 'package:courier_app/features/add_shipment/model/shipment_type_model.dart';
 import 'package:courier_app/features/add_shipment/model/transport_mode_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
+import 'package:equatable/equatable.dart';
 
 part 'add_shipment_event.dart';
 part 'add_shipment_state.dart';
@@ -31,6 +33,8 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
     on<FetchSenderByPhone>(_fetchSenderByPhone);
     on<FetchEstimatedRate>(_fetchEstimatedRate);
     on<InitiatePaymentEvent>(_initiatePayment);
+    on<CheckPaymentStatusEvent>(_checkPaymentStatus);
+    on<FetchShipmentDetailsEvent>(_fetchShipmentDetails);
   }
 
   // Helper method to handle retries
@@ -209,6 +213,31 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
       emit(InitiatePaymentSuccess(message: response));
     } catch (e) {
       emit(InitiatePaymentFailure(errorMessage: e.toString()));
+    }
+  }
+
+  void _checkPaymentStatus(
+      CheckPaymentStatusEvent event, Emitter<AddShipmentState> emit) async {
+    emit(CheckPaymentStatusLoading());
+    try {
+      final response = await _retryOperation(
+          () => addShipmentRepository.checkPaymentStatus(event.awb),
+          'checkPaymentStatus');
+      emit(CheckPaymentStatusSuccess(message: response));
+    } catch (e) {
+      emit(CheckPaymentStatusFailure(errorMessage: e.toString()));
+    }
+  }
+
+  void _fetchShipmentDetails(
+      FetchShipmentDetailsEvent event, Emitter<AddShipmentState> emit) async {
+    try {
+      emit(AddShipmentLoading());
+      final details = await addShipmentRepository
+          .fetchShipmentDetailsByTracking(event.trackingNumber);
+      emit(ShipmentDetailsFetched(shipmentDetails: details));
+    } catch (e) {
+      emit(ShipmentDetailsFetchError(error: e.toString()));
     }
   }
 }

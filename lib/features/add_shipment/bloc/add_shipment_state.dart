@@ -1,9 +1,31 @@
 part of 'add_shipment_bloc.dart';
 
-@immutable
-sealed class AddShipmentState {}
+abstract class AddShipmentState extends Equatable {
+  const AddShipmentState();
 
-final class AddShipmentInitial extends AddShipmentState {}
+  @override
+  List<Object> get props => [];
+}
+
+class AddShipmentInitial extends AddShipmentState {}
+
+class AddShipmentLoading extends AddShipmentState {}
+
+class ShipmentDetailsFetched extends AddShipmentState {
+  final PaymentInvoiceModel shipmentDetails;
+  const ShipmentDetailsFetched({required this.shipmentDetails});
+
+  @override
+  List<Object> get props => [shipmentDetails];
+}
+
+class ShipmentDetailsFetchError extends AddShipmentState {
+  final String error;
+  const ShipmentDetailsFetchError({required this.error});
+
+  @override
+  List<Object> get props => [error];
+}
 
 final class FetchBranchesLoading extends AddShipmentState {}
 
@@ -103,8 +125,6 @@ final class FetchTransportModesFailure extends AddShipmentState {
   FetchTransportModesFailure({required this.errorMessage});
 }
 
-final class AddShipmentLoading extends AddShipmentState {}
-
 final class AddShipmentSuccess extends AddShipmentState {
   final String trackingNumber;
 
@@ -170,4 +190,32 @@ final class InitiatePaymentSuccess extends AddShipmentState {
 final class InitiatePaymentFailure extends AddShipmentState {
   final String errorMessage;
   InitiatePaymentFailure({required this.errorMessage});
+}
+
+final class CheckPaymentStatusLoading extends AddShipmentState {}
+
+final class CheckPaymentStatusSuccess extends AddShipmentState {
+  final String message;
+
+  CheckPaymentStatusSuccess({required this.message});
+}
+
+final class CheckPaymentStatusFailure extends AddShipmentState {
+  final String errorMessage;
+
+  CheckPaymentStatusFailure({required this.errorMessage});
+}
+
+final class FetchShipmentDetailsLoading extends AddShipmentState {}
+
+final class FetchShipmentDetailsSuccess extends AddShipmentState {
+  final PaymentInvoiceModel shipmentDetails;
+
+  FetchShipmentDetailsSuccess({required this.shipmentDetails});
+}
+
+final class FetchShipmentDetailsFailure extends AddShipmentState {
+  final String errorMessage;
+
+  FetchShipmentDetailsFailure({required this.errorMessage});
 }

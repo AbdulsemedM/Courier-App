@@ -1,5 +1,7 @@
 import 'package:courier_app/configuration/api_constants.dart';
 import 'package:courier_app/providers/provider_setup.dart';
+// import 'package:http/http.dart' as http;
+// import 'dart:convert';
 
 class AddShipmentDataProvider {
   Future<String> fetchBranches() async {
@@ -133,6 +135,44 @@ class AddShipmentDataProvider {
       return response.body;
     } catch (e) {
       throw e.toString();
+    }
+  }
+
+  Future<String> checkPaymentStatus(String awb) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider
+          .getRequest("/api/v1/payment/status", params: {"awb": awb});
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<String> fetchShipmentDetails(String awb) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider
+          .getRequest("/api/v1/shipment-invoice", params: {"awb": awb});
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<String> fetchShipmentDetailsByTracking(String trackingNumber) async {
+    try {
+      // final response = await http.get(
+      //   Uri.parse(
+      //       '${ApiEndpoints.baseUrl}${ApiEndpoints.shipmentDetails(trackingNumber)}'),
+      //   headers: await ApiEndpoints.getHeaders(),
+      // );
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider.getRequest("/api/v1/shipment-invoice",
+          params: {"awb": trackingNumber});
+      return response.body;
+    } catch (e) {
+      throw Exception('Failed to fetch shipment details: ${e.toString()}');
     }
   }
 }
