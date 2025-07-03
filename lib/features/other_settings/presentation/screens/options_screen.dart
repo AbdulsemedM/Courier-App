@@ -1,3 +1,5 @@
+import 'package:courier_app/app/utils/dialog_utils.dart';
+import 'package:courier_app/configuration/phone_number_manager.dart';
 import 'package:courier_app/features/branches/presentation/screen/branches_screen.dart';
 import 'package:courier_app/features/countries/presentation/screen/countries_screen.dart';
 import 'package:courier_app/features/currency/presentation/screen/currency_screen.dart';
@@ -13,8 +15,30 @@ import 'package:courier_app/features/transport_modes/presentation/screen/transpo
 import 'package:flutter/material.dart';
 import '../widgets/options_widget.dart';
 
-class OptionsScreen extends StatelessWidget {
+class OptionsScreen extends StatefulWidget {
   const OptionsScreen({super.key});
+
+  @override
+  State<OptionsScreen> createState() => _OptionsScreenState();
+}
+
+class _OptionsScreenState extends State<OptionsScreen> {
+  List<String> permissions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPermissions();
+  }
+
+  void fetchPermissions() async {
+    final permissions = await PermissionManager().getPermission();
+    if (permissions != null) {
+      setState(() {
+        this.permissions = permissions;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +113,12 @@ class OptionsScreen extends StatelessWidget {
                             subtitle: 'Manage branches',
                             color: Colors.blue,
                             isDarkMode: isDarkMode,
-                            onTap: () => _handleOptionTap(context, 'Branches'),
+                            onTap: () => permissions.contains('manage_branches')
+                                ? _handleOptionTap(context, 'Branches')
+                                : displaySnack(
+                                    context,
+                                    'You do not have permission to manage branches',
+                                    Colors.red),
                           ),
                           OptionCard(
                             icon: Icons.public,
@@ -97,7 +126,13 @@ class OptionsScreen extends StatelessWidget {
                             subtitle: 'Manage locations',
                             color: Colors.green,
                             isDarkMode: isDarkMode,
-                            onTap: () => _handleOptionTap(context, 'Countries'),
+                            onTap: () => permissions
+                                    .contains('manage_countries')
+                                ? _handleOptionTap(context, 'Countries')
+                                : displaySnack(
+                                    context,
+                                    'You do not have permission to manage countries',
+                                    Colors.red),
                           ),
                           OptionCard(
                             icon: Icons.payment,
@@ -105,8 +140,13 @@ class OptionsScreen extends StatelessWidget {
                             subtitle: 'Configure options',
                             color: Colors.orange,
                             isDarkMode: isDarkMode,
-                            onTap: () =>
-                                _handleOptionTap(context, 'Payment methods'),
+                            onTap: () => permissions
+                                    .contains('manage_payment_methods')
+                                ? _handleOptionTap(context, 'Payment methods')
+                                : displaySnack(
+                                    context,
+                                    'You do not have permission to manage payment methods',
+                                    Colors.red),
                           ),
                           OptionCard(
                             icon: Icons.local_shipping_outlined,
@@ -114,8 +154,13 @@ class OptionsScreen extends StatelessWidget {
                             subtitle: 'Manage types',
                             color: Colors.purple,
                             isDarkMode: isDarkMode,
-                            onTap: () =>
-                                _handleOptionTap(context, 'Shipment types'),
+                            onTap: () => permissions
+                                    .contains('manage_shipment_types')
+                                ? _handleOptionTap(context, 'Shipment types')
+                                : displaySnack(
+                                    context,
+                                    'You do not have permission to manage shipment types',
+                                    Colors.red),
                           ),
                           OptionCard(
                             icon: Icons.miscellaneous_services_outlined,
@@ -123,8 +168,12 @@ class OptionsScreen extends StatelessWidget {
                             subtitle: 'Configure services',
                             color: Colors.teal,
                             isDarkMode: isDarkMode,
-                            onTap: () =>
-                                _handleOptionTap(context, 'Services modes'),
+                            onTap: () => permissions.contains('Services_modes')
+                                ? _handleOptionTap(context, 'Services modes')
+                                : displaySnack(
+                                    context,
+                                    'You do not have permission to manage services modes',
+                                    Colors.red),
                           ),
                           OptionCard(
                             icon: Icons.currency_exchange,
@@ -132,7 +181,13 @@ class OptionsScreen extends StatelessWidget {
                             subtitle: 'Set currency options',
                             color: Colors.indigo,
                             isDarkMode: isDarkMode,
-                            onTap: () => _handleOptionTap(context, 'Currency'),
+                            onTap: () => permissions
+                                    .contains('manage_currencies')
+                                ? _handleOptionTap(context, 'Currency')
+                                : displaySnack(
+                                    context,
+                                    'You do not have permission to manage currency',
+                                    Colors.red),
                           ),
                         ],
                       ),
@@ -155,8 +210,13 @@ class OptionsScreen extends StatelessWidget {
                         subtitle: 'Configure transportation options',
                         color: Colors.amber,
                         isDarkMode: isDarkMode,
-                        onTap: () =>
-                            _handleOptionTap(context, 'Transport modes'),
+                        onTap: () => permissions
+                                .contains('manage_transport_modes')
+                            ? _handleOptionTap(context, 'Transport modes')
+                            : displaySnack(
+                                context,
+                                'You do not have permission to manage transport modes',
+                                Colors.red),
                       ),
                       ListOptionCard(
                         icon: Icons.currency_exchange,
@@ -164,8 +224,13 @@ class OptionsScreen extends StatelessWidget {
                         subtitle: 'Configure exchange rates',
                         color: Colors.deepPurpleAccent,
                         isDarkMode: isDarkMode,
-                        onTap: () =>
-                            _handleOptionTap(context, 'Exchange rates'),
+                        onTap: () => permissions
+                                .contains('manage_exchange_rates')
+                            ? _handleOptionTap(context, 'Exchange rates')
+                            : displaySnack(
+                                context,
+                                'You do not have permission to manage exchange rates',
+                                Colors.red),
                       ),
                       ListOptionCard(
                         icon: Icons.people_outline,
@@ -173,8 +238,12 @@ class OptionsScreen extends StatelessWidget {
                         subtitle: 'Manage accounts',
                         color: Colors.deepOrange,
                         isDarkMode: isDarkMode,
-                        onTap: () =>
-                            _handleOptionTap(context, 'Account management'),
+                        onTap: () => permissions.contains('manage_accounting')
+                            ? _handleOptionTap(context, 'Account management')
+                            : displaySnack(
+                                context,
+                                'You do not have permission to manage accounts',
+                                Colors.red),
                       ),
                       ListOptionCard(
                         icon: Icons.people_outline,
@@ -182,8 +251,12 @@ class OptionsScreen extends StatelessWidget {
                         subtitle: 'Manage user access and permissions',
                         color: Colors.cyan,
                         isDarkMode: isDarkMode,
-                        onTap: () =>
-                            _handleOptionTap(context, 'User management'),
+                        onTap: () => permissions.contains('manage_users')
+                            ? _handleOptionTap(context, 'User management')
+                            : displaySnack(
+                                context,
+                                'You do not have permission to manage users',
+                                Colors.red),
                       ),
                     ],
                   ),
@@ -262,7 +335,7 @@ class OptionsScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isDarkMode
                         ? const Color(0xFF5b3895)
-                        : const Color(0xFF5b3895),
+                        : const Color.fromARGB(255, 75, 23, 160),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -301,9 +374,18 @@ class OptionsScreen extends StatelessWidget {
                           colors: [Colors.blue, Colors.blueAccent],
                         ),
                         onTap: () {
-                          Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const ManageUserScreen()));
+                          if (permissions.contains('manag_users')) {
+                            Navigator.pop(context);
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    const ManageUserScreen()));
+                          } else {
+                            Navigator.pop(context);
+                            displaySnack(
+                                context,
+                                'You do not have permission to manage users',
+                                Colors.red);
+                          }
                           // Navigate to user management screen
                         },
                       ),
@@ -317,10 +399,18 @@ class OptionsScreen extends StatelessWidget {
                           colors: [Colors.purple, Colors.purpleAccent],
                         ),
                         onTap: () {
-                          Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  const ManageCustomersScreen()));
+                          if (permissions.contains('manage_customers')) {
+                            Navigator.pop(context);
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    const ManageCustomersScreen()));
+                          } else {
+                            Navigator.pop(context);
+                            displaySnack(
+                                context,
+                                'You do not have permission to manage customers',
+                                Colors.red);
+                          }
                           // Navigate to customer management screen
                         },
                       ),
@@ -334,9 +424,18 @@ class OptionsScreen extends StatelessWidget {
                           colors: [Colors.orange, Colors.deepOrange],
                         ),
                         onTap: () {
-                          Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const ManageAgentScreen()));
+                          if (permissions.contains('manage_agents')) {
+                            Navigator.pop(context);
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    const ManageAgentScreen()));
+                          } else {
+                            Navigator.pop(context);
+                            displaySnack(
+                                context,
+                                'You do not have permission to manage agents',
+                                Colors.red);
+                          }
                           // Navigate to agent management screen
                         },
                       ),

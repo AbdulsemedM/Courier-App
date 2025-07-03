@@ -3,36 +3,99 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+class Permission {
+  final int id;
+  final String name;
+  final String description;
+
+  Permission({
+    required this.id,
+    required this.name,
+    required this.description,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+    };
+  }
+
+  factory Permission.fromMap(Map<String, dynamic> map) {
+    return Permission(
+      id: map['id'] as int,
+      name: map['name'] as String,
+      description: map['description'] as String,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Permission.fromJson(String source) =>
+      Permission.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() =>
+      'Permission(id: $id, name: $name, description: $description)';
+
+  @override
+  bool operator ==(covariant Permission other) {
+    if (identical(this, other)) return true;
+
+    return other.id == id &&
+        other.name == name &&
+        other.description == description;
+  }
+
+  @override
+  int get hashCode => id.hashCode ^ name.hashCode ^ description.hashCode;
+}
+
 class Permissions {
+  final int? roleId;
   final String? roleName;
-  final List<String>? permissions;
+  final String? roleDescription;
+  final List<Permission>? permissions;
+
   Permissions({
+    this.roleId,
     this.roleName,
+    this.roleDescription,
     this.permissions,
   });
 
   Permissions copyWith({
+    int? roleId,
     String? roleName,
-    List<String>? permissions,
+    String? roleDescription,
+    List<Permission>? permissions,
   }) {
     return Permissions(
+      roleId: roleId ?? this.roleId,
       roleName: roleName ?? this.roleName,
+      roleDescription: roleDescription ?? this.roleDescription,
       permissions: permissions ?? this.permissions,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
+    return {
+      'roleId': roleId,
       'roleName': roleName,
-      'permissions': permissions,
+      'roleDescription': roleDescription,
+      'permissions': permissions?.map((x) => x.toMap()).toList(),
     };
   }
 
   factory Permissions.fromMap(Map<String, dynamic> map) {
     return Permissions(
-      roleName: map['roleName'] != null ? map['roleName'] as String : null,
+      roleId: map['roleId'] as int?,
+      roleName: map['roleName'] as String?,
+      roleDescription: map['roleDescription'] as String?,
       permissions: map['permissions'] != null
-          ? List<String>.from((map['permissions']['name'] as List<String>))
+          ? List<Permission>.from(
+              (map['permissions'] as List).map((x) => Permission.fromMap(x)))
           : null,
     );
   }
@@ -43,18 +106,25 @@ class Permissions {
       Permissions.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() =>
-      'Permissions(roleName: $roleName, permissions: $permissions)';
+  String toString() {
+    return 'Permissions(roleId: $roleId, roleName: $roleName, roleDescription: $roleDescription, permissions: $permissions)';
+  }
 
   @override
   bool operator ==(covariant Permissions other) {
     if (identical(this, other)) return true;
 
-    return other.roleName == roleName &&
+    return other.roleId == roleId &&
+        other.roleName == roleName &&
+        other.roleDescription == roleDescription &&
         listEquals(other.permissions, permissions);
   }
 
   @override
-  int get hashCode => roleName.hashCode ^ permissions.hashCode;
+  int get hashCode {
+    return roleId.hashCode ^
+        roleName.hashCode ^
+        roleDescription.hashCode ^
+        permissions.hashCode;
+  }
 }
-

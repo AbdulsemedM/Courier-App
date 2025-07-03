@@ -35,7 +35,8 @@ class LoginRepository {
       await authService.storeRoleId(decodedToken['user']['role']);
       final permissions =
           await loginDataProvider.getPermissions(decodedToken['user']['role']);
-      await PermissionManager().setPermission(permissions.permissions ?? []);
+      await PermissionManager().setPermission(
+          permissions.permissions?.map((e) => e.name).toList() ?? []);
       return data['message'];
     } catch (e) {
       // Print and re-throw the exception for the message only

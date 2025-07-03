@@ -201,11 +201,18 @@ final List<MenuOption> defaultMenuOptions = [
     color: Colors.teal,
     screen: ComingSoonScreen(),
   ),
-  // const MenuOption(
-  //   title: 'Other Settings',
-  //   subtitle: 'Get help',
-  //   icon: Icons.settings,
-  //   color: Colors.teal,
-  //   screen: OptionsScreen(),
-  // ),
+  const MenuOption(
+    title: 'Shelves Management',
+    subtitle: 'Manage shelves',
+    icon: Icons.help_outline,
+    color: Colors.teal,
+    screen: ComingSoonScreen(),
+  ),
+  const MenuOption(
+    title: 'Other Settings',
+    subtitle: 'Get help',
+    icon: Icons.settings,
+    color: Colors.teal,
+    screen: ComingSoonScreen(),
+  ),
 ];

@@ -1,3 +1,5 @@
+import 'package:courier_app/app/utils/dialog_utils.dart';
+import 'package:courier_app/configuration/phone_number_manager.dart';
 import 'package:courier_app/features/add_shipment/presentation/screens/add_shipment_screen.dart';
 import 'package:courier_app/features/barcode_reader/presentation/screen/barcode_reader_screen.dart';
 import 'package:courier_app/features/other_settings/presentation/screens/options_screen.dart';
@@ -16,6 +18,29 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<String> permissions = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchPermissions();
+    // final permissions = await PermissionManager().getPermission();
+    // if (permissions != null) {
+    //   for (var permission in permissions) {
+    //     print(permission);
+    //   }
+    // }
+  }
+
+  void fetchPermissions() async {
+    final permissions = await PermissionManager().getPermission();
+    if (permissions != null) {
+      setState(() {
+        this.permissions = permissions;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -181,10 +206,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.add_box_outlined,
                     label: 'Add Shipment',
                     description: 'Create new shipment',
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AddShipmentScreen())),
+                    onTap: () => permissions.contains('add_shipment')
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const AddShipmentScreen()))
+                        : displaySnack(
+                            context,
+                            'You do not have permission to add shipment',
+                            Colors.red),
                     isDarkMode: isDarkMode,
                   ),
                   HomeWidgets.buildEnhancedActionCard(
@@ -192,10 +223,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.track_changes,
                     label: 'Track Order',
                     description: 'Track status',
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const TrackShipmentScreen())),
+                    onTap: () => permissions.contains('Track_Shipment')
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const TrackShipmentScreen()))
+                        : displaySnack(
+                            context,
+                            'You do not have permission to track shipment',
+                            Colors.red),
                     isDarkMode: isDarkMode,
                   ),
                   HomeWidgets.buildEnhancedActionCard(
@@ -203,10 +240,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.barcode_reader,
                     label: 'Change Status',
                     description: 'Change status of shipment',
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const BarcodeReaderScreen())),
+                    onTap: () => permissions.contains('Change_Shipment_Status')
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const BarcodeReaderScreen()))
+                        : displaySnack(
+                            context,
+                            'You do not have permission to change status',
+                            Colors.red),
                     isDarkMode: isDarkMode,
                   ),
                   // HomeWidgets.buildEnhancedActionCard(
