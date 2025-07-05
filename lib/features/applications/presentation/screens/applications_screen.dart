@@ -43,6 +43,11 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
         context,
         MaterialPageRoute(builder: (context) => screen),
       );
+    } else if (screen is ComingSoonScreen) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => screen),
+      );
     } else {
       displaySnack(context, errorMessage, Colors.red);
     }
