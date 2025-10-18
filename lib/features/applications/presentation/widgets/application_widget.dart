@@ -3,6 +3,7 @@ import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
 import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
 import 'package:courier_app/features/roles/presentation/screen/roles_screen.dart';
+import 'package:courier_app/features/shelves_management/presentation/screen/shelves_screen.dart';
 // import 'package:courier_app/features/other_settings/presentation/screens/options_screen.dart';
 import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
 import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
@@ -206,7 +207,7 @@ final List<MenuOption> defaultMenuOptions = [
     subtitle: 'Manage shelves',
     icon: Icons.help_outline,
     color: Colors.teal,
-    screen: ComingSoonScreen(),
+    screen: ShelvesScreen(),
   ),
   const MenuOption(
     title: 'Other Settings',

@@ -6,3 +6,5 @@ sealed class ShelvesManagementEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class FetchShelvesEvent extends ShelvesManagementEvent {}

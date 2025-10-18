@@ -24,6 +24,7 @@ class LoginDataProvider {
       final json = jsonDecode(response.body);
       return Permissions.fromMap(json['data']);
     } catch (e) {
+      print(e.toString());
       throw e.toString();
     }
   }

@@ -4,14 +4,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 class Permission {
-  final int id;
-  final String name;
-  final String description;
+  final int? id;
+  final String? name;
+  final String? description;
 
   Permission({
-    required this.id,
-    required this.name,
-    required this.description,
+    this.id,
+    this.name,
+    this.description,
   });
 
   Map<String, dynamic> toMap() {
@@ -24,11 +24,11 @@ class Permission {
 
   factory Permission.fromMap(Map<String, dynamic> map) {
     return Permission(
-      id: map['id'] as int,
-      name: map['name'] as String,
-      description: map['description'] as String,
+      id: map['id'] as int?,
+      name: map['name'] as String?,
+      description: map['description'] as String?,
     );
-  }
+  } 
 
   String toJson() => json.encode(toMap());
 

@@ -5,6 +5,7 @@ import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
 import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
 import 'package:courier_app/features/roles/presentation/screen/roles_screen.dart';
+import 'package:courier_app/features/shelves_management/presentation/screen/shelves_screen.dart';
 import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
 import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
 import 'package:flutter/material.dart';
@@ -101,6 +102,9 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
           } else if (screen is ComingSoonScreen) {
             permission = 'manage_extra_fee';
             errorMessage = 'You do not have permission to manage extra fees';
+          } else if (screen is ShelvesScreen) {
+            permission = 'Shelves_management';
+            errorMessage = 'You do not have permission to manage shelves';
           }
 
           _handleOptionSelected(context, screen, permission, errorMessage);
