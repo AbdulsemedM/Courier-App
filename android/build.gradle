@@ -18,7 +18,7 @@ tasks.register("clean", Delete) {
 }
 
 buildscript {
-    ext.kotlin_version = '1.7.10'  // or newer
+    ext.kotlin_version = '1.8.22'  // or newer
     repositories {
         google()
         mavenCentral()

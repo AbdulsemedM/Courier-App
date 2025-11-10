@@ -101,7 +101,11 @@ class UserModel {
       password: json['password'] as String?,
       isPasswordChanged: json['isPasswordChanged'] as bool?,
       branch: json['branch'] != null
-          ? BranchModel.fromJson(json['branch'] as Map<String, dynamic>)
+          ? (json['branch'] is Map<String, dynamic>
+              ? BranchModel.fromJson(json['branch'] as Map<String, dynamic>)
+              : (json['branch'] is int
+                  ? BranchModel.fromJson({'id': json['branch']})
+                  : null))
           : null,
       status: json['status'] as int?,
       serviceMode: json['serviceMode'] != null

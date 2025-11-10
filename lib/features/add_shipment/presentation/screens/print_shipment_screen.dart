@@ -23,9 +23,17 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<AddShipmentBloc>().add(
-          FetchShipmentDetailsEvent(trackingNumber: widget.trackingNumber),
-        );
+    print(
+        '[PrintShipmentScreen] initState called with trackingNumber: ${widget.trackingNumber}');
+    try {
+      context.read<AddShipmentBloc>().add(
+            FetchShipmentDetailsEvent(trackingNumber: widget.trackingNumber),
+          );
+      print('[PrintShipmentScreen] FetchShipmentDetailsEvent dispatched');
+    } catch (e) {
+      print('[PrintShipmentScreen] Error in initState: ${e.toString()}');
+      print('[PrintShipmentScreen] Error stack trace: ${StackTrace.current}');
+    }
   }
 
   @override
@@ -36,22 +44,46 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
       ),
       body: BlocConsumer<AddShipmentBloc, AddShipmentState>(
         listener: (context, state) {
+          print(
+              '[PrintShipmentScreen] BlocConsumer listener - state: ${state.runtimeType}');
           if (state is ShipmentDetailsFetched) {
-            setState(() {
-              shipmentData = state.shipmentDetails.toMap();
-            });
+            print('[PrintShipmentScreen] ShipmentDetailsFetched received');
+            try {
+              setState(() {
+                shipmentData = state.shipmentDetails.toMap();
+              });
+              print('[PrintShipmentScreen] shipmentData set: $shipmentData');
+            } catch (e) {
+              print(
+                  '[PrintShipmentScreen] Error setting shipmentData: ${e.toString()}');
+              print(
+                  '[PrintShipmentScreen] Error stack trace: ${StackTrace.current}');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(
+                        'Error displaying shipment details: ${e.toString()}')),
+              );
+            }
           } else if (state is ShipmentDetailsFetchError) {
+            print(
+                '[PrintShipmentScreen] ShipmentDetailsFetchError received: ${state.error}');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.error)),
             );
           }
         },
         builder: (context, state) {
-          if (state is AddShipmentLoading) {
+          print(
+              '[PrintShipmentScreen] BlocConsumer builder - state: ${state.runtimeType}');
+          if (state is FetchShipmentDetailsLoading ||
+              state is AddShipmentLoading) {
+            print('[PrintShipmentScreen] Showing loading indicator');
             return const Center(child: CircularProgressIndicator());
           }
 
           if (shipmentData == null) {
+            print(
+                '[PrintShipmentScreen] shipmentData is null, showing message');
             return const Center(child: Text('No shipment details available'));
           }
 
@@ -66,22 +98,16 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                       _buildSection('SENDER:', {
                         'Name': shipmentData!['senderName'] ?? '',
                         'Mobile': shipmentData!['senderMobile'] ?? '',
-                        'Branch Name': shipmentData!['senderBranch'] ?? '',
-                        'Branch Phone':
-                            shipmentData!['senderBranchPhone'] ?? '',
                       }),
                       const Divider(),
                       _buildSection('RECEIVER:', {
                         'Name': shipmentData!['receiverName'] ?? '',
                         'Mobile': shipmentData!['receiverMobile'] ?? '',
-                        'Branch Name': shipmentData!['receiverBranch'] ?? '',
-                        'Branch Phone':
-                            shipmentData!['receiverBranchPhone'] ?? '',
                       }),
                       const Divider(),
                       _buildSection('SHIPMENT DETAIL:', {
-                        'Shipment Date': DateFormat('dd-MM-yyyy HH:mm:ss')
-                            .format(DateTime.parse(shipmentData!['createdAt'])),
+                        'Shipment Date':
+                            _formatDate(shipmentData!['createdAt']),
                         'Payment Method': shipmentData!['paymentMethod'] ?? '',
                         'Delivery Type': shipmentData!['deliveryType'] ?? '',
                         'Description':
@@ -140,6 +166,24 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
         },
       ),
     );
+  }
+
+  String _formatDate(dynamic dateValue) {
+    try {
+      if (dateValue == null || dateValue.toString().isEmpty) {
+        print('[PrintShipmentScreen] Date value is null or empty');
+        return 'N/A';
+      }
+      print(
+          '[PrintShipmentScreen] Formatting date: $dateValue (type: ${dateValue.runtimeType})');
+      final dateString = dateValue.toString();
+      final dateTime = DateTime.parse(dateString);
+      return DateFormat('dd-MM-yyyy HH:mm:ss').format(dateTime);
+    } catch (e) {
+      print('[PrintShipmentScreen] Error formatting date: ${e.toString()}');
+      print('[PrintShipmentScreen] Date value: $dateValue');
+      return dateValue?.toString() ?? 'N/A';
+    }
   }
 
   Widget _buildSection(String title, Map<String, String> data) {
@@ -228,10 +272,6 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                                 'Name:', shipmentData!['senderName'] ?? ''),
                             _buildPdfInfoLine('Sender Mobile:',
                                 shipmentData!['senderMobile'] ?? ''),
-                            _buildPdfInfoLine('Branch Name:',
-                                shipmentData!['senderBranch'] ?? ''),
-                            _buildPdfInfoLine('Branch Phone:',
-                                shipmentData!['senderBranchPhone'] ?? ''),
                           ],
                         ),
                       ),
@@ -259,10 +299,6 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                                 'Name:', shipmentData!['receiverName'] ?? ''),
                             _buildPdfInfoLine('Receiver Mobile:',
                                 shipmentData!['receiverMobile'] ?? ''),
-                            _buildPdfInfoLine('Branch Name:',
-                                shipmentData!['receiverBranch'] ?? ''),
-                            _buildPdfInfoLine('Branch Phone:',
-                                shipmentData!['receiverBranchPhone'] ?? ''),
                           ],
                         ),
                       ),
@@ -288,10 +324,8 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                         ),
                       ),
                       pw.SizedBox(height: 8),
-                      _buildPdfInfoLine(
-                          'Shipment Date:',
-                          DateFormat('yyyy-MM-dd').format(
-                              DateTime.parse(shipmentData!['createdAt']))),
+                      _buildPdfInfoLine('Shipment Date:',
+                          _formatPdfDate(shipmentData!['createdAt'])),
                       _buildPdfInfoLine('Payment Method:',
                           shipmentData!['paymentMethod'] ?? ''),
                       _buildPdfInfoLine('Delivery Type:',
@@ -384,6 +418,20 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
       bytes: await pdf.save(),
       filename: 'shipment_${widget.trackingNumber}.pdf',
     );
+  }
+
+  String _formatPdfDate(dynamic dateValue) {
+    try {
+      if (dateValue == null || dateValue.toString().isEmpty) {
+        return 'N/A';
+      }
+      final dateString = dateValue.toString();
+      final dateTime = DateTime.parse(dateString);
+      return DateFormat('yyyy-MM-dd').format(dateTime);
+    } catch (e) {
+      print('[PrintShipmentScreen] Error formatting PDF date: ${e.toString()}');
+      return dateValue?.toString() ?? 'N/A';
+    }
   }
 
   pw.Widget _buildPdfInfoLine(String label, String value,

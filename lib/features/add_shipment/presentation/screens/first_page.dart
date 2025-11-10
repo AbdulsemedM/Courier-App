@@ -274,7 +274,7 @@ class _FirstPageState extends State<FirstPage> {
                     ),
                   );
                 }
-              } else if (state is FetchCustomerByPhoneFailure) {
+              } else if (state is FetchSenderByPhoneFailure) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.errorMessage),

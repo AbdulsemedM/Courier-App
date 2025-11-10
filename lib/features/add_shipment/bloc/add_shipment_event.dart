@@ -90,24 +90,44 @@ class FetchSenderByPhone extends AddShipmentEvent {
 class FetchEstimatedRate extends AddShipmentEvent {
   final int originId;
   final int destinationId;
-  FetchEstimatedRate({required this.originId, required this.destinationId});
+  final int serviceModeId;
+  final int shipmentTypeId;
+  final int deliveryTypeId;
+  final String unit;
+  FetchEstimatedRate({
+    required this.originId,
+    required this.destinationId,
+    required this.serviceModeId,
+    required this.shipmentTypeId,
+    required this.deliveryTypeId,
+    required this.unit,
+  });
 
   @override
-  List<Object> get props => [originId, destinationId];
+  List<Object> get props => [
+        originId,
+        destinationId,
+        serviceModeId,
+        shipmentTypeId,
+        deliveryTypeId,
+        unit,
+      ];
 }
 
 class InitiatePaymentEvent extends AddShipmentEvent {
   final String awb;
   final String paymentMethod;
+  final String payerAccount;
   final int addedBy;
   InitiatePaymentEvent({
     required this.awb,
     required this.paymentMethod,
+    required this.payerAccount,
     required this.addedBy,
   });
 
   @override
-  List<Object> get props => [awb, paymentMethod, addedBy];
+  List<Object> get props => [awb, paymentMethod, payerAccount, addedBy];
 }
 
 class CheckPaymentStatusEvent extends AddShipmentEvent {

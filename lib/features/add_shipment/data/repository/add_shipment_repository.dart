@@ -281,16 +281,42 @@ class AddShipmentRepository {
   // Note: We don't cache addShipment since it's a POST request
   Future<String> addShipment(Map<String, dynamic> body) async {
     try {
+      print('[Repository] addShipment called with body: $body');
       final response = await addShipmentDataProvider.addNewShipment(body);
+      print('[Repository] Received response: $response');
       final data = jsonDecode(response);
+      print('[Repository] Parsed data: $data');
       if (data['status'] != 200) {
+        print(
+            '[Repository] Error status: ${data['status']}, message: ${data['message']}');
         throw data['message'];
       }
-      final message = data['message'];
-      final subString = message.substring(0, 9);
-      return subString;
+      // Extract AWB from message string or data.data.awb
+      String? awb;
+      if (data['data'] != null && data['data']['awb'] != null) {
+        // If AWB is in data.data.awb
+        awb = data['data']['awb'].toString();
+        print('[Repository] Extracted AWB from data.data.awb: $awb');
+      } else if (data['message'] != null) {
+        // Extract AWB from message string (format: "ETAA34664 Shipment created successfully...")
+        final message = data['message'].toString();
+        print('[Repository] Message: $message');
+        // AWB is typically at the start of the message, extract it using regex
+        final awbMatch = RegExp(r'[A-Z]{3,4}\d{5,}').firstMatch(message);
+        if (awbMatch != null) {
+          awb = awbMatch.group(0);
+          print('[Repository] Extracted AWB from message: $awb');
+        }
+      }
+
+      if (awb != null && awb.isNotEmpty) {
+        return awb;
+      } else {
+        print('[Repository] Error: AWB not found in response');
+        throw 'AWB not found in response';
+      }
     } catch (e) {
-      print('Error in addShipment: ${e.toString()}');
+      print('[Repository] Error in addShipment: ${e.toString()}');
       rethrow;
     }
   }
@@ -312,10 +338,22 @@ class AddShipmentRepository {
   }
 
   Future<EstimatedRateModel> fetchEstimatedRate(
-      int originId, int destinationId) async {
+    int originId,
+    int destinationId,
+    int serviceModeId,
+    int shipmentTypeId,
+    int deliveryTypeId,
+    String unit,
+  ) async {
     try {
       final response = await addShipmentDataProvider.fetchEstimatedRate(
-          originId, destinationId);
+        originId,
+        destinationId,
+        serviceModeId,
+        shipmentTypeId,
+        deliveryTypeId,
+        unit,
+      );
       final data = jsonDecode(response);
       if (data['status'] != 200) {
         throw data['message'];
@@ -327,11 +365,11 @@ class AddShipmentRepository {
     }
   }
 
-  Future<String> initiatePayment(
-      String awb, String paymentMethod, int addedBy) async {
+  Future<String> initiatePayment(String awb, String paymentMethod,
+      String payerAccount, int addedBy) async {
     try {
       final response = await addShipmentDataProvider.initiatePayment(
-          awb, paymentMethod, addedBy);
+          awb, paymentMethod, payerAccount, addedBy);
       final data = jsonDecode(response);
       if (data['status'] != 200) {
         throw data['message'];
@@ -375,14 +413,32 @@ class AddShipmentRepository {
   Future<PaymentInvoiceModel> fetchShipmentDetailsByTracking(
       String trackingNumber) async {
     try {
+      print(
+          '[Repository] fetchShipmentDetailsByTracking called with trackingNumber: $trackingNumber');
       final response = await addShipmentDataProvider
           .fetchShipmentDetailsByTracking(trackingNumber);
+      print('[Repository] Received response: $response');
       final data = jsonDecode(response);
+      print('[Repository] Parsed data: $data');
       if (data['status'] != 200) {
+        print(
+            '[Repository] Error status: ${data['status']}, message: ${data['message']}');
         throw data['message'];
       }
-      return PaymentInvoiceModel.fromMap(data['data']);
+      if (data['data'] == null) {
+        print('[Repository] Error: data field is null in response');
+        throw 'Shipment details data is null';
+      }
+      print(
+          '[Repository] Attempting to parse PaymentInvoiceModel from data: ${data['data']}');
+      final model = PaymentInvoiceModel.fromMap(data['data']);
+      print('[Repository] Successfully parsed PaymentInvoiceModel');
+      return model;
     } catch (e) {
+      print(
+          '[Repository] Error in fetchShipmentDetailsByTracking: ${e.toString()}');
+      print('[Repository] Error type: ${e.runtimeType}');
+      print('[Repository] Error stack trace: ${StackTrace.current}');
       throw Exception('Failed to fetch shipment details: ${e.toString()}');
     }
   }

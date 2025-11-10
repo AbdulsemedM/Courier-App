@@ -20,6 +20,16 @@ class PaymentInvoiceModel {
   final String? paymentStatus;
   final String? paymentReference;
   final String? createdAt;
+  final String? barcodeUrl;
+  final String? transactionReference;
+  final double? netFee;
+  final double? totalAmount;
+  final int? qty;
+  final String? unit;
+  final int? numPcs;
+  final int? numBoxes;
+  final int? senderBranchId;
+  final int? receiverBranchId;
   PaymentInvoiceModel({
     this.id,
     this.awb,
@@ -39,6 +49,16 @@ class PaymentInvoiceModel {
     this.paymentStatus,
     this.paymentReference,
     this.createdAt,
+    this.barcodeUrl,
+    this.transactionReference,
+    this.netFee,
+    this.totalAmount,
+    this.qty,
+    this.unit,
+    this.numPcs,
+    this.numBoxes,
+    this.senderBranchId,
+    this.receiverBranchId,
   });
 
   PaymentInvoiceModel copyWith({
@@ -59,6 +79,16 @@ class PaymentInvoiceModel {
     String? paymentStatus,
     String? paymentReference,
     String? createdAt,
+    String? barcodeUrl,
+    String? transactionReference,
+    double? netFee,
+    double? totalAmount,
+    int? qty,
+    String? unit,
+    int? numPcs,
+    int? numBoxes,
+    int? senderBranchId,
+    int? receiverBranchId,
   }) {
     return PaymentInvoiceModel(
       id: id ?? this.id,
@@ -79,6 +109,16 @@ class PaymentInvoiceModel {
       paymentStatus: paymentStatus ?? this.paymentStatus,
       paymentReference: paymentReference ?? this.paymentReference,
       createdAt: createdAt ?? this.createdAt,
+      barcodeUrl: barcodeUrl ?? this.barcodeUrl,
+      transactionReference: transactionReference ?? this.transactionReference,
+      netFee: netFee ?? this.netFee,
+      totalAmount: totalAmount ?? this.totalAmount,
+      qty: qty ?? this.qty,
+      unit: unit ?? this.unit,
+      numPcs: numPcs ?? this.numPcs,
+      numBoxes: numBoxes ?? this.numBoxes,
+      senderBranchId: senderBranchId ?? this.senderBranchId,
+      receiverBranchId: receiverBranchId ?? this.receiverBranchId,
     );
   }
 
@@ -102,56 +142,149 @@ class PaymentInvoiceModel {
       'paymentStatus': paymentStatus,
       'paymentReference': paymentReference,
       'createdAt': createdAt,
+      'barcodeUrl': barcodeUrl,
+      'transactionReference': transactionReference,
+      'netFee': netFee,
+      'totalAmount': totalAmount,
+      'qty': qty,
+      'unit': unit,
+      'numPcs': numPcs,
+      'numBoxes': numBoxes,
+      'senderBranchId': senderBranchId,
+      'receiverBranchId': receiverBranchId,
     };
   }
 
   factory PaymentInvoiceModel.fromMap(Map<String, dynamic> map) {
-    return PaymentInvoiceModel(
-      id: map['id'] != null ? map['id'] as int : null,
-      awb: map['awb'] != null ? map['awb'] as String : null,
-      senderName:
-          map['senderName'] != null ? map['senderName'] as String : null,
-      senderMobile:
-          map['senderMobile'] != null ? map['senderMobile'] as String : null,
-      senderBranch: map['senderBranch']["name"] != null
-          ? map['senderBranch']["name"] as String
-          : null,
-      senderBranchPhone: map['senderBranch']["phone"] != null
-          ? map['senderBranch']["phone"] as String
-          : null,
-      receiverName:
-          map['receiverName'] != null ? map['receiverName'] as String : null,
-      receiverMobile: map['receiverMobile'] != null
-          ? map['receiverMobile'] as String
-          : null,
-      receiverBranch: map['receiverBranch']["name"] != null
-          ? map['receiverBranch']["name"] as String
-          : null,
-      receiverBranchPhone: map['receiverBranch']["phone"] != null
-          ? map['receiverBranch']["phone"] as String
-          : null,
-      shipmentDescription: map['shipmentDescription'] != null
-          ? map['shipmentDescription'] as String
-          : null,
-      paymentMethod: map['paymentMethod']["method"] != null
-          ? map['paymentMethod']["method"] as String
-          : null,
-      paymentMode: map['paymentMethod']["mode"] != null
-          ? map['paymentMethod']["mode"] as String
-          : null,
-      deliveryType: map['deliveryType']["type"] != null
-          ? map['deliveryType']["type"] as String
-          : null,
-      shipmentStatus: map['shipmentStatus']["code"] != null
-          ? map['shipmentStatus']["code"] as String
-          : null,
-      paymentStatus:
-          map['paymentStatus'] != null ? map['paymentStatus'] as String : null,
-      paymentReference: map['paymentReference'] != null
-          ? map['paymentReference'] as String
-          : null,
-      createdAt: map['createdAt'] != null ? map['createdAt'] as String : null,
-    );
+    try {
+      print('[Model] PaymentInvoiceModel.fromMap called with map: $map');
+      // Safely extract nested objects
+      final senderBranch = map['senderBranch'];
+      final receiverBranch = map['receiverBranch'];
+      final paymentMethod = map['paymentMethod'];
+      final deliveryType = map['deliveryType'];
+      final shipmentStatus = map['shipmentStatus'];
+
+      print(
+          '[Model] senderBranch: $senderBranch (type: ${senderBranch.runtimeType})');
+      print(
+          '[Model] receiverBranch: $receiverBranch (type: ${receiverBranch.runtimeType})');
+      print(
+          '[Model] paymentMethod: $paymentMethod (type: ${paymentMethod.runtimeType})');
+      print(
+          '[Model] deliveryType: $deliveryType (type: ${deliveryType.runtimeType})');
+      print(
+          '[Model] shipmentStatus: $shipmentStatus (type: ${shipmentStatus.runtimeType})');
+
+      // Handle senderBranch - can be int (ID) or Map
+      int? senderBranchId;
+      String? senderBranchName;
+      String? senderBranchPhone;
+      if (senderBranch is int) {
+        senderBranchId = senderBranch;
+      } else if (senderBranch is Map<String, dynamic>) {
+        senderBranchId = senderBranch['id'] as int?;
+        senderBranchName = senderBranch['name'] as String?;
+        senderBranchPhone = senderBranch['phone'] as String?;
+      }
+
+      // Handle receiverBranch - can be int (ID) or Map
+      int? receiverBranchId;
+      String? receiverBranchName;
+      String? receiverBranchPhone;
+      if (receiverBranch is int) {
+        receiverBranchId = receiverBranch;
+      } else if (receiverBranch is Map<String, dynamic>) {
+        receiverBranchId = receiverBranch['id'] as int?;
+        receiverBranchName = receiverBranch['name'] as String?;
+        receiverBranchPhone = receiverBranch['phone'] as String?;
+      }
+
+      return PaymentInvoiceModel(
+        id: map['id'] != null ? map['id'] as int : null,
+        awb: map['awb'] != null ? map['awb'] as String : null,
+        senderName:
+            map['senderName'] != null ? map['senderName'] as String : null,
+        senderMobile:
+            map['senderMobile'] != null ? map['senderMobile'] as String : null,
+        senderBranch: senderBranchName,
+        senderBranchPhone: senderBranchPhone,
+        senderBranchId: senderBranchId,
+        receiverName:
+            map['receiverName'] != null ? map['receiverName'] as String : null,
+        receiverMobile: map['receiverMobile'] != null
+            ? map['receiverMobile'] as String
+            : null,
+        receiverBranch: receiverBranchName,
+        receiverBranchPhone: receiverBranchPhone,
+        receiverBranchId: receiverBranchId,
+        shipmentDescription: map['shipmentDescription'] != null
+            ? map['shipmentDescription'] as String
+            : null,
+        paymentMethod: (paymentMethod is Map<String, dynamic> &&
+                paymentMethod["method"] != null)
+            ? paymentMethod["method"] as String
+            : null,
+        paymentMode: (paymentMethod is Map<String, dynamic> &&
+                paymentMethod["mode"] != null)
+            ? paymentMethod["mode"] as String
+            : (map['paymentMode'] is Map<String, dynamic> &&
+                    map['paymentMode']["code"] != null)
+                ? map['paymentMode']["code"] as String
+                : null,
+        deliveryType: (deliveryType is Map<String, dynamic> &&
+                deliveryType["type"] != null)
+            ? deliveryType["type"] as String
+            : null,
+        shipmentStatus: (shipmentStatus is Map<String, dynamic> &&
+                shipmentStatus["code"] != null)
+            ? shipmentStatus["code"] as String
+            : null,
+        paymentStatus: map['paymentStatus'] != null
+            ? map['paymentStatus'] as String
+            : null,
+        paymentReference: map['paymentReference'] != null
+            ? map['paymentReference'] as String
+            : null,
+        createdAt: map['createdAt'] != null ? map['createdAt'] as String : null,
+        barcodeUrl:
+            map['barcodeUrl'] != null ? map['barcodeUrl'] as String : null,
+        transactionReference: map['transactionReference'] != null
+            ? map['transactionReference'] as String
+            : null,
+        netFee: map['netFee'] != null
+            ? (map['netFee'] is double
+                ? map['netFee'] as double
+                : (map['netFee'] as num).toDouble())
+            : null,
+        totalAmount: map['totalAmount'] != null
+            ? (map['totalAmount'] is double
+                ? map['totalAmount'] as double
+                : (map['totalAmount'] as num).toDouble())
+            : null,
+        qty: map['qty'] != null
+            ? (map['qty'] is int
+                ? map['qty'] as int
+                : (map['qty'] as num).toInt())
+            : null,
+        unit: map['unit'] != null ? map['unit'] as String : null,
+        numPcs: map['numPcs'] != null
+            ? (map['numPcs'] is int
+                ? map['numPcs'] as int
+                : (map['numPcs'] as num).toInt())
+            : null,
+        numBoxes: map['numBoxes'] != null
+            ? (map['numBoxes'] is int
+                ? map['numBoxes'] as int
+                : (map['numBoxes'] as num).toInt())
+            : null,
+      );
+    } catch (e) {
+      print('[Model] Error in PaymentInvoiceModel.fromMap: ${e.toString()}');
+      print('[Model] Error type: ${e.runtimeType}');
+      print('[Model] Error stack trace: ${StackTrace.current}');
+      rethrow;
+    }
   }
 
   String toJson() => json.encode(toMap());
@@ -185,7 +318,17 @@ class PaymentInvoiceModel {
         other.shipmentStatus == shipmentStatus &&
         other.paymentStatus == paymentStatus &&
         other.paymentReference == paymentReference &&
-        other.createdAt == createdAt;
+        other.createdAt == createdAt &&
+        other.barcodeUrl == barcodeUrl &&
+        other.transactionReference == transactionReference &&
+        other.netFee == netFee &&
+        other.totalAmount == totalAmount &&
+        other.qty == qty &&
+        other.unit == unit &&
+        other.numPcs == numPcs &&
+        other.numBoxes == numBoxes &&
+        other.senderBranchId == senderBranchId &&
+        other.receiverBranchId == receiverBranchId;
   }
 
   @override
@@ -207,6 +350,16 @@ class PaymentInvoiceModel {
         shipmentStatus.hashCode ^
         paymentStatus.hashCode ^
         paymentReference.hashCode ^
-        createdAt.hashCode;
+        createdAt.hashCode ^
+        barcodeUrl.hashCode ^
+        transactionReference.hashCode ^
+        netFee.hashCode ^
+        totalAmount.hashCode ^
+        qty.hashCode ^
+        unit.hashCode ^
+        numPcs.hashCode ^
+        numBoxes.hashCode ^
+        senderBranchId.hashCode ^
+        receiverBranchId.hashCode;
   }
 }

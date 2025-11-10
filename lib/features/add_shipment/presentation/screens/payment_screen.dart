@@ -114,11 +114,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     children: [
                       ElevatedButton.icon(
                         onPressed: () {
+                          final payerAccount =
+                              widget.formData['payerAccount']?.toString() ??
+                                  widget.formData['senderMobile']?.toString();
                           context.read<AddShipmentBloc>().add(
                                 InitiatePaymentEvent(
                                   awb: widget.trackingNumber,
                                   paymentMethod: widget.paymentInfo,
-                                  addedBy: 1,
+                                  payerAccount: payerAccount!,
+                                  addedBy:
+                                      widget.formData['addedBy'] as int? ?? 1,
                                 ),
                               );
                         },

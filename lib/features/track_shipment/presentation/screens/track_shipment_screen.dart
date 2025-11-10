@@ -119,12 +119,10 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                 }
 
                 if (state is TrackShipmentSuccess) {
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: TrackShipmentWidgets.buildTrackingDetails(
-                      isDarkMode: isDarkMode,
-                      shipments: state.trackShipmentModel,
-                    ),
+                  return TrackShipmentWidgets.buildTrackingDetails(
+                    isDarkMode: isDarkMode,
+                    shipments: state.trackShipmentModel,
+                    branches: null, // Branches can be fetched and passed here if needed
                   );
                 }
 

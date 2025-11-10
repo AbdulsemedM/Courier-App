@@ -1,5 +1,7 @@
+import 'package:courier_app/features/add_shipment/model/delivery_types_model.dart';
 import 'package:courier_app/features/add_shipment/model/service_modes_model.dart';
 import 'package:courier_app/features/add_shipment/model/shipment_type_model.dart';
+import 'package:courier_app/features/add_shipment/model/transport_mode_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
@@ -10,6 +12,8 @@ class SecondPage extends StatefulWidget {
   final VoidCallback onPrevious;
   final List<ServiceModeModel> serviceModes;
   final List<ShipmentTypeModel> shipmentTypes;
+  final List<DeliveryTypeModel> deliveryTypes;
+  final List<TransportModeModel> transportModes;
 
   const SecondPage({
     super.key,
@@ -18,6 +22,8 @@ class SecondPage extends StatefulWidget {
     required this.onPrevious,
     required this.serviceModes,
     required this.shipmentTypes,
+    required this.deliveryTypes,
+    required this.transportModes,
   });
 
   @override
@@ -161,6 +167,48 @@ class _SecondPageState extends State<SecondPage> {
             },
             isDarkMode: isDarkMode,
           ),
+          const SizedBox(height: 16),
+          _buildDropdownField(
+            label: 'Delivery Type',
+            value: widget.formData['deliveryTypeId'] != null
+                ? widget.formData['deliveryTypeId'].toString()
+                : null,
+            items: widget.deliveryTypes
+                .map((type) => DropdownMenuItem<String>(
+                      value: type.id?.toString(),
+                      child: Text(type.type ?? ''),
+                    ))
+                .toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  widget.formData['deliveryTypeId'] = int.parse(value);
+                });
+              }
+            },
+            isDarkMode: isDarkMode,
+          ),
+          const SizedBox(height: 16),
+          _buildDropdownField(
+            label: 'Transport Mode',
+            value: widget.formData['transportModeId'] != null
+                ? widget.formData['transportModeId'].toString()
+                : null,
+            items: widget.transportModes
+                .map((mode) => DropdownMenuItem<String>(
+                      value: mode.id?.toString(),
+                      child: Text(mode.description ?? ''),
+                    ))
+                .toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  widget.formData['transportModeId'] = int.parse(value);
+                });
+              }
+            },
+            isDarkMode: isDarkMode,
+          ),
           const SizedBox(height: 32),
           Row(
             children: [
@@ -192,14 +240,10 @@ class _SecondPageState extends State<SecondPage> {
                           widget.formData['quantity'] == 0 ||
                           widget.formData['unit'] == null ||
                           widget.formData['unit'] == '' ||
-                          // widget.formData['numPcs'] == null ||
-                          // widget.formData['numPcs'] == 0 ||
-                          // widget.formData['numBoxes'] == null ||
-                          // widget.formData['numBoxes'] == 0 ||
                           widget.formData['serviceModeId'] == null ||
-                          widget.formData['serviceModeId'] == 1 ||
                           widget.formData['shipmentTypeId'] == null ||
-                          widget.formData['shipmentTypeId'] == 1 ||
+                          widget.formData['deliveryTypeId'] == null ||
+                          widget.formData['transportModeId'] == null ||
                           widget.formData['shipmentDescription'] == null ||
                           widget.formData['shipmentDescription'] == '')
                       ? null

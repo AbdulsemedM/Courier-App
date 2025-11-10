@@ -8,7 +8,7 @@ import 'package:courier_app/features/add_shipment/model/payment_mode_model.dart'
 import 'package:courier_app/features/add_shipment/model/service_modes_model.dart';
 import 'package:courier_app/features/add_shipment/model/shipment_type_model.dart';
 import 'package:courier_app/features/add_shipment/model/transport_mode_model.dart';
-import 'package:courier_app/features/add_shipment/presentation/screens/payment_screen.dart';
+import 'package:courier_app/features/add_shipment/presentation/screens/payment_waiting_screen.dart';
 import 'package:courier_app/features/add_shipment/presentation/screens/print_shipment_screen.dart';
 // import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -60,17 +60,19 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
     "serviceModeId": null,
     "extraFee": 0,
     "extraFeeDescription": "null",
+    "deliveryTypeId": null,
+    "transportModeId": null,
   };
   final authService = AuthService();
   final Map<String, dynamic> formData3 = {
     // "paymentMethodId": 1,
-    "deliveryTypeId": "",
-    "transportModeId": "",
     "hudhudPercent": 10.5,
     "hudhudNet": 95.75,
     "creditAccount": "",
+    "creditAmount": 0.0,
     "paymentModeId": "",
     "paymentMethodId": "",
+    "payerAccount": "",
     "addedBy": "",
   };
   void _nextPage() {
@@ -80,11 +82,23 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
         curve: Curves.easeInOut,
       );
     }
-    if (_currentPage == 0) {
+  }
+
+  void _onPageChanged(int page) {
+    setState(() => _currentPage = page);
+    // Fetch rate when user moves to step 3 (page 2) after completing all fields in step 2
+    if (page == 2) {
       final bloc = context.read<AddShipmentBloc>();
+      // Get unit from formData2 and convert to lowercase
+      final unit = (formData2['unit'] as String?)?.toLowerCase() ?? 'kg';
       bloc.add(FetchEstimatedRate(
-          originId: formData1['senderBranchId'],
-          destinationId: formData1['receiverBranchId']));
+        originId: formData1['senderBranchId'] as int,
+        destinationId: formData1['receiverBranchId'] as int,
+        serviceModeId: formData2['serviceModeId'] as int,
+        shipmentTypeId: formData2['shipmentTypeId'] as int,
+        deliveryTypeId: formData2['deliveryTypeId'] as int,
+        unit: unit,
+      ));
     }
   }
 
@@ -309,9 +323,25 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
               current is FetchShipmentTypesFailure ||
               current is FetchTransportModesFailure,
           listener: (context, state) {
+            String errorMessage = '';
+            if (state is FetchBranchesFailure) {
+              errorMessage = state.errorMessage;
+            } else if (state is FetchDeliveryTypesFailure) {
+              errorMessage = state.errorMessage;
+            } else if (state is FetchPaymentMethodsFailure) {
+              errorMessage = state.errorMessage;
+            } else if (state is FetchPaymentModesFailure) {
+              errorMessage = state.errorMessage;
+            } else if (state is FetchServicesFailure) {
+              errorMessage = state.errorMessage;
+            } else if (state is FetchShipmentTypesFailure) {
+              errorMessage = state.errorMessage;
+            } else if (state is FetchTransportModesFailure) {
+              errorMessage = state.errorMessage;
+            }
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Error: ${(state as dynamic).error}'),
+                content: Text('Error: $errorMessage'),
                 action: SnackBarAction(
                   label: 'Retry',
                   onPressed: () => _fetchAllData(false),
@@ -334,19 +364,60 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
               String info = paymentService.paymentInfo;
 
               // Use Future.microtask to ensure navigation happens after the current frame
-              Future.microtask(() {
+              Future.microtask(() async {
                 // Check if the widget is still mounted before navigating
                 if (!mounted) return;
 
                 if (info == "CASH") {
-                  String method = paymentService.paymentMethod;
+                  final paymentMethod = paymentService.paymentMethod;
+
+                  // Check if both payment mode and payment method are CASH
+                  final isPaymentMethodCash = paymentMethod.isNotEmpty &&
+                      paymentMethod.toUpperCase() == "CASH";
+
+                  // If both are CASH, skip waiting screen and go directly to print screen
+                  if (isPaymentMethodCash) {
+                    if (!mounted) return;
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PrintShipmentScreen(
+                          trackingNumber: state.trackingNumber,
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  // Get payerAccount with fallback priority: payerAccount -> creditAccount -> senderMobile
+                  // Use completeFormData to ensure we have the merged data
+                  String payerAccount = '';
+                  if (completeFormData['payerAccount']?.toString().isNotEmpty ==
+                      true) {
+                    payerAccount = completeFormData['payerAccount']!.toString();
+                  } else if (completeFormData['senderMobile']
+                          ?.toString()
+                          .isNotEmpty ==
+                      true) {
+                    payerAccount = completeFormData['senderMobile']!.toString();
+                  }
+
+                  final userId = await authService.getUserId();
+                  final addedBy = formData3['addedBy'] as int? ??
+                      int.parse(userId.toString());
+
+                  if (!mounted) return;
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PaymentScreen(
-                        formData: completeFormData,
+                      builder: (context) => PaymentWaitingScreen(
                         trackingNumber: state.trackingNumber,
-                        paymentInfo: method,
+                        branches: branches,
+                        paymentMethod: paymentMethod.isNotEmpty
+                            ? paymentMethod
+                            : 'EBIRRCOOP',
+                        payerAccount: payerAccount,
+                        addedBy: addedBy,
                       ),
                     ),
                   );
@@ -437,9 +508,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                       child: PageView(
                         controller: _pageController,
                         physics: const NeverScrollableScrollPhysics(),
-                        onPageChanged: (page) {
-                          setState(() => _currentPage = page);
-                        },
+                        onPageChanged: _onPageChanged,
                         children: [
                           FirstPage(
                             formData: formData1,
@@ -452,27 +521,39 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                             onPrevious: _previousPage,
                             serviceModes: services,
                             shipmentTypes: shipmentTypes,
+                            deliveryTypes: deliveryTypes,
+                            transportModes: transportModes,
                           ),
                           ThirdPage(
                             formData: formData3,
                             onPrevious: _previousPage,
                             paymentModes: paymentModes,
                             paymentMethods: paymentMethods,
-                            deliveryTypes: deliveryTypes,
-                            transportModes: transportModes,
                             quantity: formData2,
                             onSubmit: () {
+                              print('[UI] Submit button pressed on step 3');
+                              print('[UI] Form validation started');
                               if (_formKey.currentState!.validate()) {
+                                print('[UI] Form validation passed');
+                                print('[UI] formData1: $formData1');
+                                print('[UI] formData2: $formData2');
+                                print('[UI] formData3: $formData3');
                                 final Map<String, dynamic> completeFormData = {
                                   ...formData1,
                                   ...formData2,
                                   ...formData3,
                                 };
-                                print(completeFormData);
+                                print(
+                                    '[UI] Complete form data: $completeFormData');
+                                print(
+                                    '[UI] Dispatching AddShipment event to bloc');
                                 context
                                     .read<AddShipmentBloc>()
                                     .add(AddShipment(body: completeFormData));
-                              } else {}
+                                print('[UI] AddShipment event dispatched');
+                              } else {
+                                print('[UI] Form validation failed');
+                              }
                             },
                           ),
                         ],

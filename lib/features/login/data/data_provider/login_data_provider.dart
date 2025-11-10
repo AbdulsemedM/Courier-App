@@ -14,6 +14,7 @@ class LoginDataProvider {
     } catch (e) {
       throw e.toString();
     }
+    
   }
 
   Future<Permissions> getPermissions(int roleId) async {

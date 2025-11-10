@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:courier_app/features/add_shipment/data/repository/add_shipment_repository.dart';
 import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:courier_app/features/add_shipment/model/customer_by_phone.dart';
@@ -35,6 +36,28 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
     on<InitiatePaymentEvent>(_initiatePayment);
     on<CheckPaymentStatusEvent>(_checkPaymentStatus);
     on<FetchShipmentDetailsEvent>(_fetchShipmentDetails);
+  }
+
+  // Helper method to extract error message from exception
+  String _extractErrorMessage(dynamic e) {
+    String errorMessage = e.toString();
+
+    // Remove "Exception: " prefix if present
+    if (errorMessage.startsWith('Exception: ')) {
+      errorMessage = errorMessage.substring(11);
+    }
+
+    // Try to parse as JSON and extract message field
+    try {
+      final data = jsonDecode(errorMessage);
+      if (data is Map && data.containsKey('message')) {
+        return data['message'].toString();
+      }
+    } catch (_) {
+      // If parsing fails, return the error message as is
+    }
+
+    return errorMessage;
   }
 
   // Helper method to handle retries
@@ -152,13 +175,21 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
   }
 
   void _addShipment(AddShipment event, Emitter<AddShipmentState> emit) async {
+    print('[Bloc] _addShipment called');
+    print('[Bloc] Event body: ${event.body}');
     emit(AddShipmentLoading());
     try {
+      print('[Bloc] Calling repository.addShipment');
       final response = await _retryOperation(
           () => addShipmentRepository.addShipment(event.body), 'addShipment');
+      print('[Bloc] Received tracking number from repository: $response');
       emit(AddShipmentSuccess(trackingNumber: response));
+      print('[Bloc] Emitted AddShipmentSuccess with trackingNumber: $response');
     } catch (e) {
-      emit(AddShipmentFailure(errorMessage: e.toString()));
+      // Extract just the message from the exception
+      String errorMessage = _extractErrorMessage(e);
+      print('[Bloc] Error in _addShipment: $errorMessage');
+      emit(AddShipmentFailure(errorMessage: errorMessage));
     }
   }
 
@@ -171,7 +202,9 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
           'fetchCustomerByPhone');
       emit(FetchCustomerByPhoneSuccess(customer: response));
     } catch (e) {
-      emit(FetchCustomerByPhoneFailure(errorMessage: e.toString()));
+      // Extract just the message from the exception
+      String errorMessage = _extractErrorMessage(e);
+      emit(FetchCustomerByPhoneFailure(errorMessage: errorMessage));
     }
   }
 
@@ -184,7 +217,9 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
           'fetchSenderByPhone');
       emit(FetchSenderByPhoneSuccess(customer: response));
     } catch (e) {
-      emit(FetchSenderByPhoneFailure(errorMessage: e.toString()));
+      // Extract just the message from the exception
+      String errorMessage = _extractErrorMessage(e);
+      emit(FetchSenderByPhoneFailure(errorMessage: errorMessage));
     }
   }
 
@@ -194,11 +229,19 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
     try {
       final response = await _retryOperation(
           () => addShipmentRepository.fetchEstimatedRate(
-              event.originId, event.destinationId),
+                event.originId,
+                event.destinationId,
+                event.serviceModeId,
+                event.shipmentTypeId,
+                event.deliveryTypeId,
+                event.unit,
+              ),
           'fetchEstimatedRate');
       emit(FetchEstimatedRateSuccess(estimatedRate: response));
     } catch (e) {
-      emit(FetchEstimatedRateFailure(errorMessage: e.toString()));
+      // Extract just the message from the exception
+      String errorMessage = _extractErrorMessage(e);
+      emit(FetchEstimatedRateFailure(errorMessage: errorMessage));
     }
   }
 
@@ -207,8 +250,8 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
     emit(InitiatePaymentLoading());
     try {
       final response = await _retryOperation(
-          () => addShipmentRepository.initiatePayment(
-              event.awb, event.paymentMethod, event.addedBy),
+          () => addShipmentRepository.initiatePayment(event.awb,
+              event.paymentMethod, event.payerAccount, event.addedBy),
           'initiatePayment');
       emit(InitiatePaymentSuccess(message: response));
     } catch (e) {
@@ -232,12 +275,23 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
   void _fetchShipmentDetails(
       FetchShipmentDetailsEvent event, Emitter<AddShipmentState> emit) async {
     try {
+      print(
+          '[Bloc] _fetchShipmentDetails called with trackingNumber: ${event.trackingNumber}');
       emit(FetchShipmentDetailsLoading());
+      print('[Bloc] Emitted FetchShipmentDetailsLoading');
       final details = await addShipmentRepository
           .fetchShipmentDetailsByTracking(event.trackingNumber);
+      print('[Bloc] Received shipment details from repository');
+      print('[Bloc] Shipment details: ${details.toString()}');
       emit(ShipmentDetailsFetched(shipmentDetails: details));
+      print('[Bloc] Emitted ShipmentDetailsFetched');
     } catch (e) {
-      emit(ShipmentDetailsFetchError(error: e.toString()));
+      String errorMessage = _extractErrorMessage(e);
+      print('[Bloc] Error in _fetchShipmentDetails: $errorMessage');
+      print('[Bloc] Error type: ${e.runtimeType}');
+      print('[Bloc] Error stack trace: ${StackTrace.current}');
+      emit(ShipmentDetailsFetchError(error: errorMessage));
+      print('[Bloc] Emitted ShipmentDetailsFetchError');
     }
   }
 }

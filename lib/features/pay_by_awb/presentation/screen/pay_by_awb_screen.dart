@@ -143,6 +143,8 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                                         awb: _awbController.text,
                                         paymentMethod:
                                             _lastFetchedDetails!.paymentMethod!,
+                                        payerAccount: _lastFetchedDetails!.senderMobile!
+                                            , // Default payer account
                                         addedBy: int.parse(
                                             await authService.getUserId() ??
                                                 '0'),
