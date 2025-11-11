@@ -35,6 +35,9 @@ class LoginRepository {
       await authService.storeRoleId(decodedToken['user']['role']);
       final permissions =
           await loginDataProvider.getPermissions(decodedToken['user']['role']);
+      if (permissions.roleName != null) {
+        await authService.storeRoleName(permissions.roleName!);
+      }
       await PermissionManager().setPermission(
           permissions.permissions?.map((e) => e.name ?? '').toList() ?? []);
       return data['message'];

@@ -35,6 +35,9 @@ import 'package:courier_app/features/miles_configuration/data/repository/miles_c
 import 'package:courier_app/features/payment_method/bloc/payment_methods_bloc.dart';
 import 'package:courier_app/features/payment_method/data/data_provider/payment_methods_data_provider.dart';
 import 'package:courier_app/features/payment_method/data/repository/payment_methods_repository.dart';
+import 'package:courier_app/features/analytics/bloc/analytics_bloc.dart';
+import 'package:courier_app/features/analytics/data/data_provider/analytics_data_provider.dart';
+import 'package:courier_app/features/analytics/data/repository/analytics_repository.dart';
 import 'package:courier_app/features/roles/bloc/roles_bloc.dart';
 import 'package:courier_app/features/roles/data/data_provider/roles_data_provider.dart';
 import 'package:courier_app/features/roles/data/repository/roles_repository.dart';
@@ -148,6 +151,9 @@ void main() async {
         BlocProvider(
             create: (context) =>
                 RolesBloc(RolesRepository(RolesDataProvider()))),
+        BlocProvider(
+            create: (context) => AnalyticsBloc(AnalyticsRepository(
+                analyticsDataProvider: AnalyticsDataProvider()))),
       ],
       child: const MyApp(),
     ),

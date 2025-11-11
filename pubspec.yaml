@@ -54,6 +54,7 @@ dependencies:
   urovo_scanner: ^1.0.3
   jwt_decoder: ^2.0.1
   qr_flutter: ^4.1.0
+  fl_chart: ^0.69.0
 
 dev_dependencies:
   flutter_test:
