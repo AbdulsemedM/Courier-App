@@ -103,14 +103,12 @@ class AnalyticsDashboardModel {
           : null,
       deliveryLocations: json['deliveryLocations'] != null
           ? (json['deliveryLocations'] as List)
-              .map((e) =>
-                  DeliveryLocation.fromJson(e as Map<String, dynamic>))
+              .map((e) => DeliveryLocation.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       earningsOverTime: json['earningsOverTime'] != null
           ? (json['earningsOverTime'] as List)
-              .map((e) =>
-                  EarningsOverTime.fromJson(e as Map<String, dynamic>))
+              .map((e) => EarningsOverTime.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       averageDeliveryTime: json['averageDeliveryTime'] != null
@@ -564,4 +562,3 @@ class AverageDeliveryTime {
     };
   }
 }
-

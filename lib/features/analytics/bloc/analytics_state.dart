@@ -17,4 +17,3 @@ final class AnalyticsError extends AnalyticsState {
 
   AnalyticsError({required this.message});
 }
-

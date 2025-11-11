@@ -14,9 +14,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.grey[850]!.withOpacity(0.5)
-            : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -75,9 +73,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.grey[850]!.withOpacity(0.5)
-            : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -136,13 +132,11 @@ class AnalyticsWidgets {
   }) {
     final isPass = status.toLowerCase() == 'pass';
     final progressColor = isPass ? Colors.green : Colors.red;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.grey[850]!.withOpacity(0.5)
-            : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -226,13 +220,11 @@ class AnalyticsWidgets {
       symbol: 'ETB ',
       decimalDigits: 2,
     ).format(value);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.grey[850]!.withOpacity(0.5)
-            : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -282,9 +274,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.grey[850]!.withOpacity(0.5)
-            : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -306,19 +296,24 @@ class AnalyticsWidgets {
             ),
           ),
           const SizedBox(height: 12),
-          _buildFinancialRow('Cash', financialPeriod.cash ?? 0.0, Colors.green, isDarkMode),
+          _buildFinancialRow(
+              'Cash', financialPeriod.cash ?? 0.0, Colors.green, isDarkMode),
           const SizedBox(height: 8),
-          _buildFinancialRow('COD', financialPeriod.cod ?? 0.0, Colors.blue, isDarkMode),
+          _buildFinancialRow(
+              'COD', financialPeriod.cod ?? 0.0, Colors.blue, isDarkMode),
           const SizedBox(height: 8),
-          _buildFinancialRow('Expenses', financialPeriod.expenses ?? 0.0, Colors.orange, isDarkMode),
+          _buildFinancialRow('Expenses', financialPeriod.expenses ?? 0.0,
+              Colors.orange, isDarkMode),
           const SizedBox(height: 8),
-          _buildFinancialRow('Expected Net', financialPeriod.expectedNetCash ?? 0.0, Colors.green, isDarkMode),
+          _buildFinancialRow('Expected Net',
+              financialPeriod.expectedNetCash ?? 0.0, Colors.green, isDarkMode),
         ],
       ),
     );
   }
 
-  static Widget _buildFinancialRow(String label, double value, Color color, bool isDarkMode) {
+  static Widget _buildFinancialRow(
+      String label, double value, Color color, bool isDarkMode) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -351,9 +346,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.grey[850]!.withOpacity(0.5)
-            : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -414,9 +407,7 @@ class AnalyticsWidgets {
         height: 200,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode
-              ? Colors.grey[850]!.withOpacity(0.5)
-              : Colors.white,
+          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
@@ -434,9 +425,7 @@ class AnalyticsWidgets {
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.grey[850]!.withOpacity(0.5)
-            : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -480,7 +469,9 @@ class AnalyticsWidgets {
                           DateFormat('MMM dd').format(dateTime),
                           style: TextStyle(
                             fontSize: 10,
-                            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                            color: isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.grey[600],
                           ),
                         );
                       } catch (e) {
@@ -518,7 +509,11 @@ class AnalyticsWidgets {
           minX: 0,
           maxX: (deliveriesPerDay.length - 1).toDouble(),
           minY: 0,
-          maxY: deliveriesPerDay.map((e) => e.deliveries ?? 0).reduce((a, b) => a > b ? a : b).toDouble() + 1,
+          maxY: deliveriesPerDay
+                  .map((e) => e.deliveries ?? 0)
+                  .reduce((a, b) => a > b ? a : b)
+                  .toDouble() +
+              1,
           lineBarsData: [
             LineChartBarData(
               spots: deliveriesPerDay.asMap().entries.map((entry) {
@@ -552,9 +547,7 @@ class AnalyticsWidgets {
         height: 200,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode
-              ? Colors.grey[850]!.withOpacity(0.5)
-              : Colors.white,
+          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
@@ -581,9 +574,7 @@ class AnalyticsWidgets {
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.grey[850]!.withOpacity(0.5)
-            : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -680,14 +671,13 @@ class AnalyticsWidgets {
     required List<AverageDeliveryTime> averageDeliveryTime,
     required bool isDarkMode,
   }) {
-    if (averageDeliveryTime.isEmpty || averageDeliveryTime.every((e) => (e.count ?? 0) == 0)) {
+    if (averageDeliveryTime.isEmpty ||
+        averageDeliveryTime.every((e) => (e.count ?? 0) == 0)) {
       return Container(
         height: 200,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode
-              ? Colors.grey[850]!.withOpacity(0.5)
-              : Colors.white,
+          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
@@ -702,14 +692,12 @@ class AnalyticsWidgets {
     }
 
     final colors = [Colors.green, Colors.blue, Colors.orange, Colors.red];
-    
+
     return Container(
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.grey[850]!.withOpacity(0.5)
-            : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -722,7 +710,11 @@ class AnalyticsWidgets {
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
-          maxY: averageDeliveryTime.map((e) => e.count ?? 0).reduce((a, b) => a > b ? a : b).toDouble() + 1,
+          maxY: averageDeliveryTime
+                  .map((e) => e.count ?? 0)
+                  .reduce((a, b) => a > b ? a : b)
+                  .toDouble() +
+              1,
           barTouchData: BarTouchData(enabled: true),
           titlesData: FlTitlesData(
             show: true,
@@ -731,14 +723,16 @@ class AnalyticsWidgets {
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
                   if (value.toInt() < averageDeliveryTime.length) {
-                    final timeRange = averageDeliveryTime[value.toInt()].timeRange ?? '';
+                    final timeRange =
+                        averageDeliveryTime[value.toInt()].timeRange ?? '';
                     return Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
                         timeRange,
                         style: TextStyle(
                           fontSize: 9,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                          color:
+                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -787,7 +781,8 @@ class AnalyticsWidgets {
                   toY: (timeData.count ?? 0).toDouble(),
                   color: colors[index % colors.length],
                   width: 20,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(4)),
                 ),
               ],
             );
@@ -805,9 +800,7 @@ class AnalyticsWidgets {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode
-              ? Colors.grey[850]!.withOpacity(0.5)
-              : Colors.white,
+          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -869,9 +862,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.grey[850]!.withOpacity(0.5)
-            : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -916,7 +907,8 @@ class AnalyticsWidgets {
                 child: LinearProgressIndicator(
                   value: (topLocation.percentage ?? 0) / 100,
                   backgroundColor: const Color(0xFF5b3895).withOpacity(0.2),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF5b3895)),
+                  valueColor:
+                      const AlwaysStoppedAnimation<Color>(Color(0xFF5b3895)),
                   minHeight: 8,
                   borderRadius: BorderRadius.circular(4),
                 ),
@@ -936,4 +928,3 @@ class AnalyticsWidgets {
     );
   }
 }
-
