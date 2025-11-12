@@ -4,6 +4,7 @@ import '../../../../core/theme/theme_provider.dart';
 import 'accounting_create_screen.dart';
 import '../../../accounts/presentation/screens/accounts_screen.dart';
 import '../../../balance_sheet/presentation/screens/balance_sheet_screen.dart';
+import '../../../income_statement/presentation/screens/income_statement_screen.dart';
 
 class AccountingScreen extends StatefulWidget {
   const AccountingScreen({super.key});
@@ -171,6 +172,14 @@ class _AccountingScreenState extends State<AccountingScreen> {
                               MaterialPageRoute(
                                 builder: (context) =>
                                     const BalanceSheetScreen(),
+                              ),
+                            );
+                          } else if (feature['title'] == 'Income Statement') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const IncomeStatementScreen(),
                               ),
                             );
                           }
