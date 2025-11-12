@@ -1,5 +1,7 @@
 import 'package:courier_app/app/utils/dialog_utils.dart';
+import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/configuration/phone_number_manager.dart';
+import 'package:courier_app/features/accounting/presentation/screens/accounting_screen.dart';
 import 'package:courier_app/features/add_shipment/presentation/screens/add_shipment_screen.dart';
 import 'package:courier_app/features/barcode_reader/presentation/screen/barcode_reader_screen.dart';
 import 'package:courier_app/features/other_settings/presentation/screens/options_screen.dart';
@@ -19,11 +21,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<String> permissions = [];
+  final AuthService _authService = AuthService();
+  bool _hasAccountingAccess = false;
+  bool _isLoadingRole = true;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     fetchPermissions();
+    _checkAccountingAccess();
     // final permissions = await PermissionManager().getPermission();
     // if (permissions != null) {
     //   for (var permission in permissions) {
@@ -39,6 +46,22 @@ class _HomeScreenState extends State<HomeScreen> {
         this.permissions = permissions;
       });
     }
+  }
+
+  Future<void> _checkAccountingAccess() async {
+    final roleName = await _authService.getRoleName();
+    setState(() {
+      _hasAccountingAccess = _hasAccountingAccessRole(roleName);
+      _isLoadingRole = false;
+    });
+  }
+
+  bool _hasAccountingAccessRole(String? roleName) {
+    if (roleName == null) return false;
+    final role = roleName.toLowerCase().trim();
+    return role == 'admin' || 
+           role == 'teller' || 
+           role == 'branch manager';
   }
 
   @override
@@ -315,6 +338,53 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              if (!_isLoadingRole && _hasAccountingAccess) ...[
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AccountingScreen()));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      backgroundColor: isDarkMode
+                          ? const Color(0xFFFF5A00)
+                          : const Color(0xFFFF5A00),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      elevation: 5,
+                      shadowColor: isDarkMode ? Colors.black54 : Colors.blue[200],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.account_balance,
+                          size: 24,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Accounting',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 32),
 
               // Statistics Section
