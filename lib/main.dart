@@ -68,6 +68,9 @@ import 'package:courier_app/features/transport_modes/data/repository/transport_m
 import 'package:courier_app/features/accounts/bloc/account_bloc.dart';
 import 'package:courier_app/features/accounts/data/data_provider/account_data_provider.dart';
 import 'package:courier_app/features/accounts/data/repository/account_repository.dart';
+import 'package:courier_app/features/balance_sheet/bloc/balance_sheet_bloc.dart';
+import 'package:courier_app/features/balance_sheet/data/data_provider/balance_sheet_data_provider.dart';
+import 'package:courier_app/features/balance_sheet/data/repository/balance_sheet_repository.dart';
 import 'package:courier_app/providers/provider_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -160,6 +163,9 @@ void main() async {
         BlocProvider(
             create: (context) => AccountBloc(AccountRepository(
                 accountDataProvider: AccountDataProvider()))),
+        BlocProvider(
+            create: (context) => BalanceSheetBloc(BalanceSheetRepository(
+                balanceSheetDataProvider: BalanceSheetDataProvider()))),
       ],
       child: const MyApp(),
     ),
