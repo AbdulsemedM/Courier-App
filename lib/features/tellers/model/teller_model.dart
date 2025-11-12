@@ -52,13 +52,37 @@ class TellerModel {
   }
 
   factory TellerModel.fromMap(Map<String, dynamic> map) {
+    // Handle branch as either object or int
+    String branchName = 'N/A';
+    String branchCode = 'N/A';
+    if (map['branch'] is Map) {
+      branchName = map['branch']['name'] as String? ?? 'N/A';
+      branchCode = map['branch']['code'] as String? ?? 'N/A';
+    } else if (map['branch'] is int) {
+      branchName = 'Branch ${map['branch']}';
+      branchCode = '';
+    }
+
+    // Handle addedBy as either object or int
+    String addedBy = 'N/A';
+    if (map['addedBy'] is Map) {
+      addedBy = map['addedBy']['email'] as String? ??
+          '${map['addedBy']['firstName'] ?? ''} ${map['addedBy']['lastName'] ?? ''}'
+              .trim();
+      if (addedBy.isEmpty) {
+        addedBy = 'User ${map['addedBy']['id'] ?? 'N/A'}';
+      }
+    } else if (map['addedBy'] is int) {
+      addedBy = 'User ${map['addedBy']}';
+    }
+
     return TellerModel(
       id: map['id'] as int,
       tellerName: map['tellerName'] as String,
-      branchName: map['branch']['name'] as String,
-      branchCode: map['branch']['code'] as String,
-      status: map['status'] as String,
-      addedBy: map['addedBy']['email'] as String,
+      branchName: branchName,
+      branchCode: branchCode,
+      status: map['status'] as String? ?? 'UNKNOWN',
+      addedBy: addedBy,
       createdAt: map['createdAt'] as String,
     );
   }

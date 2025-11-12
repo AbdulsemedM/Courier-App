@@ -15,7 +15,8 @@ class TellerDataProvider {
   Future<String> addTeller(Map<String, dynamic> servicesMode) async {
     try {
       final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
-      final response = await apiProvider.postRequest("/api/v1/tellers", servicesMode);
+      final response =
+          await apiProvider.postRequest("/api/v1/teller", servicesMode);
       return response.body;
     } catch (e) {
       throw e.toString();
@@ -26,8 +27,8 @@ class TellerDataProvider {
       Map<String, dynamic> servicesMode, String tellerId) async {
     try {
       final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
-      final response =
-          await apiProvider.putRequest("/api/v1/tellers/$tellerId", servicesMode);
+      final response = await apiProvider.putRequest(
+          "/api/v1/tellers/$tellerId", servicesMode);
       return response.body;
     } catch (e) {
       throw e.toString();

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
+import 'accounting_create_screen.dart';
+import '../../../accounts/presentation/screens/accounts_screen.dart';
 
 class AccountingScreen extends StatefulWidget {
   const AccountingScreen({super.key});
@@ -84,7 +86,8 @@ class _AccountingScreenState extends State<AccountingScreen> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
+      backgroundColor:
+          isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -146,8 +149,23 @@ class _AccountingScreenState extends State<AccountingScreen> {
                         color: feature['color'] as Color,
                         isDarkMode: isDarkMode,
                         onTap: () {
-                          // TODO: Navigate to specific feature screen
-                          // For now, just show a placeholder
+                          if (feature['title'] == 'Create') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const AccountingCreateScreen(),
+                              ),
+                            );
+                          } else if (feature['title'] == 'Accounts') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AccountsScreen(),
+                              ),
+                            );
+                          }
+                          // TODO: Navigate to other specific feature screens
                         },
                       );
                     }).toList(),
@@ -218,4 +236,3 @@ class _AccountingScreenState extends State<AccountingScreen> {
     );
   }
 }
-

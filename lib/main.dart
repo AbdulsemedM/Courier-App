@@ -65,6 +65,9 @@ import 'package:courier_app/features/track_shipment/data/repository/track_shipme
 import 'package:courier_app/features/transport_modes/bloc/transport_modes_bloc.dart';
 import 'package:courier_app/features/transport_modes/data/data_provider/transport_modes_data_provider.dart';
 import 'package:courier_app/features/transport_modes/data/repository/transport_modes_repository.dart';
+import 'package:courier_app/features/accounts/bloc/account_bloc.dart';
+import 'package:courier_app/features/accounts/data/data_provider/account_data_provider.dart';
+import 'package:courier_app/features/accounts/data/repository/account_repository.dart';
 import 'package:courier_app/providers/provider_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -154,6 +157,9 @@ void main() async {
         BlocProvider(
             create: (context) => AnalyticsBloc(AnalyticsRepository(
                 analyticsDataProvider: AnalyticsDataProvider()))),
+        BlocProvider(
+            create: (context) => AccountBloc(AccountRepository(
+                accountDataProvider: AccountDataProvider()))),
       ],
       child: const MyApp(),
     ),
