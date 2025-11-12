@@ -77,6 +77,9 @@ import 'package:courier_app/features/income_statement/data/repository/income_sta
 import 'package:courier_app/features/teller_accounts/bloc/teller_account_bloc.dart';
 import 'package:courier_app/features/teller_accounts/data/data_provider/teller_account_data_provider.dart';
 import 'package:courier_app/features/teller_accounts/data/repository/teller_account_repository.dart';
+import 'package:courier_app/features/teller_by_branch/bloc/teller_by_branch_bloc.dart';
+import 'package:courier_app/features/teller_by_branch/data/data_provider/teller_by_branch_data_provider.dart';
+import 'package:courier_app/features/teller_by_branch/data/repository/teller_by_branch_repository.dart';
 import 'package:courier_app/providers/provider_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -167,8 +170,8 @@ void main() async {
             create: (context) => AnalyticsBloc(AnalyticsRepository(
                 analyticsDataProvider: AnalyticsDataProvider()))),
         BlocProvider(
-            create: (context) => AccountBloc(AccountRepository(
-                accountDataProvider: AccountDataProvider()))),
+            create: (context) => AccountBloc(
+                AccountRepository(accountDataProvider: AccountDataProvider()))),
         BlocProvider(
             create: (context) => BalanceSheetBloc(BalanceSheetRepository(
                 balanceSheetDataProvider: BalanceSheetDataProvider()))),
@@ -178,6 +181,9 @@ void main() async {
         BlocProvider(
             create: (context) => TellerAccountBloc(TellerAccountRepository(
                 tellerAccountDataProvider: TellerAccountDataProvider()))),
+        BlocProvider(
+            create: (context) => TellerByBranchBloc(TellerByBranchRepository(
+                tellerByBranchDataProvider: TellerByBranchDataProvider()))),
       ],
       child: const MyApp(),
     ),
