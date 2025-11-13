@@ -10,7 +10,8 @@ class TellerByBranchAdminScreen extends StatefulWidget {
   const TellerByBranchAdminScreen({super.key});
 
   @override
-  State<TellerByBranchAdminScreen> createState() => _TellerByBranchAdminScreenState();
+  State<TellerByBranchAdminScreen> createState() =>
+      _TellerByBranchAdminScreenState();
 }
 
 class _TellerByBranchAdminScreenState extends State<TellerByBranchAdminScreen> {
@@ -441,4 +442,3 @@ class _TellerByBranchAdminScreenState extends State<TellerByBranchAdminScreen> {
     super.dispose();
   }
 }
-
