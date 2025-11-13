@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/teller_by_branch/data/data_provider/teller_by_branch_data_provider.dart';
 import 'package:courier_app/features/teller_by_branch/data/model/teller_by_branch_model.dart';
 
@@ -68,6 +69,31 @@ class TellerByBranchRepository {
       }
       
       return tellersWithStatus;
+    } catch (e) {
+      print(e.toString());
+      throw e.toString();
+    }
+  }
+
+  Future<String> reopenTeller(int tellerId) async {
+    try {
+      // Get userId from AuthService
+      final authService = AuthService();
+      final userIdString = await authService.getUserId();
+      if (userIdString == null) {
+        throw 'User ID not found';
+      }
+      final userId = int.parse(userIdString);
+
+      final response = await tellerByBranchDataProvider.reopenTeller(
+        tellerId: tellerId,
+        userId: userId,
+      );
+      final data = jsonDecode(response);
+      if (data['status'] != 200) {
+        throw data['message'] ?? 'Failed to reopen teller';
+      }
+      return data['message'] ?? 'Teller reopened successfully';
     } catch (e) {
       print(e.toString());
       throw e.toString();

@@ -7,6 +7,14 @@ import '../../../balance_sheet/presentation/screens/balance_sheet_screen.dart';
 import '../../../income_statement/presentation/screens/income_statement_screen.dart';
 import '../../../teller_accounts/presentation/screens/teller_accounts_screen.dart';
 import '../../../teller_by_branch/presentation/screens/teller_by_branch_screen.dart';
+import '../../../teller_by_branch_admin/presentation/screens/teller_by_branch_admin_screen.dart';
+import '../../../teller_by_branch/bloc/teller_by_branch_bloc.dart';
+import '../../../teller_by_branch/data/repository/teller_by_branch_repository.dart';
+import '../../../teller_by_branch/data/data_provider/teller_by_branch_data_provider.dart';
+import '../../../branches/bloc/branches_bloc.dart';
+import '../../../branches/data/repository/branches_repository.dart';
+import '../../../branches/data/data_provider/branches_data_provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../transaction_branch_to_hq/presentation/screens/transaction_branch_to_hq_screen.dart';
 import '../../../transaction_hq_to_branch/presentation/screens/transaction_hq_to_branch_screen.dart';
 
@@ -197,7 +205,39 @@ class _AccountingScreenState extends State<AccountingScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const TellerByBranchScreen(),
+                                builder: (context) => BlocProvider(
+                                  create: (context) => TellerByBranchBloc(
+                                    TellerByBranchRepository(
+                                      tellerByBranchDataProvider: TellerByBranchDataProvider(),
+                                    ),
+                                  ),
+                                  child: const TellerByBranchScreen(),
+                                ),
+                              ),
+                            );
+                          } else if (feature['title'] == 'Teller By Branch Admin') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MultiBlocProvider(
+                                  providers: [
+                                    BlocProvider(
+                                      create: (context) => TellerByBranchBloc(
+                                        TellerByBranchRepository(
+                                          tellerByBranchDataProvider: TellerByBranchDataProvider(),
+                                        ),
+                                      ),
+                                    ),
+                                    BlocProvider(
+                                      create: (context) => BranchesBloc(
+                                        BranchesRepository(
+                                          branchesDataProvider: BranchesDataProvider(),
+                                        ),
+                                      )..add(FetchBranches()),
+                                    ),
+                                  ],
+                                  child: const TellerByBranchAdminScreen(),
+                                ),
                               ),
                             );
                           } else if (feature['title'] == 'Transaction Branch to HQ') {

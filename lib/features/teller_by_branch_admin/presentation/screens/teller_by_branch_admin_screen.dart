@@ -2,17 +2,18 @@ import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/teller_by_branch/bloc/teller_by_branch_bloc.dart';
 import 'package:courier_app/features/teller_by_branch/data/model/teller_by_branch_model.dart';
 import 'package:courier_app/features/teller_by_branch/presentation/widgets/teller_by_branch_table.dart';
+import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class TellerByBranchScreen extends StatefulWidget {
-  const TellerByBranchScreen({super.key});
+class TellerByBranchAdminScreen extends StatefulWidget {
+  const TellerByBranchAdminScreen({super.key});
 
   @override
-  State<TellerByBranchScreen> createState() => _TellerByBranchScreenState();
+  State<TellerByBranchAdminScreen> createState() => _TellerByBranchAdminScreenState();
 }
 
-class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
+class _TellerByBranchAdminScreenState extends State<TellerByBranchAdminScreen> {
   final TextEditingController _searchController = TextEditingController();
   int? _selectedBranchId;
   String? _selectedStatus; // null means "All Statuses"
@@ -27,6 +28,9 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
   }
 
   Future<void> _initializeData() async {
+    // Fetch branches
+    context.read<BranchesBloc>().add(FetchBranches());
+
     // Get user's branch as default
     final branch = await _authService.getBranch();
     if (branch != null) {
@@ -83,7 +87,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Tellers By Branch',
+                      'Tellers By Branch (Admin)',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -99,6 +103,59 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
+                    // Branch Selector
+                    BlocBuilder<BranchesBloc, BranchesState>(
+                      builder: (context, state) {
+                        if (state is FetchBranchesLoaded) {
+                          return DropdownButtonFormField<int>(
+                            value: _selectedBranchId,
+                            decoration: InputDecoration(
+                              labelText: 'Select Branch',
+                              prefixIcon: const Icon(Icons.business),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              filled: true,
+                              fillColor: isDarkMode
+                                  ? Colors.white.withOpacity(0.1)
+                                  : Colors.white.withOpacity(0.9),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                            ),
+                            dropdownColor: isDarkMode
+                                ? const Color(0xFF1A1C2E)
+                                : Colors.white,
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
+                            items: state.branches.map((branch) {
+                              return DropdownMenuItem<int>(
+                                value: branch.id,
+                                child: Text(
+                                  '${branch.name} (${branch.code})',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedBranchId = value;
+                                _currentPage = 0;
+                              });
+                              _fetchTellers();
+                            },
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                    const SizedBox(height: 12),
                     // Status Filter
                     DropdownButtonFormField<String>(
                       value: _selectedStatus,
@@ -189,170 +246,139 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
 
               // Main Content
               Expanded(
-                child: BlocListener<TellerByBranchBloc, TellerByBranchState>(
-                  listener: (context, state) {
-                    if (state is ReopenTellerSuccess) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(state.message),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                      // Refresh the tellers list
-                      if (_selectedBranchId != null) {
-                        _fetchTellers();
-                      }
+                child: BlocBuilder<TellerByBranchBloc, TellerByBranchState>(
+                  builder: (context, state) {
+                    if (state is FetchTellersByBranchLoading) {
+                      return const Center(child: CircularProgressIndicator());
                     }
-                    if (state is ReopenTellerError) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(state.message),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  },
-                  child: BlocBuilder<TellerByBranchBloc, TellerByBranchState>(
-                    builder: (context, state) {
-                      if (state is FetchTellersByBranchLoading ||
-                          state is ReopenTellerLoading) {
-                        return const Center(child: CircularProgressIndicator());
+
+                    if (state is FetchTellersByBranchSuccess) {
+                      final filteredTellers =
+                          _getFilteredTellers(state.tellers);
+
+                      if (filteredTellers.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No tellers found',
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
+                          ),
+                        );
                       }
 
-                      if (state is FetchTellersByBranchSuccess) {
-                        final filteredTellers =
-                            _getFilteredTellers(state.tellers);
+                      final totalPages =
+                          (filteredTellers.length / _itemsPerPage).ceil();
+                      // Ensure current page is within valid range
+                      if (_currentPage >= totalPages) {
+                        _currentPage = totalPages > 0 ? totalPages - 1 : 0;
+                      }
+                      final paginatedTellers =
+                          _getPaginatedTellers(filteredTellers);
 
-                        if (filteredTellers.isEmpty) {
-                          return Center(
-                            child: Text(
-                              'No tellers found',
+                      return Column(
+                        children: [
+                          Expanded(
+                            child: TellerByBranchTable(
+                              tellers: paginatedTellers,
+                              // No onStatusToggle for admin version
+                            ),
+                          ),
+                          // Pagination Controls
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.chevron_left,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                  onPressed: _currentPage > 0
+                                      ? () {
+                                          setState(() {
+                                            _currentPage--;
+                                          });
+                                        }
+                                      : null,
+                                ),
+                                const SizedBox(width: 16),
+                                Text(
+                                  'Page ${_currentPage + 1} of ${totalPages == 0 ? 1 : totalPages}',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.chevron_right,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                  onPressed: _currentPage < totalPages - 1
+                                      ? () {
+                                          setState(() {
+                                            _currentPage++;
+                                          });
+                                        }
+                                      : null,
+                                ),
+                                const SizedBox(width: 16),
+                                Text(
+                                  'Total: ${filteredTellers.length}',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : Colors.black87,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    if (state is FetchTellersByBranchError) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Error: ${state.message}',
                               style: TextStyle(
                                 color: isDarkMode ? Colors.white : Colors.black,
                               ),
                             ),
-                          );
-                        }
-
-                        final totalPages =
-                            (filteredTellers.length / _itemsPerPage).ceil();
-                        // Ensure current page is within valid range
-                        if (_currentPage >= totalPages) {
-                          _currentPage = totalPages > 0 ? totalPages - 1 : 0;
-                        }
-                        final paginatedTellers =
-                            _getPaginatedTellers(filteredTellers);
-
-                        return Column(
-                          children: [
-                            Expanded(
-                              child: TellerByBranchTable(
-                                tellers: paginatedTellers,
-                                onStatusToggle: (tellerId, isOpen) {
-                                  context.read<TellerByBranchBloc>().add(
-                                        ReopenTeller(tellerId: tellerId),
-                                      );
-                                },
-                              ),
-                            ),
-                            // Pagination Controls
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.chevron_left,
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                    onPressed: _currentPage > 0
-                                        ? () {
-                                            setState(() {
-                                              _currentPage--;
-                                            });
-                                          }
-                                        : null,
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    'Page ${_currentPage + 1} of ${totalPages == 0 ? 1 : totalPages}',
-                                    style: TextStyle(
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.chevron_right,
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                    onPressed: _currentPage < totalPages - 1
-                                        ? () {
-                                            setState(() {
-                                              _currentPage++;
-                                            });
-                                          }
-                                        : null,
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    'Total: ${filteredTellers.length}',
-                                    style: TextStyle(
-                                      color: isDarkMode
-                                          ? Colors.white70
-                                          : Colors.black87,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _fetchTellers,
+                              child: const Text('Retry'),
                             ),
                           ],
-                        );
-                      }
-
-                      if (state is FetchTellersByBranchError) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Error: ${state.message}',
-                                style: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: _fetchTellers,
-                                child: const Text('Retry'),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-
-                      return Center(
-                        child: Text(
-                          'Select a branch to view tellers',
-                          style: TextStyle(
-                            color:
-                                isDarkMode ? Colors.white70 : Colors.grey[700],
-                          ),
-                          textAlign: TextAlign.center,
                         ),
                       );
-                    },
-                  ),
+                    }
+
+                    return Center(
+                      child: Text(
+                        'Select a branch to view tellers',
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -415,3 +441,4 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
     super.dispose();
   }
 }
+

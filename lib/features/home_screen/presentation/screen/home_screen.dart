@@ -7,6 +7,7 @@ import 'package:courier_app/features/barcode_reader/presentation/screen/barcode_
 import 'package:courier_app/features/other_settings/presentation/screens/options_screen.dart';
 // import 'package:courier_app/features/track_order/presentation/screens/track_order_screen.dart';
 import 'package:courier_app/features/track_shipment/presentation/screens/track_shipment_screen.dart';
+import 'package:courier_app/features/reports/presentation/screens/reports_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
@@ -59,9 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _hasAccountingAccessRole(String? roleName) {
     if (roleName == null) return false;
     final role = roleName.toLowerCase().trim();
-    return role == 'admin' || 
-           role == 'teller' || 
-           role == 'branch manager';
+    return role == 'admin' || role == 'teller' || role == 'branch manager';
   }
 
   @override
@@ -294,6 +293,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 32),
+
+              // Creative Reports Button
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: _buildCreativeReportsButton(context, isDarkMode),
+              ),
+              const SizedBox(height: 16),
+
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -360,7 +368,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       elevation: 5,
-                      shadowColor: isDarkMode ? Colors.black54 : Colors.blue[200],
+                      shadowColor:
+                          isDarkMode ? Colors.black54 : Colors.blue[200],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -388,62 +397,162 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 32),
 
               // Statistics Section
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? Colors.grey[850]!.withOpacity(0.5)
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDarkMode
-                          ? Colors.black.withOpacity(0.2)
-                          : Colors.grey.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Today\'s Statistics',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.grey.shade800,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        HomeWidgets.buildStatisticItem(
-                          icon: Icons.local_shipping,
-                          label: 'Deliveries',
-                          value: '24',
-                          isDarkMode: isDarkMode,
-                        ),
-                        HomeWidgets.buildStatisticItem(
-                          icon: Icons.pending_actions,
-                          label: 'Pending',
-                          value: '12',
-                          isDarkMode: isDarkMode,
-                        ),
-                        HomeWidgets.buildStatisticItem(
-                          icon: Icons.done_all,
-                          label: 'Completed',
-                          value: '36',
-                          isDarkMode: isDarkMode,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              // Container(
+              //   padding: const EdgeInsets.all(20),
+              //   decoration: BoxDecoration(
+              //     color: isDarkMode
+              //         ? Colors.grey[850]!.withOpacity(0.5)
+              //         : Colors.white,
+              //     borderRadius: BorderRadius.circular(20),
+              //     boxShadow: [
+              //       BoxShadow(
+              //         color: isDarkMode
+              //             ? Colors.black.withOpacity(0.2)
+              //             : Colors.grey.withOpacity(0.1),
+              //         blurRadius: 10,
+              //         offset: const Offset(0, 5),
+              //       ),
+              //     ],
+              //   ),
+              //   child: Column(
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       Text(
+              //         'Today\'s Statistics',
+              //         style: TextStyle(
+              //           fontSize: 18,
+              //           fontWeight: FontWeight.bold,
+              //           color: isDarkMode ? Colors.white : Colors.grey.shade800,
+              //         ),
+              //       ),
+              //       const SizedBox(height: 20),
+              //       Row(
+              //         mainAxisAlignment: MainAxisAlignment.spaceAround,
+              //         children: [
+              //           HomeWidgets.buildStatisticItem(
+              //             icon: Icons.local_shipping,
+              //             label: 'Deliveries',
+              //             value: '24',
+              //             isDarkMode: isDarkMode,
+              //           ),
+              //           HomeWidgets.buildStatisticItem(
+              //             icon: Icons.pending_actions,
+              //             label: 'Pending',
+              //             value: '12',
+              //             isDarkMode: isDarkMode,
+              //           ),
+              //           HomeWidgets.buildStatisticItem(
+              //             icon: Icons.done_all,
+              //             label: 'Completed',
+              //             value: '36',
+              //             isDarkMode: isDarkMode,
+              //           ),
+              //         ],
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreativeReportsButton(BuildContext context, bool isDarkMode) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF667eea),
+            const Color(0xFF764ba2),
+            const Color(0xFFf093fb),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF667eea).withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: const Color(0xFF764ba2).withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+            spreadRadius: -5,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ReportsScreen(),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 2,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.analytics_outlined,
+                    size: 32,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Reports & Analytics',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'View detailed insights and analytics',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white.withOpacity(0.9),
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white.withOpacity(0.9),
+                  size: 20,
+                ),
+              ],
+            ),
           ),
         ),
       ),

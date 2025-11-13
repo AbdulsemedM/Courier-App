@@ -23,5 +23,25 @@ class TellerByBranchDataProvider {
       throw e.toString();
     }
   }
+
+  Future<String> reopenTeller({
+    required int tellerId,
+    required int userId,
+  }) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final params = {
+        'tellerId': tellerId.toString(),
+        'userId': userId.toString(),
+      };
+      final response = await apiProvider.getRequest(
+        '/api/v1/teller/reopen',
+        params: params,
+      );
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }
 

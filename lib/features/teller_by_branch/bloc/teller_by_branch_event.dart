@@ -9,3 +9,9 @@ class FetchTellersByBranch extends TellerByBranchEvent {
   FetchTellersByBranch({required this.branchId});
 }
 
+class ReopenTeller extends TellerByBranchEvent {
+  final int tellerId;
+
+  ReopenTeller({required this.tellerId});
+}
+

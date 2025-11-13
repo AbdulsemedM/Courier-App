@@ -10,6 +10,7 @@ class TellerByBranchBloc extends Bloc<TellerByBranchEvent, TellerByBranchState> 
   final TellerByBranchRepository tellerByBranchRepository;
   TellerByBranchBloc(this.tellerByBranchRepository) : super(TellerByBranchInitial()) {
     on<FetchTellersByBranch>(_fetchTellersByBranch);
+    on<ReopenTeller>(_reopenTeller);
   }
 
   void _fetchTellersByBranch(FetchTellersByBranch event, Emitter<TellerByBranchState> emit) async {
@@ -19,6 +20,19 @@ class TellerByBranchBloc extends Bloc<TellerByBranchEvent, TellerByBranchState> 
       emit(FetchTellersByBranchSuccess(tellers: tellers));
     } catch (e) {
       emit(FetchTellersByBranchError(message: e.toString()));
+    }
+  }
+
+  void _reopenTeller(ReopenTeller event, Emitter<TellerByBranchState> emit) async {
+    emit(ReopenTellerLoading());
+    try {
+      final message = await tellerByBranchRepository.reopenTeller(event.tellerId);
+      emit(ReopenTellerSuccess(message: message));
+      // After successful reopen, refresh the tellers list
+      // Note: We need the current branchId, but we don't have it in the event
+      // We'll handle refresh in the UI after success
+    } catch (e) {
+      emit(ReopenTellerError(message: e.toString()));
     }
   }
 }

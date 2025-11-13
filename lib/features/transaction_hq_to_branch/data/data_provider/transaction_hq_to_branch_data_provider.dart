@@ -7,7 +7,7 @@ class TransactionHqToBranchDataProvider {
     try {
       final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
       final response = await apiProvider.getRequest(
-          "/api/v1/transactions/hq?branchId=$branchId&startDate=$startDate&endDate=$endDate");
+          "/api/v1/transactions/branch?branchId=$branchId&startDate=$startDate&endDate=$endDate");
       return response.body;
     } catch (e) {
       throw e.toString();

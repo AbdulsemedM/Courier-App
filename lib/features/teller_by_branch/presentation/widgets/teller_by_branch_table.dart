@@ -4,10 +4,12 @@ import 'package:intl/intl.dart';
 
 class TellerByBranchTable extends StatelessWidget {
   final List<TellerByBranchWithStatus> tellers;
+  final Function(int tellerId, bool isOpen)? onStatusToggle;
 
   const TellerByBranchTable({
     super.key,
     required this.tellers,
+    this.onStatusToggle,
   });
 
   @override
@@ -119,6 +121,16 @@ class TellerByBranchTable extends StatelessWidget {
                 ),
               ),
             ),
+            if (onStatusToggle != null)
+              DataColumn(
+                label: Text(
+                  'Action',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
           ],
           rows: tellers.map((tellerWithStatus) {
             final teller = tellerWithStatus.teller;
@@ -261,6 +273,22 @@ class TellerByBranchTable extends StatelessWidget {
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 )),
+                if (onStatusToggle != null)
+                  DataCell(
+                    status != null
+                        ? Switch(
+                            value: status.isOpen,
+                            onChanged: (value) {
+                              if (onStatusToggle != null) {
+                                onStatusToggle!(teller.id, value);
+                              }
+                            },
+                            activeColor: const Color(0xFF9C27B0),
+                            inactiveThumbColor: Colors.grey,
+                            inactiveTrackColor: Colors.grey[300],
+                          )
+                        : const SizedBox.shrink(),
+                  ),
               ],
             );
           }).toList(),

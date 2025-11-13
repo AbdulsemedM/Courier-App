@@ -19,3 +19,17 @@ final class FetchTellersByBranchError extends TellerByBranchState {
   FetchTellersByBranchError({required this.message});
 }
 
+final class ReopenTellerLoading extends TellerByBranchState {}
+
+final class ReopenTellerSuccess extends TellerByBranchState {
+  final String message;
+
+  ReopenTellerSuccess({required this.message});
+}
+
+final class ReopenTellerError extends TellerByBranchState {
+  final String message;
+
+  ReopenTellerError({required this.message});
+}
+
