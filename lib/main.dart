@@ -83,6 +83,9 @@ import 'package:courier_app/features/teller_by_branch/data/repository/teller_by_
 import 'package:courier_app/features/transaction_branch_to_hq/bloc/transaction_branch_to_hq_bloc.dart';
 import 'package:courier_app/features/transaction_branch_to_hq/data/data_provider/transaction_branch_to_hq_data_provider.dart';
 import 'package:courier_app/features/transaction_branch_to_hq/data/repository/transaction_branch_to_hq_repository.dart';
+import 'package:courier_app/features/transaction_hq_to_branch/bloc/transaction_hq_to_branch_bloc.dart';
+import 'package:courier_app/features/transaction_hq_to_branch/data/data_provider/transaction_hq_to_branch_data_provider.dart';
+import 'package:courier_app/features/transaction_hq_to_branch/data/repository/transaction_hq_to_branch_repository.dart';
 import 'package:courier_app/providers/provider_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -191,6 +194,10 @@ void main() async {
             create: (context) => TransactionBranchToHqBloc(
                 TransactionBranchToHqRepository(
                     dataProvider: TransactionBranchToHqDataProvider()))),
+        BlocProvider(
+            create: (context) => TransactionHqToBranchBloc(
+                TransactionHqToBranchRepository(
+                    dataProvider: TransactionHqToBranchDataProvider()))),
       ],
       child: const MyApp(),
     ),
