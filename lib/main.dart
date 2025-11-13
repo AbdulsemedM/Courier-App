@@ -80,6 +80,9 @@ import 'package:courier_app/features/teller_accounts/data/repository/teller_acco
 import 'package:courier_app/features/teller_by_branch/bloc/teller_by_branch_bloc.dart';
 import 'package:courier_app/features/teller_by_branch/data/data_provider/teller_by_branch_data_provider.dart';
 import 'package:courier_app/features/teller_by_branch/data/repository/teller_by_branch_repository.dart';
+import 'package:courier_app/features/transaction_branch_to_hq/bloc/transaction_branch_to_hq_bloc.dart';
+import 'package:courier_app/features/transaction_branch_to_hq/data/data_provider/transaction_branch_to_hq_data_provider.dart';
+import 'package:courier_app/features/transaction_branch_to_hq/data/repository/transaction_branch_to_hq_repository.dart';
 import 'package:courier_app/providers/provider_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -184,6 +187,10 @@ void main() async {
         BlocProvider(
             create: (context) => TellerByBranchBloc(TellerByBranchRepository(
                 tellerByBranchDataProvider: TellerByBranchDataProvider()))),
+        BlocProvider(
+            create: (context) => TransactionBranchToHqBloc(
+                TransactionBranchToHqRepository(
+                    dataProvider: TransactionBranchToHqDataProvider()))),
       ],
       child: const MyApp(),
     ),

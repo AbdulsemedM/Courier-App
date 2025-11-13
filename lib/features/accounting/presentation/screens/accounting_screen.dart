@@ -7,6 +7,7 @@ import '../../../balance_sheet/presentation/screens/balance_sheet_screen.dart';
 import '../../../income_statement/presentation/screens/income_statement_screen.dart';
 import '../../../teller_accounts/presentation/screens/teller_accounts_screen.dart';
 import '../../../teller_by_branch/presentation/screens/teller_by_branch_screen.dart';
+import '../../../transaction_branch_to_hq/presentation/screens/transaction_branch_to_hq_screen.dart';
 
 class AccountingScreen extends StatefulWidget {
   const AccountingScreen({super.key});
@@ -196,6 +197,13 @@ class _AccountingScreenState extends State<AccountingScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const TellerByBranchScreen(),
+                              ),
+                            );
+                          } else if (feature['title'] == 'Transaction Branch to HQ') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const TransactionBranchToHqScreen(),
                               ),
                             );
                           }
