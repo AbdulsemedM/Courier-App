@@ -17,6 +17,22 @@ import '../../../branches/data/data_provider/branches_data_provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../transaction_branch_to_hq/presentation/screens/transaction_branch_to_hq_screen.dart';
 import '../../../transaction_hq_to_branch/presentation/screens/transaction_hq_to_branch_screen.dart';
+import '../../../closeout_transaction/presentation/screens/closeout_transaction_screen.dart';
+import '../../../closeout_transaction/bloc/closeout_transaction_bloc.dart';
+import '../../../closeout_transaction/data/repository/closeout_transaction_repository.dart';
+import '../../../closeout_transaction/data/data_provider/closeout_transaction_data_provider.dart';
+import '../../../pending_closeout/presentation/screens/pending_closeout_screen.dart';
+import '../../../pending_closeout/bloc/pending_closeout_bloc.dart';
+import '../../../pending_closeout/data/repository/pending_closeout_repository.dart';
+import '../../../pending_closeout/data/data_provider/pending_closeout_data_provider.dart';
+import '../../../teller_liability/presentation/screens/teller_liability_screen.dart';
+import '../../../teller_liability/bloc/teller_liability_bloc.dart';
+import '../../../teller_liability/data/repository/teller_liability_repository.dart';
+import '../../../teller_liability/data/data_provider/teller_liability_data_provider.dart';
+import '../../../teller_liability_by_branch/presentation/screens/teller_liability_by_branch_screen.dart';
+import '../../../teller_liability_by_branch/bloc/teller_liability_by_branch_bloc.dart';
+import '../../../teller_liability_by_branch/data/repository/teller_liability_by_branch_repository.dart';
+import '../../../teller_liability_by_branch/data/data_provider/teller_liability_by_branch_data_provider.dart';
 
 class AccountingScreen extends StatefulWidget {
   const AccountingScreen({super.key});
@@ -252,6 +268,106 @@ class _AccountingScreenState extends State<AccountingScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const TransactionHqToBranchScreen(),
+                              ),
+                            );
+                          } else if (feature['title'] == 'Closeout Transaction') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MultiBlocProvider(
+                                  providers: [
+                                    BlocProvider(
+                                      create: (context) => CloseoutTransactionBloc(
+                                        repository: CloseoutTransactionRepository(
+                                          dataProvider: CloseoutTransactionDataProvider(),
+                                        ),
+                                      ),
+                                    ),
+                                    BlocProvider(
+                                      create: (context) => TellerByBranchBloc(
+                                        TellerByBranchRepository(
+                                          tellerByBranchDataProvider: TellerByBranchDataProvider(),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  child: const CloseoutTransactionScreen(),
+                                ),
+                              ),
+                            );
+                          } else if (feature['title'] == 'Pending Closeout') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MultiBlocProvider(
+                                  providers: [
+                                    BlocProvider(
+                                      create: (context) => PendingCloseoutBloc(
+                                        repository: PendingCloseoutRepository(
+                                          dataProvider: PendingCloseoutDataProvider(),
+                                        ),
+                                      ),
+                                    ),
+                                    BlocProvider(
+                                      create: (context) => BranchesBloc(
+                                        BranchesRepository(
+                                          branchesDataProvider: BranchesDataProvider(),
+                                        ),
+                                      )..add(FetchBranches()),
+                                    ),
+                                  ],
+                                  child: const PendingCloseoutScreen(),
+                                ),
+                              ),
+                            );
+                          } else if (feature['title'] == 'Teller Liability') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MultiBlocProvider(
+                                  providers: [
+                                    BlocProvider(
+                                      create: (context) => TellerLiabilityBloc(
+                                        repository: TellerLiabilityRepository(
+                                          dataProvider: TellerLiabilityDataProvider(),
+                                        ),
+                                      )..add(FetchTellerLiabilities()),
+                                    ),
+                                    BlocProvider(
+                                      create: (context) => BranchesBloc(
+                                        BranchesRepository(
+                                          branchesDataProvider: BranchesDataProvider(),
+                                        ),
+                                      )..add(FetchBranches()),
+                                    ),
+                                  ],
+                                  child: const TellerLiabilityScreen(),
+                                ),
+                              ),
+                            );
+                          } else if (feature['title'] == 'Teller Liability Branch') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MultiBlocProvider(
+                                  providers: [
+                                    BlocProvider(
+                                      create: (context) => TellerLiabilityByBranchBloc(
+                                        repository: TellerLiabilityByBranchRepository(
+                                          dataProvider: TellerLiabilityByBranchDataProvider(),
+                                        ),
+                                      ),
+                                    ),
+                                    BlocProvider(
+                                      create: (context) => BranchesBloc(
+                                        BranchesRepository(
+                                          branchesDataProvider: BranchesDataProvider(),
+                                        ),
+                                      )..add(FetchBranches()),
+                                    ),
+                                  ],
+                                  child: const TellerLiabilityByBranchScreen(),
+                                ),
                               ),
                             );
                           }

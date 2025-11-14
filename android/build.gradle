@@ -8,6 +8,38 @@ allprojects {
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
+    
+    // Apply ProGuard rules and desugaring to all Android subprojects (including plugins)
+    afterEvaluate { subProject ->
+        if (subProject.hasProperty('android')) {
+            def proguardRules = rootProject.file('app/proguard-rules.pro')
+            
+            subProject.android {
+                // Enable desugaring for all modules
+                compileOptions {
+                    coreLibraryDesugaringEnabled true
+                }
+                
+                // Enable multidex (required for desugaring)
+                defaultConfig {
+                    multiDexEnabled true
+                }
+                
+                // Add ProGuard rules to all modules with release build type
+                buildTypes.all { buildType ->
+                    if (buildType.name == 'release' && proguardRules.exists()) {
+                        buildType.proguardFiles += proguardRules
+                    }
+                }
+            }
+            
+            // Add desugaring and multidex dependencies to all Android modules
+            subProject.dependencies {
+                coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+                implementation 'androidx.multidex:multidex:2.0.1'
+            }
+        }
+    }
 }
 subprojects {
     project.evaluationDependsOn(":app")
