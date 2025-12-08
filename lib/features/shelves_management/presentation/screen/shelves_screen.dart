@@ -17,7 +17,10 @@ class _ShelvesScreenState extends State<ShelvesScreen> {
   @override
   void initState() {
     super.initState();
-    _refreshData();
+    // Use addPostFrameCallback to ensure context is available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshData();
+    });
   }
 
   void _refreshData() {

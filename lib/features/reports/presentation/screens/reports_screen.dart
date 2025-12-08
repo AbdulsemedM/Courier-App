@@ -10,6 +10,17 @@ import 'package:courier_app/features/admin_report/presentation/screens/admin_rep
 import 'package:courier_app/features/admin_report/bloc/admin_report_bloc.dart';
 import 'package:courier_app/features/admin_report/data/repository/admin_report_repository.dart';
 import 'package:courier_app/features/admin_report/data/data_provider/admin_report_data_provider.dart';
+import 'package:courier_app/features/branch_expenses/presentation/screens/branch_expenses_screen.dart';
+import 'package:courier_app/features/branch_expenses/bloc/branch_expenses_bloc.dart';
+import 'package:courier_app/features/branch_expenses/data/repository/branch_expenses_repository.dart';
+import 'package:courier_app/features/branch_expenses/data/data_provider/branch_expenses_data_provider.dart';
+import 'package:courier_app/features/admin_expenses/presentation/screens/admin_expenses_screen.dart';
+import 'package:courier_app/features/admin_expenses/bloc/admin_expenses_bloc.dart';
+import 'package:courier_app/features/admin_expenses/data/repository/admin_expenses_repository.dart';
+import 'package:courier_app/features/admin_expenses/data/data_provider/admin_expenses_data_provider.dart';
+import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
+import 'package:courier_app/features/branches/data/repository/branches_repository.dart';
+import 'package:courier_app/features/branches/data/data_provider/branches_data_provider.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -179,12 +190,53 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     title: 'Branch Expense',
                     description: 'View branch expenses',
                     isDarkMode: isDarkMode,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                            create: (context) => BranchExpensesBloc(
+                              repository: BranchExpensesRepository(
+                                dataProvider: BranchExpensesDataProvider(),
+                              ),
+                            ),
+                            child: const BranchExpensesScreen(),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   _buildReportCard(
                     icon: Icons.account_balance_wallet,
                     title: 'Admin Expense',
                     description: 'View admin expenses',
                     isDarkMode: isDarkMode,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (context) => AdminExpensesBloc(
+                                  repository: AdminExpensesRepository(
+                                    dataProvider: AdminExpensesDataProvider(),
+                                  ),
+                                ),
+                              ),
+                              BlocProvider(
+                                create: (context) => BranchesBloc(
+                                  BranchesRepository(
+                                    branchesDataProvider: BranchesDataProvider(),
+                                  ),
+                                )..add(FetchBranches()),
+                              ),
+                            ],
+                            child: const AdminExpensesScreen(),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

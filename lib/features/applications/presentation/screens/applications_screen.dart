@@ -6,9 +6,13 @@ import 'package:courier_app/features/miles_configuration/presentation/screens/mi
 import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
 import 'package:courier_app/features/roles/presentation/screen/roles_screen.dart';
 import 'package:courier_app/features/shelves_management/presentation/screen/shelves_screen.dart';
+import 'package:courier_app/features/shelves_management/bloc/shelves_management_bloc.dart';
+import 'package:courier_app/features/shelves_management/data/repository/shelves_repository.dart';
+import 'package:courier_app/features/shelves_management/data/data_provider/shelves_data_provider.dart';
 import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
 import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
 
@@ -40,10 +44,31 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
   void _handleOptionSelected(BuildContext context, Widget screen,
       String permission, String errorMessage) {
     if (permissions.contains(permission)) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => screen),
-      );
+      // Wrap ShelvesScreen with required BLoC providers
+      if (screen is ShelvesScreen) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) => ShelvesManagementBloc(
+                    shelvesRepository: ShelvesRepository(
+                      shelvesDataProvider: ShelvesDataProvider(),
+                    ),
+                  ),
+                ),
+              ],
+              child: const ShelvesScreen(),
+            ),
+          ),
+        );
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => screen),
+        );
+      }
     } else if (screen is ComingSoonScreen) {
       Navigator.push(
         context,
