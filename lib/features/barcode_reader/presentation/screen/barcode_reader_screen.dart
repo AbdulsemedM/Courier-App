@@ -9,8 +9,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../core/services/scanner_service.dart';
 import '../widgets/barcode_reader_widget.dart';
-import 'package:urovo_scanner/urovo_scanner.dart';
 import 'package:flutter/services.dart';
 
 class BarcodeReaderScreen extends StatefulWidget {
@@ -23,15 +23,21 @@ class BarcodeReaderScreen extends StatefulWidget {
 class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   bool _isScanning = true;
   bool _hasCameraPermission = false;
-  bool _isUrovoDevice = false;
+  bool _isHardwareScanner = false; // True for Sunmi or Urovo
   String _deviceName = 'Unknown';
   final _trackingController = TextEditingController();
   String? _error;
   final Set<String> _scannedBarcodes = {}; // Using Set to ensure uniqueness
+  List<String> _scannedBarcodesList = []; // List for UI updates
   bool _isPaused = false;
+  final FocusNode _focusNode = FocusNode(); // For capturing scanner input
+  String _scannerBuffer = ''; // Buffer for scanner input
+  DateTime? _lastScannerInput; // Track timing of scanner input
   List<StatusModel> statuses = [];
   String? selectedStatus;
-  StreamSubscription<String?>? _barcodeStreamSubscription;
+  StreamSubscription<String>? _barcodeStreamSubscription;
+  final ScannerService _scannerService = ScannerService();
+  ScannerType? _scannerType;
 
   @override
   void initState() {
@@ -42,30 +48,123 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Ensure scanner is activated when screen becomes visible
+    // Wait a bit for initialization to complete
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted && _scannerType == ScannerType.sunmi) {
+        _scannerService.startScanner();
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _trackingController.dispose();
+    _focusNode.dispose();
     _barcodeStreamSubscription?.cancel();
+    _scannerService.dispose();
     super.dispose();
   }
 
   Future<void> _initializeScanner() async {
     try {
-      final isUrovo = await UrovoScanner.isUrovoDevice ?? false;
-      final deviceName = await UrovoScanner.deviceName ?? 'Unknown device';
-      print('Device name: $deviceName');
+      // Detect scanner type (Sunmi, Urovo, or Camera)
+      _scannerType = await _scannerService.detectScannerType();
+      _deviceName = _scannerService.deviceName ?? 'Unknown device';
+
+      print('Scanner type detected: $_scannerType');
+      print('Device name: $_deviceName');
+
       setState(() {
-        _isUrovoDevice = isUrovo;
-        _deviceName = deviceName;
+        _deviceName = _deviceName;
+        _isHardwareScanner = _scannerType == ScannerType.sunmi ||
+            _scannerType == ScannerType.urovo;
       });
 
-      if (_isUrovoDevice) {
-        // Initialize Urovo scanner
-        _barcodeStreamSubscription =
-            UrovoScanner.barcodeStream.listen((barcode) {
-          if (barcode != null) {
-            _onBarcodeDetected(barcode);
-          }
-        });
+      print('Hardware scanner flag set to: $_isHardwareScanner');
+
+      if (_scannerType == ScannerType.sunmi ||
+          _scannerType == ScannerType.urovo) {
+        // Initialize hardware scanner (Sunmi or Urovo)
+        print('BarcodeReaderScreen: Initializing scanner stream...');
+        final stream = _scannerService.initializeScanner();
+        print('BarcodeReaderScreen: Stream obtained, setting up listener...');
+
+        // Set up listener FIRST before starting scanner
+        _barcodeStreamSubscription = stream.listen(
+          (barcode) {
+            print(
+                'BarcodeReaderScreen: ✅✅✅ Received barcode from stream: "$barcode"');
+            print('BarcodeReaderScreen: Barcode length: ${barcode.length}');
+            print('BarcodeReaderScreen: Widget mounted: $mounted');
+            print(
+                'BarcodeReaderScreen: Current list length: ${_scannedBarcodesList.length}');
+
+            if (barcode.isNotEmpty) {
+              print('BarcodeReaderScreen: Processing barcode: $barcode');
+              // Call directly first
+              if (mounted) {
+                print(
+                    'BarcodeReaderScreen: Calling _onBarcodeDetected directly');
+                _onBarcodeDetected(barcode);
+              }
+
+              // Also call in postFrameCallback as backup
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  print(
+                      'BarcodeReaderScreen: Calling _onBarcodeDetected in postFrameCallback (backup)');
+                  // Only call if barcode wasn't already added (check by length)
+                  if (!_scannedBarcodesList.contains(barcode)) {
+                    _onBarcodeDetected(barcode);
+                  } else {
+                    print(
+                        'BarcodeReaderScreen: Barcode already in list, skipping duplicate');
+                  }
+                } else {
+                  print(
+                      'BarcodeReaderScreen: Widget not mounted in postFrameCallback');
+                }
+              });
+            } else {
+              print('BarcodeReaderScreen: ⚠️ Received empty barcode');
+            }
+          },
+          onError: (error) {
+            print('BarcodeReaderScreen: ❌ Scanner error: $error');
+            if (mounted) {
+              setState(() {
+                _error = 'Scanner error: $error';
+              });
+            }
+          },
+          cancelOnError: false, // Keep listening even on error
+        );
+        print(
+            'BarcodeReaderScreen: ✅ Scanner stream subscription created and listening');
+
+        // Wait a moment to ensure listener is ready, then start scanner
+        await Future.delayed(const Duration(milliseconds: 100));
+
+        // Start Sunmi scanner if applicable - keep it active
+        if (_scannerType == ScannerType.sunmi) {
+          print('BarcodeReaderScreen: Starting Sunmi scanner...');
+          await _scannerService.startScanner();
+          print('BarcodeReaderScreen: Sunmi scanner started');
+
+          // Request focus to capture keyboard input (scanner may send as HID keyboard)
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _focusNode.requestFocus();
+              print('BarcodeReaderScreen: Requested focus for keyboard input');
+            }
+          });
+
+          // Keep scanner active - retry periodically
+          _keepScannerActive();
+        }
       } else {
         // Initialize regular camera scanner
         _requestCameraPermission();
@@ -73,6 +172,17 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
     } on PlatformException catch (e) {
       print('Error initializing scanner: ${e.message}');
       // Fallback to regular camera scanner
+      setState(() {
+        _scannerType = ScannerType.camera;
+        _isHardwareScanner = false;
+      });
+      _requestCameraPermission();
+    } catch (e) {
+      print('Unexpected error initializing scanner: $e');
+      setState(() {
+        _scannerType = ScannerType.camera;
+        _isHardwareScanner = false;
+      });
       _requestCameraPermission();
     }
   }
@@ -185,27 +295,66 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   }
 
   void _onBarcodeDetected(String barcode) async {
-    if (_isPaused) return; // Ignore if scanning is paused
+    print('_onBarcodeDetected called with: $barcode');
+
+    if (_isPaused) {
+      print('Scanner is paused, ignoring barcode');
+      return; // Ignore if scanning is paused
+    }
 
     if (barcode.isEmpty) {
+      print('Empty barcode detected');
       setState(() {
         _error = 'Invalid barcode detected';
       });
       return;
     }
 
+    // Trim whitespace
+    barcode = barcode.trim();
+    print('Processing barcode: $barcode');
+
     // Check for duplicates
     if (_scannedBarcodes.contains(barcode)) {
+      print('Duplicate barcode detected: $barcode');
       setState(() {
         _error = 'This barcode has already been scanned';
       });
       return;
     }
 
-    // Add to list directly
+    // Add to list and update UI
+    print('Adding barcode to list: $barcode');
+    print('Current scanned count before add: ${_scannedBarcodes.length}');
+
+    // Add to set for uniqueness check
+    _scannedBarcodes.add(barcode);
+
+    // Create a new list to ensure Flutter detects the change
+    final newList = List<String>.from(_scannedBarcodes);
+
+    print(
+        'Before setState - List length: ${_scannedBarcodesList.length}, New list length: ${newList.length}');
+
+    // Update list for UI (Flutter detects List changes better than Set)
     setState(() {
-      _scannedBarcodes.add(barcode);
+      _scannedBarcodesList = newList;
       _error = null;
+    });
+
+    print('After setState - List length: ${_scannedBarcodesList.length}');
+    print('Barcode added. Total scanned: ${_scannedBarcodes.length}');
+    print('Scanned barcodes list: $_scannedBarcodesList');
+    print('setState called, UI should update now');
+
+    // Force a rebuild by calling setState again after a tiny delay
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (mounted) {
+        setState(() {
+          // Just trigger a rebuild
+        });
+        print('Forced rebuild triggered');
+      }
     });
 
     // Optional: Add a brief pause to prevent multiple rapid scans
@@ -238,7 +387,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Total scanned: ${_scannedBarcodes.length}',
+            'Total scanned: ${_scannedBarcodesList.length}',
             style: TextStyle(
               color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
               fontSize: 12,
@@ -269,9 +418,14 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   }
 
   Widget _buildScannedList(bool isDarkMode) {
-    if (_scannedBarcodes.isEmpty) return const SizedBox.shrink();
+    if (_scannedBarcodesList.isEmpty) return const SizedBox.shrink();
+
+    print(
+        '_buildScannedList called with ${_scannedBarcodesList.length} barcodes');
+    print('Barcodes: $_scannedBarcodesList');
 
     return Container(
+      key: ValueKey('scanned_list_${_scannedBarcodesList.length}'),
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -290,7 +444,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Scanned Barcodes (${_scannedBarcodes.length})',
+                'Scanned Barcodes (${_scannedBarcodesList.length})',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: isDarkMode ? Colors.white : Colors.black87,
@@ -298,7 +452,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
               ),
               Row(
                 children: [
-                  if (_scannedBarcodes.isNotEmpty)
+                  if (_scannedBarcodesList.isNotEmpty)
                     ElevatedButton.icon(
                       onPressed: () {
                         if (selectedStatus == null) {
@@ -312,7 +466,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                         }
                         context.read<BarcodeReaderBloc>().add(
                               BarcodeReaderChangeStatusEvent(
-                                shipmentIds: _scannedBarcodes.toList(),
+                                shipmentIds: _scannedBarcodesList,
                                 status: selectedStatus!,
                               ),
                             );
@@ -331,7 +485,10 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                     icon: const Icon(Icons.clear_all),
                     color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                     onPressed: () {
-                      setState(() => _scannedBarcodes.clear());
+                      setState(() {
+                        _scannedBarcodes.clear();
+                        _scannedBarcodesList.clear();
+                      });
                     },
                     tooltip: 'Clear all',
                   ),
@@ -343,7 +500,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _scannedBarcodes
+            children: _scannedBarcodesList
                 .map((barcode) => Chip(
                       label: Text(
                         barcode,
@@ -360,7 +517,11 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                         color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                       ),
                       onDeleted: () {
-                        setState(() => _scannedBarcodes.remove(barcode));
+                        setState(() {
+                          _scannedBarcodes.remove(barcode);
+                          _scannedBarcodesList =
+                              List<String>.from(_scannedBarcodes);
+                        });
                       },
                     ))
                 .toList(),
@@ -469,6 +630,23 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       _isScanning = !_isScanning;
       _error = null;
     });
+
+    // If switching to scanning mode and it's Sunmi, ensure scanner is active
+    if (_isScanning && _scannerType == ScannerType.sunmi) {
+      _scannerService.startScanner();
+    }
+  }
+
+  // Keep scanner active by periodically reactivating it
+  void _keepScannerActive() {
+    if (_scannerType == ScannerType.sunmi) {
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted && _scannerType == ScannerType.sunmi) {
+          _scannerService.startScanner();
+          _keepScannerActive(); // Schedule next activation
+        }
+      });
+    }
   }
 
   @override
@@ -513,115 +691,163 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
           },
         ),
       ],
-      child: Scaffold(
-        backgroundColor:
-            isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: const Color.fromARGB(255, 75, 23, 160),
-          title: Text(
-            'Track Shipment',
-            style: TextStyle(
-              color: isDarkMode ? Colors.white : Colors.black87,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        body: Column(
-          children: [
-            BarcodeReaderWidgets.buildStatusDropdown(
-              isDarkMode: isDarkMode,
-              selectedStatus: selectedStatus,
-              statuses: statuses,
-              onChanged: (value) {
-                setState(() {
-                  selectedStatus = value;
-                });
-              },
-            ),
-            if (_error != null)
-              BarcodeReaderWidgets.buildErrorMessage(_error!, isDarkMode),
-            if (_scannedBarcodes.isNotEmpty) _buildScannedList(isDarkMode),
-            Expanded(
-              child: _isScanning
-                  ? _isUrovoDevice
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Text(
-                              //   'Urovo Scanner Active',
-                              //   style: TextStyle(
-                              //     color: isDarkMode
-                              //         ? Colors.white
-                              //         : Colors.black87,
-                              //     fontSize: 18,
-                              //     fontWeight: FontWeight.bold,
-                              //   ),
-                              // ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Device: $_deviceName',
-                                style: TextStyle(
-                                  color: isDarkMode
-                                      ? Colors.grey[400]
-                                      : Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Press the scan button on your device',
-                                style: TextStyle(
-                                  color: isDarkMode
-                                      ? Colors.grey[400]
-                                      : Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : _hasCameraPermission
-                          ? BarcodeReaderWidgets.buildScanner(
-                              isDarkMode: isDarkMode,
-                              onBarcodeDetected: _onBarcodeDetected,
-                            )
-                          : const Text('Camera permission is required.')
-                  : BarcodeReaderWidgets.buildManualEntry(
-                      isDarkMode: isDarkMode,
-                      controller: _trackingController,
-                      onSubmit: _onManualSubmit,
-                    ),
-            ),
-          ],
-        ),
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BarcodeReaderWidgets.buildToggleButton(
-              isDarkMode: isDarkMode,
-              isScanning: _isScanning,
-              onToggle: _toggleScanMode,
-            ),
-            const SizedBox(width: 16),
-            FloatingActionButton(
-              backgroundColor: const Color(0xFFFF5A00),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const TrackOrderScreen()),
-                );
-              },
-              child: const Icon(
-                Icons.radar_rounded,
-                size: 30,
-                color: Colors.white,
+      child: KeyboardListener(
+        focusNode: _focusNode,
+        onKeyEvent: (event) {
+          // Capture keyboard input from scanner (HID mode)
+          if (event is KeyDownEvent && _scannerType == ScannerType.sunmi) {
+            final keyLabel = event.logicalKey.keyLabel;
+            print('🔍 Key pressed: $keyLabel (${event.logicalKey.keyId})');
+
+            // If it's a printable character, add to buffer
+            if (keyLabel.length == 1 && event.character != null) {
+              final now = DateTime.now();
+              if (_lastScannerInput != null) {
+                final timeDiff = now.difference(_lastScannerInput!);
+                // If more than 100ms passed, assume new scan started
+                if (timeDiff.inMilliseconds > 100) {
+                  _scannerBuffer = '';
+                }
+              }
+              _scannerBuffer += event.character!;
+              _lastScannerInput = now;
+              print('🔍 Scanner buffer: $_scannerBuffer');
+            } else if (event.logicalKey == LogicalKeyboardKey.enter) {
+              // Enter key indicates end of barcode
+              if (_scannerBuffer.isNotEmpty) {
+                print('🔍✅ Complete barcode from keyboard: $_scannerBuffer');
+                _onBarcodeDetected(_scannerBuffer.trim());
+                _scannerBuffer = '';
+                _lastScannerInput = null;
+              }
+            }
+          }
+        },
+        child: Scaffold(
+          backgroundColor:
+              isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: const Color.fromARGB(255, 75, 23, 160),
+            title: Text(
+              'Track Shipment',
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black87,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ],
+          ),
+          body: Column(
+            children: [
+              BarcodeReaderWidgets.buildStatusDropdown(
+                isDarkMode: isDarkMode,
+                selectedStatus: selectedStatus,
+                statuses: statuses,
+                onChanged: (value) {
+                  setState(() {
+                    selectedStatus = value;
+                  });
+                },
+              ),
+              if (_error != null)
+                BarcodeReaderWidgets.buildErrorMessage(_error!, isDarkMode),
+              // Always show the scanned list if there are barcodes
+              if (_scannedBarcodesList.isNotEmpty)
+                _buildScannedList(isDarkMode),
+              Expanded(
+                child: _isScanning
+                    ? _isHardwareScanner
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  _scannerType == ScannerType.sunmi
+                                      ? Icons.qr_code_scanner
+                                      : Icons.scanner,
+                                  size: 64,
+                                  color: isDarkMode
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _scannerType == ScannerType.sunmi
+                                      ? 'Sunmi Scanner Active'
+                                      : 'Urovo Scanner Active',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black87,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Device: $_deviceName',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.grey[400]
+                                        : Colors.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Press the scan button on your device',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.grey[400]
+                                        : Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : _hasCameraPermission
+                            ? BarcodeReaderWidgets.buildScanner(
+                                isDarkMode: isDarkMode,
+                                onBarcodeDetected: _onBarcodeDetected,
+                              )
+                            : const Text('Camera permission is required.')
+                    : BarcodeReaderWidgets.buildManualEntry(
+                        isDarkMode: isDarkMode,
+                        controller: _trackingController,
+                        onSubmit: _onManualSubmit,
+                      ),
+              ),
+            ],
+          ),
+          floatingActionButton: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              BarcodeReaderWidgets.buildToggleButton(
+                isDarkMode: isDarkMode,
+                isScanning: _isScanning,
+                onToggle: _toggleScanMode,
+              ),
+              const SizedBox(width: 16),
+              FloatingActionButton(
+                backgroundColor: const Color(0xFFFF5A00),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const TrackOrderScreen()),
+                  );
+                },
+                child: const Icon(
+                  Icons.radar_rounded,
+                  size: 30,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
