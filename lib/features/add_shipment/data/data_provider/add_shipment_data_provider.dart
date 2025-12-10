@@ -144,6 +144,37 @@ class AddShipmentDataProvider {
     }
   }
 
+  Future<String> checkDiscount(
+    int originId,
+    int destinationId,
+    int serviceModeId,
+    int shipmentTypeId,
+    int deliveryTypeId,
+    String unit,
+    double weightKg,
+    double discountPricePerKg,
+  ) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider.getRequest(
+        "/api/v1/rate/discount-check",
+        params: {
+          "originId": originId,
+          "destinationId": destinationId,
+          "serviceModeId": serviceModeId,
+          "shipmentTypeId": shipmentTypeId,
+          "deliveryTypeId": deliveryTypeId,
+          "unit": unit.toLowerCase(),
+          "weightKg": weightKg,
+          "discountPricePerKg": discountPricePerKg,
+        },
+      );
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
   Future<String> initiatePayment(String awb, String paymentMethod,
       String payerAccount, int addedBy) async {
     try {

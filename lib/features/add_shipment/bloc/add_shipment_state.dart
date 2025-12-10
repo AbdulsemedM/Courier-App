@@ -179,6 +179,23 @@ final class FetchEstimatedRateFailure extends AddShipmentState {
   FetchEstimatedRateFailure({required this.errorMessage});
 }
 
+final class CheckDiscountLoading extends AddShipmentState {}
+
+final class CheckDiscountSuccess extends AddShipmentState {
+  final DiscountModel discount;
+
+  CheckDiscountSuccess({required this.discount});
+
+  @override
+  List<Object> get props => [discount];
+}
+
+final class CheckDiscountFailure extends AddShipmentState {
+  final String errorMessage;
+
+  CheckDiscountFailure({required this.errorMessage});
+}
+
 final class InitiatePaymentLoading extends AddShipmentState {}
 
 final class InitiatePaymentSuccess extends AddShipmentState {

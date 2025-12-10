@@ -5,6 +5,7 @@ import 'package:courier_app/features/add_shipment/data/data_provider/add_shipmen
 import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:courier_app/features/add_shipment/model/customer_by_phone.dart';
 import 'package:courier_app/features/add_shipment/model/delivery_types_model.dart';
+import 'package:courier_app/features/add_shipment/model/discount_model.dart';
 import 'package:courier_app/features/add_shipment/model/estimated_rate_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_invoice_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_method_model.dart';
@@ -358,9 +359,49 @@ class AddShipmentRepository {
       if (data['status'] != 200) {
         throw data['message'];
       }
-      return EstimatedRateModel.fromMap(data['data']);
+      // API returns data as an array, so we need to access the first element
+      final dataList = data['data'] as List;
+      if (dataList.isEmpty) {
+        throw 'No rate data found';
+      }
+      return EstimatedRateModel.fromMap(dataList[0] as Map<String, dynamic>);
     } catch (e) {
       print('Error in fetchEstimatedRate: ${e.toString()}');
+      rethrow;
+    }
+  }
+
+  Future<DiscountModel> checkDiscount(
+    int originId,
+    int destinationId,
+    int serviceModeId,
+    int shipmentTypeId,
+    int deliveryTypeId,
+    String unit,
+    double weightKg,
+    double discountPricePerKg,
+  ) async {
+    try {
+      final response = await addShipmentDataProvider.checkDiscount(
+        originId,
+        destinationId,
+        serviceModeId,
+        shipmentTypeId,
+        deliveryTypeId,
+        unit,
+        weightKg,
+        discountPricePerKg,
+      );
+      final data = jsonDecode(response);
+      if (data['status'] != 200) {
+        throw data['message'];
+      }
+      final discountData =
+          DiscountModel.fromMap(data['data'] as Map<String, dynamic>);
+      // Round big decimal numbers
+      return discountData.rounded();
+    } catch (e) {
+      print('Error in checkDiscount: ${e.toString()}');
       rethrow;
     }
   }

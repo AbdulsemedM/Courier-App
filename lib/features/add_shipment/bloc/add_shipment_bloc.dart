@@ -3,6 +3,7 @@ import 'package:courier_app/features/add_shipment/data/repository/add_shipment_r
 import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:courier_app/features/add_shipment/model/customer_by_phone.dart';
 import 'package:courier_app/features/add_shipment/model/delivery_types_model.dart';
+import 'package:courier_app/features/add_shipment/model/discount_model.dart';
 import 'package:courier_app/features/add_shipment/model/estimated_rate_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_invoice_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_method_model.dart';
@@ -33,6 +34,7 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
     on<FetchCustomerByPhone>(_fetchCustomerByPhone);
     on<FetchSenderByPhone>(_fetchSenderByPhone);
     on<FetchEstimatedRate>(_fetchEstimatedRate);
+    on<CheckDiscount>(_checkDiscount);
     on<InitiatePaymentEvent>(_initiatePayment);
     on<CheckPaymentStatusEvent>(_checkPaymentStatus);
     on<FetchShipmentDetailsEvent>(_fetchShipmentDetails);
@@ -242,6 +244,30 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
       // Extract just the message from the exception
       String errorMessage = _extractErrorMessage(e);
       emit(FetchEstimatedRateFailure(errorMessage: errorMessage));
+    }
+  }
+
+  void _checkDiscount(
+      CheckDiscount event, Emitter<AddShipmentState> emit) async {
+    emit(CheckDiscountLoading());
+    try {
+      final response = await _retryOperation(
+          () => addShipmentRepository.checkDiscount(
+                event.originId,
+                event.destinationId,
+                event.serviceModeId,
+                event.shipmentTypeId,
+                event.deliveryTypeId,
+                event.unit,
+                event.weightKg,
+                event.discountPricePerKg,
+              ),
+          'checkDiscount');
+      emit(CheckDiscountSuccess(discount: response));
+    } catch (e) {
+      // Extract just the message from the exception
+      String errorMessage = _extractErrorMessage(e);
+      emit(CheckDiscountFailure(errorMessage: errorMessage));
     }
   }
 

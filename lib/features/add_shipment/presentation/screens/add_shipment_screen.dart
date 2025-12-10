@@ -530,6 +530,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                             paymentModes: paymentModes,
                             paymentMethods: paymentMethods,
                             quantity: formData2,
+                            formData1: formData1,
                             onSubmit: () {
                               print('[UI] Submit button pressed on step 3');
                               print('[UI] Form validation started');

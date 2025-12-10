@@ -7,6 +7,7 @@ import 'package:printing/printing.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
+import 'package:device_info_plus/device_info_plus.dart';
 import '../../bloc/add_shipment_bloc.dart';
 
 class PrintShipmentScreen extends StatefulWidget {
@@ -21,12 +22,14 @@ class PrintShipmentScreen extends StatefulWidget {
 
 class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
   Map<String, dynamic>? shipmentData;
+  bool _isSunmiDevice = false;
 
   @override
   void initState() {
     super.initState();
     print(
         '[PrintShipmentScreen] initState called with trackingNumber: ${widget.trackingNumber}');
+    _checkIfSunmiDevice();
     try {
       context.read<AddShipmentBloc>().add(
             FetchShipmentDetailsEvent(trackingNumber: widget.trackingNumber),
@@ -35,6 +38,33 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
     } catch (e) {
       print('[PrintShipmentScreen] Error in initState: ${e.toString()}');
       print('[PrintShipmentScreen] Error stack trace: ${StackTrace.current}');
+    }
+  }
+
+  Future<void> _checkIfSunmiDevice() async {
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      final androidInfo = await deviceInfo.androidInfo;
+      final manufacturer = androidInfo.manufacturer.toUpperCase();
+      final model = androidInfo.model.toUpperCase();
+
+      final isSunmi = manufacturer.contains('SUNMI') ||
+          model.contains('V3 MIX') ||
+          model.contains('V3MIX') ||
+          model.contains('SUNMI') ||
+          model.contains('V3');
+
+      setState(() {
+        _isSunmiDevice = isSunmi;
+      });
+
+      print(
+          '[PrintShipmentScreen] Device check - Manufacturer: ${androidInfo.manufacturer}, Model: ${androidInfo.model}, IsSunmi: $isSunmi');
+    } catch (e) {
+      print('[PrintShipmentScreen] Error checking device: ${e.toString()}');
+      setState(() {
+        _isSunmiDevice = false;
+      });
     }
   }
 
@@ -157,12 +187,30 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: () => _generatePdf(context),
-                  child: const Text('Download PDF'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                  ),
+                child: Column(
+                  children: [
+                    if (_isSunmiDevice)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: ElevatedButton.icon(
+                          onPressed: () => _printPdf(context),
+                          icon: const Icon(Icons.print),
+                          label: const Text('Print PDF'),
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(50),
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ElevatedButton(
+                      onPressed: () => _generatePdf(context),
+                      child: const Text('Download PDF'),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -220,7 +268,34 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
     );
   }
 
-  Future<void> _generatePdf(BuildContext context) async {
+  Future<void> _printPdf(BuildContext context) async {
+    try {
+      // Generate PDF first
+      final pdf = await _generatePdfDocument();
+
+      // Print directly to printer
+      await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => pdf.save(),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Printing to Sunmi printer...'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      print('[PrintShipmentScreen] Error printing PDF: ${e.toString()}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error printing: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<pw.Document> _generatePdfDocument() async {
     final pdf = pw.Document();
 
     // Load logo and barcode images
@@ -616,10 +691,26 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
       ),
     );
 
-    await Printing.sharePdf(
-      bytes: await pdf.save(),
-      filename: 'shipment_${widget.trackingNumber}.pdf',
-    );
+    return pdf;
+  }
+
+  Future<void> _generatePdf(BuildContext context) async {
+    try {
+      final pdf = await _generatePdfDocument();
+
+      await Printing.sharePdf(
+        bytes: await pdf.save(),
+        filename: 'shipment_${widget.trackingNumber}.pdf',
+      );
+    } catch (e) {
+      print('[PrintShipmentScreen] Error generating PDF: ${e.toString()}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error generating PDF: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   // Parse AWB to extract prefix (ETAA, ETJJ, ETJM, etc.) and numeric suffix
