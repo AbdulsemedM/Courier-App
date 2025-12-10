@@ -169,21 +169,85 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
   }
 
   Widget _buildStepIndicator(bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+    final steps = [
+      'Create Shipment',
+      'Payment',
+      'Print Shipment',
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      color: isDarkMode ? const Color(0xFF5b3895) : Colors.white,
       child: Row(
         children: List.generate(3, (index) {
-          bool isActive = index <= _currentPage;
+          final isActive = index == _currentPage;
+          final isCompleted = index < _currentPage;
+
           return Expanded(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              height: 4,
-              decoration: BoxDecoration(
-                color: isActive
-                    ? (isDarkMode ? Colors.blue[400] : Colors.blue)
-                    : (isDarkMode ? Colors.grey[700] : Colors.grey[300]),
-                borderRadius: BorderRadius.circular(2),
-              ),
+            child: Row(
+              children: [
+                // Step Circle and Label
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: isActive
+                                ? Colors.blue
+                                : (isCompleted
+                                    ? Colors.grey[400]
+                                    : Colors.grey[300]),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${index + 1}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Step Label
+                        Text(
+                          steps[index],
+                          style: TextStyle(
+                            color: isActive
+                                ? (isDarkMode ? Colors.white : Colors.black87)
+                                : (isDarkMode
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600]),
+                            fontSize: 14,
+                            fontWeight:
+                                isActive ? FontWeight.w600 : FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                // Connecting Line
+                if (index < 2)
+                  Expanded(
+                    child: Container(
+                      height: 2,
+                      margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
+                      decoration: BoxDecoration(
+                        color: isCompleted || (index < _currentPage)
+                            ? Colors.grey[400]
+                            : Colors.grey[300],
+                      ),
+                    ),
+                  ),
+              ],
             ),
           );
         }),
