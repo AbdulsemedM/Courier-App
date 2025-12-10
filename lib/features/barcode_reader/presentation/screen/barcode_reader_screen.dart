@@ -678,7 +678,12 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
               _trackingController.clear();
               setState(() {
                 selectedStatus = null;
+                // Clear all scanned barcodes from UI
+                _scannedBarcodes.clear();
+                _scannedBarcodesList.clear();
               });
+              // Clear shipments from store
+              context.read<TrackOrderBloc>().add(ClearShipments());
             }
             if (state is BarcodeReaderError) {
               ScaffoldMessenger.of(context).showSnackBar(
