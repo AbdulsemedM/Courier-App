@@ -43,12 +43,34 @@ class MilesConfigurationModel {
   }
 
   factory MilesConfigurationModel.fromMap(Map<String, dynamic> map) {
+    // Handle originBranch - can be int (ID) or Map (object)
+    String originBranchName = '';
+    final originBranch = map['originBranch'];
+    if (originBranch is Map<String, dynamic>) {
+      originBranchName = originBranch['name'] as String? ?? '';
+    } else if (originBranch is int) {
+      // If it's just an ID, we can't get the name - use empty string or ID as fallback
+      originBranchName = 'Branch $originBranch';
+    }
+
+    // Handle destinationBranch - can be int (ID) or Map (object)
+    String destinationBranchName = '';
+    final destinationBranch = map['destinationBranch'];
+    if (destinationBranch is Map<String, dynamic>) {
+      destinationBranchName = destinationBranch['name'] as String? ?? '';
+    } else if (destinationBranch is int) {
+      // If it's just an ID, we can't get the name - use empty string or ID as fallback
+      destinationBranchName = 'Branch $destinationBranch';
+    }
+
     return MilesConfigurationModel(
       id: map['id'] as int,
-      originBranchName: map['originBranch']['name'] as String,
-      destinationBranchName: map['destinationBranch']['name'] as String,
+      originBranchName: originBranchName,
+      destinationBranchName: destinationBranchName,
       unit: map['unit'] as String,
-      milesPerUnit: map['milesPerUnit'] as double,
+      milesPerUnit: (map['milesPerUnit'] is int)
+          ? (map['milesPerUnit'] as int).toDouble()
+          : (map['milesPerUnit'] as num).toDouble(),
     );
   }
 

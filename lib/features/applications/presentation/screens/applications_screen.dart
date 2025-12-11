@@ -111,18 +111,18 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
             permission = 'pay_by_awb';
             errorMessage = 'You do not have permission to access Pay by AWB';
           } else if (screen is MilesConfigurationScreen) {
-            permission = 'manage_miles';
+            permission = 'manage_miles_config';
             errorMessage =
                 'You do not have permission to access Miles Configuration';
           } else if (screen is ShipmentInvoiceScreen) {
-            permission = 'manage_shipment_invoice';
+            permission = 'Shipment_Invoice';
             errorMessage =
                 'You do not have permission to access Shipment Invoice';
           } else if (screen is ShipmentsScreen) {
-            permission = 'view_shipments';
+            permission = 'manage_shipments';
             errorMessage = 'You do not have permission to view shipments';
           } else if (screen is RolesScreen) {
-            permission = 'manage_roles';
+            permission = 'Roles';
             errorMessage = 'You do not have permission to manage roles';
           } else if (screen is ComingSoonScreen) {
             permission = 'manage_extra_fee';
