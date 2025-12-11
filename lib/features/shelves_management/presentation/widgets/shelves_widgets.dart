@@ -75,7 +75,7 @@ class BranchFilter extends StatelessWidget {
           ...branches.map((branch) {
             return DropdownMenuItem<int?>(
               value: branch.id,
-              child: Text(branch.name ?? ''),
+              child: Text(branch.name),
             );
           }),
         ],

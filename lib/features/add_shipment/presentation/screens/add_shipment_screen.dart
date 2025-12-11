@@ -644,14 +644,14 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
     );
   }
 
-  void _handlePaymentInfo(String info) {
-    // Use Provider.of with listen: false for event handlers
-    Provider.of<PaymentService>(context, listen: false).setPaymentInfo(info);
-  }
+  // void _handlePaymentInfo(String info) {
+  //   // Use Provider.of with listen: false for event handlers
+  //   Provider.of<PaymentService>(context, listen: false).setPaymentInfo(info);
+  // }
 
-  void _handlePaymentMethod(String method) {
-    // Use Provider.of with listen: false for event handlers
-    Provider.of<PaymentService>(context, listen: false)
-        .setPaymentMethod(method);
-  }
+  // void _handlePaymentMethod(String method) {
+  //   // Use Provider.of with listen: false for event handlers
+  //   Provider.of<PaymentService>(context, listen: false)
+  //       .setPaymentMethod(method);
+  // }
 }

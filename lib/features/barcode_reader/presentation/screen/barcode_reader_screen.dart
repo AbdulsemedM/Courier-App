@@ -241,58 +241,58 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //   }
   // }
 
-  void _showPermissionExplanationDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Camera Permission Required'),
-        content: const Text(
-          'This app requires camera access to scan barcodes. Please grant camera permission to continue.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final result = await Permission.camera.request();
-              setState(() {
-                _hasCameraPermission = result.isGranted;
-              });
-            },
-            child: const Text('Allow'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Deny'),
-          ),
-        ],
-      ),
-    );
-  }
+  // void _showPermissionExplanationDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Camera Permission Required'),
+  //       content: const Text(
+  //         'This app requires camera access to scan barcodes. Please grant camera permission to continue.',
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () async {
+  //             Navigator.pop(context);
+  //             final result = await Permission.camera.request();
+  //             setState(() {
+  //               _hasCameraPermission = result.isGranted;
+  //             });
+  //           },
+  //           child: const Text('Allow'),
+  //         ),
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('Deny'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  void _showSettingsRedirectDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Permission Required'),
-        content: const Text(
-          'Camera permission is permanently denied. Please enable it in settings to use the barcode scanner.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await openAppSettings();
-            },
-            child: const Text('Open Settings'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
-      ),
-    );
-  }
+  // void _showSettingsRedirectDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Permission Required'),
+  //       content: const Text(
+  //         'Camera permission is permanently denied. Please enable it in settings to use the barcode scanner.',
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () async {
+  //             Navigator.pop(context);
+  //             await openAppSettings();
+  //           },
+  //           child: const Text('Open Settings'),
+  //         ),
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('Cancel'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   void _onBarcodeDetected(String barcode) async {
     print('_onBarcodeDetected called with: $barcode');
@@ -363,59 +363,59 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
     setState(() => _isPaused = false);
   }
 
-  Widget _buildBarcodeDialog(String barcode) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    final isDarkMode = themeProvider.isDarkMode;
+  // Widget _buildBarcodeDialog(String barcode) {
+  //   final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+  //   final isDarkMode = themeProvider.isDarkMode;
 
-    return AlertDialog(
-      backgroundColor: isDarkMode ? const Color(0xFF1E2837) : Colors.white,
-      title: Text(
-        'Barcode Detected',
-        style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black87,
-        ),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Value: $barcode',
-            style: TextStyle(
-              color: isDarkMode ? Colors.grey[300] : Colors.grey[800],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Total scanned: ${_scannedBarcodesList.length}',
-            style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text(
-            'Skip',
-            style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-            ),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context, true),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isDarkMode ? Colors.blue[700] : Colors.blue,
-            foregroundColor: Colors.white,
-          ),
-          child: const Text('Store & Continue'),
-        ),
-      ],
-    );
-  }
+  //   return AlertDialog(
+  //     backgroundColor: isDarkMode ? const Color(0xFF1E2837) : Colors.white,
+  //     title: Text(
+  //       'Barcode Detected',
+  //       style: TextStyle(
+  //         color: isDarkMode ? Colors.white : Colors.black87,
+  //       ),
+  //     ),
+  //     content: Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           'Value: $barcode',
+  //           style: TextStyle(
+  //             color: isDarkMode ? Colors.grey[300] : Colors.grey[800],
+  //           ),
+  //         ),
+  //         const SizedBox(height: 16),
+  //         Text(
+  //           'Total scanned: ${_scannedBarcodesList.length}',
+  //           style: TextStyle(
+  //             color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+  //             fontSize: 12,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //     actions: [
+  //       TextButton(
+  //         onPressed: () => Navigator.pop(context, false),
+  //         child: Text(
+  //           'Skip',
+  //           style: TextStyle(
+  //             color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+  //           ),
+  //         ),
+  //       ),
+  //       ElevatedButton(
+  //         onPressed: () => Navigator.pop(context, true),
+  //         style: ElevatedButton.styleFrom(
+  //           backgroundColor: isDarkMode ? Colors.blue[700] : Colors.blue,
+  //           foregroundColor: Colors.white,
+  //         ),
+  //         child: const Text('Store & Continue'),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildScannedList(bool isDarkMode) {
     if (_scannedBarcodesList.isEmpty) return const SizedBox.shrink();
@@ -531,69 +531,69 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
     );
   }
 
-  Widget _buildStatusDropdown(bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Select Status',
-            style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: isDarkMode
-                  ? Colors.grey[800]!.withOpacity(0.5)
-                  : Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
-              ),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: selectedStatus,
-                hint: Text(
-                  'Select status',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                  ),
-                ),
-                isExpanded: true,
-                icon: Icon(
-                  Icons.arrow_drop_down,
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                ),
-                dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
-                items: statuses
-                    .map((status) => DropdownMenuItem<String>(
-                          value: status.code,
-                          child: Text(
-                            '${status.code} - ${status.description}',
-                            style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedStatus = value;
-                  });
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildStatusDropdown(bool isDarkMode) {
+  //   return Container(
+  //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           'Select Status',
+  //           style: TextStyle(
+  //             color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+  //             fontSize: 14,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 8),
+  //         Container(
+  //           padding: const EdgeInsets.symmetric(horizontal: 12),
+  //           decoration: BoxDecoration(
+  //             color: isDarkMode
+  //                 ? Colors.grey[800]!.withOpacity(0.5)
+  //                 : Colors.white,
+  //             borderRadius: BorderRadius.circular(12),
+  //             border: Border.all(
+  //               color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+  //             ),
+  //           ),
+  //           child: DropdownButtonHideUnderline(
+  //             child: DropdownButton<String>(
+  //               value: selectedStatus,
+  //               hint: Text(
+  //                 'Select status',
+  //                 style: TextStyle(
+  //                   color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+  //                 ),
+  //               ),
+  //               isExpanded: true,
+  //               icon: Icon(
+  //                 Icons.arrow_drop_down,
+  //                 color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+  //               ),
+  //               dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+  //               items: statuses
+  //                   .map((status) => DropdownMenuItem<String>(
+  //                         value: status.code,
+  //                         child: Text(
+  //                           '${status.code} - ${status.description}',
+  //                           style: TextStyle(
+  //                             color: isDarkMode ? Colors.white : Colors.black87,
+  //                           ),
+  //                         ),
+  //                       ))
+  //                   .toList(),
+  //               onChanged: (value) {
+  //                 setState(() {
+  //                   selectedStatus = value;
+  //                 });
+  //               },
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   void _onManualSubmit(dynamic value) {
     if (value == null || (value is List && value.isEmpty)) {
