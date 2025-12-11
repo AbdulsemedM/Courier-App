@@ -1,6 +1,7 @@
 import 'package:courier_app/app/utils/dialog_utils.dart';
 import 'package:courier_app/configuration/phone_number_manager.dart';
 import 'package:courier_app/features/applications/presentation/widgets/application_widget.dart';
+import 'package:courier_app/features/applications/presentation/widgets/shipment_type_modal.dart';
 import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
 import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
@@ -44,8 +45,12 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
   void _handleOptionSelected(BuildContext context, Widget screen,
       String permission, String errorMessage) {
     if (permissions.contains(permission)) {
+      // Show modal for ShipmentsScreen
+      if (screen is ShipmentsScreen) {
+        _showShipmentTypeModal(context);
+      }
       // Wrap ShelvesScreen with required BLoC providers
-      if (screen is ShelvesScreen) {
+      else if (screen is ShelvesScreen) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -76,6 +81,39 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
       );
     } else {
       displaySnack(context, errorMessage, Colors.red);
+    }
+  }
+
+  void _showShipmentTypeModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ShipmentTypeModal(
+        onTypeSelected: (type) {
+          _handleShipmentTypeSelection(context, type);
+        },
+      ),
+    );
+  }
+
+  void _handleShipmentTypeSelection(BuildContext context, ShipmentType type) {
+    if (type == ShipmentType.all) {
+      // Navigate to the existing ShipmentsScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ShipmentsScreen()),
+      );
+    } else {
+      // For other types, you can navigate to filtered screens or show filtered ShipmentsScreen
+      // For now, navigate to ShipmentsScreen with a filter parameter
+      // You may want to modify ShipmentsScreen to accept an initial filter parameter
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ShipmentsScreen()),
+      );
+      // TODO: Implement filtering for R4P, Arrived, Arriving, and Delivered shipments
+      // This could be done by passing a parameter to ShipmentsScreen or using a state management solution
     }
   }
 
