@@ -161,7 +161,7 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
             permission = 'manage_shipments';
             errorMessage = 'You do not have permission to view shipments';
           } else if (screen is RolesScreen) {
-            permission = 'Roles';
+            permission = 'manage_permissions';
             errorMessage = 'You do not have permission to manage roles';
           } else if (screen is ComingSoonScreen) {
             permission = 'manage_extra_fee';
