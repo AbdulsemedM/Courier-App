@@ -253,6 +253,7 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
         ...data.entries.map((entry) => Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     '${entry.key}: ',
@@ -260,7 +261,12 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Text(entry.value),
+                  Expanded(
+                    child: Text(
+                      entry.value,
+                      softWrap: true,
+                    ),
+                  ),
                 ],
               ),
             )),

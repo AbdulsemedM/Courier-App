@@ -1,4 +1,5 @@
 import 'package:courier_app/features/track_order/model/shipmet_status_model.dart';
+import 'package:courier_app/features/add_shipment/presentation/screens/print_shipment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -85,6 +86,8 @@ class ShipmentsWidgets {
   static Widget buildShipmentsTable({
     required bool isDarkMode,
     required List<ShipmentModel> shipments,
+    bool showDeliverButton = false,
+    Function(String)? onDeliver,
   }) {
     return Container(
       margin: const EdgeInsets.all(16),
@@ -163,6 +166,15 @@ class ShipmentsWidgets {
                   ),
                 ),
               ),
+              DataColumn(
+                label: Text(
+                  'Action',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
             ],
             rows: shipments.map((shipment) {
               return DataRow(
@@ -210,6 +222,49 @@ class ShipmentsWidgets {
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   )),
+                  DataCell(
+                    Builder(
+                      builder: (context) => Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.print,
+                              color: isDarkMode ? Colors.blue[300] : Colors.blue,
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              if (shipment.awb != null && shipment.awb!.isNotEmpty) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PrintShipmentScreen(
+                                      trackingNumber: shipment.awb!,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            tooltip: 'Print',
+                          ),
+                          if (showDeliverButton && onDeliver != null)
+                            IconButton(
+                              icon: Icon(
+                                Icons.local_shipping,
+                                color: isDarkMode ? Colors.green[300] : Colors.green,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                if (shipment.awb != null && shipment.awb!.isNotEmpty) {
+                                  onDeliver(shipment.awb!);
+                                }
+                              },
+                              tooltip: 'Deliver',
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               );
             }).toList(),

@@ -1,14 +1,21 @@
+import 'dart:io';
 import 'package:courier_app/features/shipment/bloc/shipments_bloc.dart';
 import 'package:courier_app/features/track_order/model/shipmet_status_model.dart';
+import 'package:courier_app/app/utils/dialog_utils.dart';
+import 'package:courier_app/features/shipment/data/data_provider/deliver_shipment_data_provider.dart';
+import 'package:courier_app/features/shipment/data/repository/deliver_shipment_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../track_order/bloc/track_order_bloc.dart';
 import '../widgets/shipments_widget.dart';
+import '../widgets/deliver_shipment_modal.dart';
 
 class ShipmentsScreen extends StatefulWidget {
-  const ShipmentsScreen({super.key});
+  final String? initialStatus;
+  
+  const ShipmentsScreen({super.key, this.initialStatus});
 
   @override
   State<ShipmentsScreen> createState() => _ShipmentsScreenState();
@@ -23,7 +30,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<ShipmentsBloc>().add(FetchShipments());
+    context.read<ShipmentsBloc>().add(FetchShipments(status: widget.initialStatus));
     context.read<TrackOrderBloc>().add(FetchStatuses());
   }
 
@@ -67,6 +74,80 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     }
   }
 
+  void _handleDeliver(String awb) {
+    final outerContext = context; // Store the outer context
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (modalContext) => DeliverShipmentModal(
+        awb: awb,
+        onDeliver: ({
+          required String awb,
+          required bool isSelf,
+          File? customerIdFile,
+          String? deliveredToName,
+          String? deliveredToPhone,
+        }) async {
+          try {
+            // Close the modal
+            Navigator.pop(modalContext);
+            
+            // Show loading using outer context
+            if (!mounted) return;
+            showDialog(
+              context: outerContext,
+              barrierDismissible: false,
+              builder: (dialogContext) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+
+            // Call the deliver API
+            final repository = DeliverShipmentRepository(
+              deliverShipmentDataProvider: DeliverShipmentDataProvider(),
+            );
+            
+            final message = await repository.deliverShipment(
+              awb: awb,
+              isSelf: isSelf,
+              customerIdFile: customerIdFile,
+              deliveredToName: deliveredToName,
+              deliveredToPhone: deliveredToPhone,
+            );
+
+            // Close loading dialog
+            if (!mounted) return;
+            Navigator.pop(outerContext);
+
+            // Show success message
+            if (!mounted) return;
+            displaySnack(outerContext, message, Colors.green);
+
+            // Refresh shipments
+            if (!mounted) return;
+            outerContext.read<ShipmentsBloc>().add(
+              FetchShipments(status: widget.initialStatus),
+            );
+          } catch (e) {
+            // Close loading dialog if still open
+            if (mounted) {
+              try {
+                Navigator.pop(outerContext);
+              } catch (_) {
+                // Dialog might already be closed
+              }
+              
+              // Show error message
+              displaySnack(outerContext, e.toString(), Colors.red);
+            }
+          }
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -87,11 +168,17 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
           BlocListener<TrackOrderBloc, TrackOrderState>(
             listener: (context, state) {
               if (state is FetchStatusSuccess) {
+                final newStatusOptions = [
+                  'All',
+                  ...state.statuses.map((s) => s.code)
+                ];
                 setState(() {
-                  _statusOptions = [
-                    'All',
-                    ...state.statuses.map((s) => s.code)
-                  ];
+                  _statusOptions = newStatusOptions;
+                  // Set the initial status after statuses are loaded
+                  if (widget.initialStatus != null && 
+                      newStatusOptions.contains(widget.initialStatus)) {
+                    _selectedStatus = widget.initialStatus!;
+                  }
                 });
               }
             },
@@ -105,12 +192,33 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
             ),
           ),
           Expanded(
-            child: BlocConsumer<ShipmentsBloc, ShipmentsState>(
-              listener: (context, state) {
-                if (state is FetchShipmentsSuccess) {
-                  _filterShipments(state.shipments);
-                }
-              },
+            child: MultiBlocListener(
+              listeners: [
+                BlocListener<ShipmentsBloc, ShipmentsState>(
+                  listener: (context, state) {
+                    if (state is FetchShipmentsSuccess) {
+                      _filterShipments(state.shipments);
+                    }
+                  },
+                ),
+                BlocListener<TrackOrderBloc, TrackOrderState>(
+                  listener: (context, state) {
+                    if (state is ChangeStatusSuccess) {
+                      displaySnack(context, state.message, Colors.green);
+                      // Refresh shipments after status change
+                      context.read<ShipmentsBloc>().add(
+                        FetchShipments(status: widget.initialStatus),
+                      );
+                    } else if (state is ChangeStatusFailure) {
+                      displaySnack(context, state.errorMessage, Colors.red);
+                    }
+                  },
+                ),
+              ],
+              child: BlocConsumer<ShipmentsBloc, ShipmentsState>(
+                listener: (context, state) {
+                  // Listener removed as it's now in MultiBlocListener
+                },
               builder: (context, state) {
                 if (state is FetchShipmentsLoading) {
                   return ShipmentsWidgets.buildShimmerEffect(isDarkMode);
@@ -120,9 +228,12 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                   if (_filteredShipments.isEmpty) {
                     return ShipmentsWidgets.buildEmptyState(isDarkMode);
                   }
+                  final showDeliverButton = widget.initialStatus == 'ARR' || _selectedStatus == 'ARR';
                   return ShipmentsWidgets.buildShipmentsTable(
                     isDarkMode: isDarkMode,
                     shipments: _filteredShipments,
+                    showDeliverButton: showDeliverButton,
+                    onDeliver: _handleDeliver,
                   );
                 }
 
@@ -139,6 +250,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
                 return ShipmentsWidgets.buildEmptyState(isDarkMode);
               },
+              ),
             ),
           ),
         ],

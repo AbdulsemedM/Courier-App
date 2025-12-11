@@ -8,9 +8,9 @@ class ShipmentRepository {
 
   ShipmentRepository({required this.shipmentDataProvider});
 
-  Future<List<ShipmentModel>> fetchShipments() async {
+  Future<List<ShipmentModel>> fetchShipments({String? status}) async {
     try {
-      final response = await shipmentDataProvider.fetchShipments();
+      final response = await shipmentDataProvider.fetchShipments(status: status);
       final data = jsonDecode(response);
       if (data['status'] != 200) {
         throw data['message'];

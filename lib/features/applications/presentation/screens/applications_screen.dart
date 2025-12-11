@@ -98,23 +98,24 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
   }
 
   void _handleShipmentTypeSelection(BuildContext context, ShipmentType type) {
-    if (type == ShipmentType.all) {
-      // Navigate to the existing ShipmentsScreen
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ShipmentsScreen()),
-      );
-    } else {
-      // For other types, you can navigate to filtered screens or show filtered ShipmentsScreen
-      // For now, navigate to ShipmentsScreen with a filter parameter
-      // You may want to modify ShipmentsScreen to accept an initial filter parameter
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ShipmentsScreen()),
-      );
-      // TODO: Implement filtering for R4P, Arrived, Arriving, and Delivered shipments
-      // This could be done by passing a parameter to ShipmentsScreen or using a state management solution
+    String? status;
+    if (type == ShipmentType.r4p) {
+      status = 'R4P';
+    } else if (type == ShipmentType.arrived) {
+      status = 'ARR';
+    } else if (type == ShipmentType.arriving) {
+      status = 'OTW'; // On the way / Arriving shipments
+    } else if (type == ShipmentType.delivered) {
+      status = 'DEL';
     }
+    // For 'all', status remains null
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ShipmentsScreen(initialStatus: status),
+      ),
+    );
   }
 
   @override
