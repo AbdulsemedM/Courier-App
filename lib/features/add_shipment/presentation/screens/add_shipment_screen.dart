@@ -170,13 +170,13 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
 
   Widget _buildStepIndicator(bool isDarkMode) {
     final steps = [
-      'Create Shipment',
+      'Sender & Receiver',
+      'Shipment Details',
       'Payment',
-      'Print Shipment',
     ];
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       color: isDarkMode ? const Color(0xFF5b3895) : Colors.white,
       child: Row(
         children: List.generate(3, (index) {
@@ -185,64 +185,61 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
 
           return Expanded(
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Step Circle and Label
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? Colors.blue
-                                : (isCompleted
-                                    ? Colors.grey[400]
-                                    : Colors.grey[300]),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${index + 1}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        // Step Label
-                        Text(
-                          steps[index],
-                          style: TextStyle(
-                            color: isActive
-                                ? (isDarkMode ? Colors.white : Colors.black87)
-                                : (isDarkMode
-                                    ? Colors.grey[400]
-                                    : Colors.grey[600]),
-                            fontSize: 14,
-                            fontWeight:
-                                isActive ? FontWeight.w600 : FontWeight.normal,
-                          ),
-                        ),
-                      ],
+                // Step Circle
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? Colors.blue
+                        : (isCompleted
+                            ? const Color(0xFFFF5A00)
+                            : Colors.grey[300]),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${index + 1}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+                // Step Label - Flexible to prevent overflow
+                Flexible(
+                  child: Text(
+                    steps[index],
+                    style: TextStyle(
+                      color: isActive
+                          ? (isDarkMode ? Colors.white : Colors.black87)
+                          : (isCompleted
+                              ? const Color(0xFFFF5A00)
+                              : (isDarkMode
+                                  ? Colors.grey[400]
+                                  : Colors.grey[600])),
+                      fontSize: 12,
+                      fontWeight:
+                          isActive ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ),
                 // Connecting Line
                 if (index < 2)
                   Expanded(
                     child: Container(
                       height: 2,
-                      margin: const EdgeInsets.only(left: 8, right: 8, top: 16),
+                      margin: const EdgeInsets.only(left: 6, right: 6, top: 16),
                       decoration: BoxDecoration(
                         color: isCompleted || (index < _currentPage)
-                            ? Colors.grey[400]
+                            ? const Color(0xFFFF5A00)
                             : Colors.grey[300],
                       ),
                     ),
