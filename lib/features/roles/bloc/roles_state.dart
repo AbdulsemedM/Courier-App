@@ -28,3 +28,39 @@ final class AddRolesError extends RolesState {
   final String message;
   AddRolesError({required this.message});
 }
+
+final class FetchAllPermissionsLoading extends RolesState {}
+
+final class FetchAllPermissionsSuccess extends RolesState {
+  final List<PermissionModel> permissions;
+  FetchAllPermissionsSuccess({required this.permissions});
+}
+
+final class FetchAllPermissionsError extends RolesState {
+  final String message;
+  FetchAllPermissionsError({required this.message});
+}
+
+final class FetchRolePermissionsLoading extends RolesState {}
+
+final class FetchRolePermissionsSuccess extends RolesState {
+  final RolePermissionsModel rolePermissions;
+  FetchRolePermissionsSuccess({required this.rolePermissions});
+}
+
+final class FetchRolePermissionsError extends RolesState {
+  final String message;
+  FetchRolePermissionsError({required this.message});
+}
+
+final class UpdateRolePermissionsLoading extends RolesState {}
+
+final class UpdateRolePermissionsSuccess extends RolesState {
+  final String message;
+  UpdateRolePermissionsSuccess({required this.message});
+}
+
+final class UpdateRolePermissionsError extends RolesState {
+  final String message;
+  UpdateRolePermissionsError({required this.message});
+}

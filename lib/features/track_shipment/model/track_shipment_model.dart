@@ -163,8 +163,22 @@ class TrackShipmentModel {
   }
 
   factory TrackShipmentModel.fromMap(Map<String, dynamic> map) {
-    final shipment = map['shipment'] ?? map;
-    final status = map['status'] ?? shipment['shipmentStatus'];
+    // Extract shipment - handle different response structures
+    dynamic shipmentData = map['shipment'];
+    Map<String, dynamic> shipment;
+    
+    if (shipmentData == null) {
+      // If no 'shipment' key, assume the map itself is the shipment data
+      shipment = map;
+    } else if (shipmentData is Map<String, dynamic>) {
+      // Normal case: shipment is a Map
+      shipment = shipmentData;
+    } else {
+      // If shipment is not a Map (e.g., it's an int ID), use the map itself
+      shipment = map;
+    }
+    
+    final status = map['status'] ?? (shipment['shipmentStatus'] is Map ? shipment['shipmentStatus'] : null);
 
     // Handle senderBranch - can be int (ID) or Map
     final senderBranch = shipment['senderBranch'];
@@ -213,9 +227,13 @@ class TrackShipmentModel {
     // Extract status information
     String? statusCode;
     String? statusDescription;
-    if (status is Map<String, dynamic>) {
+    if (status != null && status is Map<String, dynamic>) {
       statusCode = status['code'] as String?;
       statusDescription = status['description'] as String?;
+    } else if (shipment['shipmentStatus'] is Map<String, dynamic>) {
+      final shipmentStatus = shipment['shipmentStatus'] as Map<String, dynamic>;
+      statusCode = shipmentStatus['code'] as String?;
+      statusDescription = shipmentStatus['description'] as String?;
     }
 
     // Extract addedBy information
@@ -246,7 +264,9 @@ class TrackShipmentModel {
       name: receiverBranchName ?? '',
       netFee: (shipment['netFee'] ?? '').toString(),
       shipmentDescription: shipment['shipmentDescription'] as String? ?? '',
-      method: shipment['paymentMethod']?['method'] as String? ?? '',
+      method: (shipment['paymentMethod'] is Map<String, dynamic>)
+          ? (shipment['paymentMethod'] as Map<String, dynamic>)['method'] as String? ?? ''
+          : '',
       updatedBy: addedByFirstName ?? '',
       description: description,
       createdAt:

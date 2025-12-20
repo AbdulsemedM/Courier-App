@@ -13,3 +13,5 @@ class ChangeStatus extends TrackOrderEvent {
 
   ChangeStatus({required this.shipmentIds, required this.status});
 }
+
+class ClearShipments extends TrackOrderEvent {}

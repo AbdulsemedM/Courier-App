@@ -125,45 +125,36 @@ class _SecondPageState extends State<SecondPage> {
             maxLines: 3,
           ),
           const SizedBox(height: 16),
-          _buildDropdownField(
+          _buildRadioButtonGroup(
             label: 'Service Mode',
-            value: null,
-            items: widget.serviceModes
-                .map((mode) => DropdownMenuItem<String>(
-                      value: mode.id?.toString(),
-                      child: Text(mode.description ?? ''),
-                    ))
+            options: widget.serviceModes
+                .map((mode) => {
+                      'id': mode.id,
+                      'label': mode.description ?? mode.code ?? '',
+                    })
                 .toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() {
-                  final selectedMode = widget.serviceModes.firstWhere(
-                    (mode) => mode.id?.toString() == value,
-                    orElse: () => ServiceModeModel(),
-                  );
-                  widget.formData['serviceModeId'] = selectedMode.id;
-                  // widget.formData['serviceModeObject'] = selectedMode;
-                });
-              }
+            selectedId: widget.formData['serviceModeId'] as int?,
+            onChanged: (id) {
+              setState(() {
+                widget.formData['serviceModeId'] = id;
+              });
             },
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: 16),
-          _buildDropdownField(
+          _buildRadioButtonGroup(
             label: 'Shipment Type',
-            value: null,
-            items: widget.shipmentTypes
-                .map((mode) => DropdownMenuItem<String>(
-                      value: mode.id?.toString(),
-                      child: Text(mode.description ?? ''),
-                    ))
+            options: widget.shipmentTypes
+                .map((type) => {
+                      'id': type.id,
+                      'label': type.description ?? type.type ?? '',
+                    })
                 .toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() {
-                  widget.formData['shipmentTypeId'] = int.parse(value);
-                });
-              }
+            selectedId: widget.formData['shipmentTypeId'] as int?,
+            onChanged: (id) {
+              setState(() {
+                widget.formData['shipmentTypeId'] = id;
+              });
             },
             isDarkMode: isDarkMode,
           ),
@@ -446,6 +437,60 @@ class _SecondPageState extends State<SecondPage> {
               ),
             ),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRadioButtonGroup({
+    required String label,
+    required List<Map<String, dynamic>> options,
+    required int? selectedId,
+    required Function(int?) onChanged,
+    required bool isDarkMode,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.grey[300] : Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 16,
+          runSpacing: 12,
+          children: options.where((option) => option['id'] != null).map((option) {
+            final id = option['id'] as int;
+            final labelText = option['label'] as String;
+
+            return InkWell(
+              onTap: () => onChanged(id),
+              borderRadius: BorderRadius.circular(8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Radio<int>(
+                    value: id,
+                    groupValue: selectedId,
+                    onChanged: (value) => onChanged(value),
+                    activeColor: Colors.blue,
+                  ),
+                  Text(
+                    labelText,
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.grey[300] : Colors.black87,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         ),
       ],
     );

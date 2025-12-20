@@ -114,6 +114,39 @@ class FetchEstimatedRate extends AddShipmentEvent {
       ];
 }
 
+class CheckDiscount extends AddShipmentEvent {
+  final int originId;
+  final int destinationId;
+  final int serviceModeId;
+  final int shipmentTypeId;
+  final int deliveryTypeId;
+  final String unit;
+  final double weightKg;
+  final double discountPricePerKg;
+  CheckDiscount({
+    required this.originId,
+    required this.destinationId,
+    required this.serviceModeId,
+    required this.shipmentTypeId,
+    required this.deliveryTypeId,
+    required this.unit,
+    required this.weightKg,
+    required this.discountPricePerKg,
+  });
+
+  @override
+  List<Object> get props => [
+        originId,
+        destinationId,
+        serviceModeId,
+        shipmentTypeId,
+        deliveryTypeId,
+        unit,
+        weightKg,
+        discountPricePerKg,
+      ];
+}
+
 class InitiatePaymentEvent extends AddShipmentEvent {
   final String awb;
   final String paymentMethod;

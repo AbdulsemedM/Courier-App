@@ -463,27 +463,25 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            const Color(0xFF667eea),
-            const Color(0xFF764ba2),
-            const Color(0xFFf093fb),
-          ],
+          colors: isDarkMode
+              ? [
+                  const Color(0xFFFF5A00),
+                  const Color(0xFFFF8C42),
+                ]
+              : [
+                  const Color(0xFFFF5A00),
+                  const Color(0xFFFF8C42),
+                ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF667eea).withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: const Color(0xFF764ba2).withOpacity(0.3),
+            color: const Color(0xFFFF5A00).withOpacity(0.3),
             blurRadius: 15,
-            offset: const Offset(0, 5),
-            spreadRadius: -5,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -498,25 +496,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           },
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 2,
-                    ),
+                    color: Colors.white.withOpacity(0.25),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
-                    Icons.analytics_outlined,
-                    size: 32,
+                    Icons.assessment_outlined,
+                    size: 28,
                     color: Colors.white,
                   ),
                 ),
@@ -526,30 +519,37 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Reports & Analytics',
+                        'Reports',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           letterSpacing: 0.5,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
-                        'View detailed insights and analytics',
+                        'View branch and admin reports',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                           color: Colors.white.withOpacity(0.9),
-                          letterSpacing: 0.3,
+                          letterSpacing: 0.2,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.white.withOpacity(0.9),
-                  size: 20,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
               ],
             ),

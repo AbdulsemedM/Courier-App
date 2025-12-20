@@ -179,7 +179,7 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
     }
   }
 
-  Future<void> _showAddUserModal(BuildContext context) async {
+  // Future<void> _showAddUserModal(BuildContext context) async {
     // final success = await showDialog<bool>(
     //   context: context,
     //   builder: (context) => const AddUserModal(),
@@ -188,7 +188,7 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
     // if (success == true && mounted) {
     //   context.read<ManageUserBloc>().add(FetchUsersEvent());
     // }
-  }
+  // }
 
   void _handleEdit(BuildContext context, UserModel user) {
     // showDialog<bool>(

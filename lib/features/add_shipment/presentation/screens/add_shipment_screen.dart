@@ -169,24 +169,96 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
   }
 
   Widget _buildStepIndicator(bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Row(
-        children: List.generate(3, (index) {
-          bool isActive = index <= _currentPage;
-          return Expanded(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              height: 4,
-              decoration: BoxDecoration(
-                color: isActive
-                    ? (isDarkMode ? Colors.blue[400] : Colors.blue)
-                    : (isDarkMode ? Colors.grey[700] : Colors.grey[300]),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          );
-        }),
+    final steps = [
+      'Sender & Receiver',
+      'Shipment Details',
+      'Payment',
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      color: isDarkMode ? const Color(0xFF5b3895) : Colors.white,
+      child: Column(
+        children: [
+          // Row with circles and connecting lines
+          Row(
+            children: List.generate(3, (index) {
+              final isActive = index == _currentPage;
+              final isCompleted = index < _currentPage;
+
+              return Expanded(
+                child: Row(
+                  children: [
+                    // Step Circle
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? Colors.blue
+                            : (isCompleted
+                                ? const Color(0xFFFF5A00)
+                                : Colors.grey[300]),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${index + 1}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Connecting Line
+                    if (index < 2)
+                      Expanded(
+                        child: Container(
+                          height: 2,
+                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                          decoration: BoxDecoration(
+                            color: isCompleted || (index < _currentPage)
+                                ? const Color(0xFFFF5A00)
+                                : Colors.grey[300],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 8),
+          // Row with step labels
+          Row(
+            children: List.generate(3, (index) {
+              final isActive = index == _currentPage;
+              final isCompleted = index < _currentPage;
+
+              return Expanded(
+                child: Text(
+                  steps[index],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isActive
+                        ? (isDarkMode ? Colors.white : Colors.black87)
+                        : (isCompleted
+                            ? const Color(0xFFFF5A00)
+                            : (isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.grey[600])),
+                    fontSize: 12,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+              );
+            }),
+          ),
+        ],
       ),
     );
   }
@@ -530,6 +602,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                             paymentModes: paymentModes,
                             paymentMethods: paymentMethods,
                             quantity: formData2,
+                            formData1: formData1,
                             onSubmit: () {
                               print('[UI] Submit button pressed on step 3');
                               print('[UI] Form validation started');
@@ -571,14 +644,14 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
     );
   }
 
-  void _handlePaymentInfo(String info) {
-    // Use Provider.of with listen: false for event handlers
-    Provider.of<PaymentService>(context, listen: false).setPaymentInfo(info);
-  }
+  // void _handlePaymentInfo(String info) {
+  //   // Use Provider.of with listen: false for event handlers
+  //   Provider.of<PaymentService>(context, listen: false).setPaymentInfo(info);
+  // }
 
-  void _handlePaymentMethod(String method) {
-    // Use Provider.of with listen: false for event handlers
-    Provider.of<PaymentService>(context, listen: false)
-        .setPaymentMethod(method);
-  }
+  // void _handlePaymentMethod(String method) {
+  //   // Use Provider.of with listen: false for event handlers
+  //   Provider.of<PaymentService>(context, listen: false)
+  //       .setPaymentMethod(method);
+  // }
 }

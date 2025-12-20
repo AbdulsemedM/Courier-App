@@ -1,12 +1,23 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <!-- Make camera optional for Sunmi devices that may use hardware scanners -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <!-- Additional permissions for Sunmi devices -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Allow installation on external storage for Sunmi devices -->
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES" tools:ignore="ProtectedPermissions" />
     <application
         android:label="HudHud Express"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,6 +38,19 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+                <!-- Intent filter for Sunmi barcode scanner -->
+            <intent-filter>
+                <action android:name="com.sunmi.scanner.ACTION_DATA_CODE_RECEIVED"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.sunmi.scanner.ACTION_DECODE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.sunmi.scanner.ACTION_DECODE_DATA"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="nlscan.action.SCANNER_RESULT"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

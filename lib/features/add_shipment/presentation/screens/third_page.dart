@@ -1,5 +1,6 @@
 import 'package:courier_app/configuration/payment_service.dart';
 import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
+import 'package:courier_app/features/add_shipment/model/estimated_rate_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_method_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_mode_model.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ class ThirdPage extends StatefulWidget {
   final VoidCallback onPrevious;
   final VoidCallback onSubmit;
   final Map<String, dynamic> quantity;
+  final Map<String, dynamic> formData1;
   final List<PaymentModeModel> paymentModes;
   final List<PaymentMethodModel> paymentMethods;
 
@@ -23,6 +25,7 @@ class ThirdPage extends StatefulWidget {
     required this.paymentModes,
     required this.paymentMethods,
     required this.quantity,
+    required this.formData1,
   });
   @override
   State<ThirdPage> createState() => _ThirdPageState();
@@ -31,6 +34,7 @@ class ThirdPage extends StatefulWidget {
 class _ThirdPageState extends State<ThirdPage> {
   var selectedPaymentMode;
   double? rate;
+  EstimatedRateModel? cachedEstimatedRate;
 
   @override
   Widget build(BuildContext context) {
@@ -48,69 +52,271 @@ class _ThirdPageState extends State<ThirdPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Total Fee Card
+                  // Total Fee Card with Discount
                   BlocListener<AddShipmentBloc, AddShipmentState>(
                     listenWhen: (previous, current) =>
                         current is FetchEstimatedRateSuccess,
                     listener: (context, state) {
                       if (state is FetchEstimatedRateSuccess) {
                         print("estimation received");
-                        // Optional: You can remove setState() and handle in BlocBuilder instead
+                        // Cache the estimated rate
+                        setState(() {
+                          cachedEstimatedRate = state.estimatedRate;
+                        });
+                        // Trigger discount check after rate is fetched
+                        final bloc = context.read<AddShipmentBloc>();
+                        final estimatedRate = state.estimatedRate;
+                        final quantity =
+                            (widget.quantity['quantity'] as num?)?.toDouble() ??
+                                1.0;
+                        final unit = (widget.quantity['unit'] as String?)
+                                ?.toLowerCase() ??
+                            'kg';
+
+                        // Use discountPricePerKg from rate (could be silverPrice, goldPrice, or platinumPrice)
+                        // For now, using the base rate as discountPricePerKg
+                        // You can modify this to use silverPrice, goldPrice, or platinumPrice based on your logic
+                        final discountPricePerKg = estimatedRate.rate;
+
+                        bloc.add(CheckDiscount(
+                          originId: widget.formData1['senderBranchId'] as int,
+                          destinationId:
+                              widget.formData1['receiverBranchId'] as int,
+                          serviceModeId:
+                              widget.quantity['serviceModeId'] as int,
+                          shipmentTypeId:
+                              widget.quantity['shipmentTypeId'] as int,
+                          deliveryTypeId:
+                              widget.quantity['deliveryTypeId'] as int,
+                          unit: unit,
+                          weightKg: quantity,
+                          discountPricePerKg: discountPricePerKg,
+                        ));
                       }
                     },
                     child: BlocBuilder<AddShipmentBloc, AddShipmentState>(
+                      buildWhen: (previous, current) =>
+                          current is FetchEstimatedRateSuccess ||
+                          current is FetchEstimatedRateLoading ||
+                          current is FetchEstimatedRateFailure ||
+                          current is CheckDiscountSuccess ||
+                          current is CheckDiscountLoading ||
+                          current is CheckDiscountFailure,
                       builder: (context, state) {
                         double totalFee = 0;
+                        double originalTotal = 0;
+                        double discountAmount = 0;
+                        double discountPercentage = 0;
+                        bool hasDiscount = false;
 
+                        // Get rate from state or cached value
+                        EstimatedRateModel? estimatedRate;
                         if (state is FetchEstimatedRateSuccess) {
-                          final rate = state.estimatedRate.rate;
+                          estimatedRate = state.estimatedRate;
+                          // Update cache
+                          cachedEstimatedRate = estimatedRate;
+                        } else if (cachedEstimatedRate != null) {
+                          // Use cached rate if state changed to discount check
+                          estimatedRate = cachedEstimatedRate;
+                        }
+
+                        // Calculate base total from rate
+                        if (estimatedRate != null) {
+                          final rate = estimatedRate.rate;
                           final quantity = (widget.quantity['quantity'] as num?)
                                   ?.toDouble() ??
                               1.0;
                           totalFee = rate * quantity;
+                          originalTotal = totalFee;
                         }
 
-                        return Center(
-                          child: Container(
-                            width: double.infinity,
-                            margin: const EdgeInsets.only(bottom: 5),
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            decoration: BoxDecoration(
-                              color: Colors.deepPurple[600],
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.08),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text(
-                                  'Total Fee',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 1.2,
+                        // Override with discount if available
+                        if (state is CheckDiscountSuccess) {
+                          hasDiscount = true;
+                          originalTotal = state.discount.originalTotal;
+                          discountAmount = state.discount.discountAmount;
+                          discountPercentage =
+                              state.discount.discountPercentage;
+                          totalFee = state.discount.discountedTotal;
+                        }
+
+                        return Column(
+                          children: [
+                            // Discount Info Card (if discount exists)
+                            if (hasDiscount)
+                              Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.green[400]!,
+                                      Colors.green[600]!,
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
                                   ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.green.withOpacity(0.3),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  "${totalFee.toStringAsFixed(2)} ETB",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 2,
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.local_offer,
+                                          color: Colors.white,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Discount Applied!',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Original Total:',
+                                          style: TextStyle(
+                                            color:
+                                                Colors.white.withOpacity(0.9),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Text(
+                                          "${originalTotal.toStringAsFixed(2)} ETB",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            decoration:
+                                                TextDecoration.lineThrough,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Discount:',
+                                          style: TextStyle(
+                                            color:
+                                                Colors.white.withOpacity(0.9),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Text(
+                                          "-${discountAmount.toStringAsFixed(2)} ETB (${discountPercentage.toStringAsFixed(1)}%)",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            // Total Fee Card
+                            Center(
+                              child: Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 5),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 16),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.deepPurple[600]!,
+                                      Colors.deepPurple[800]!,
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
                                   ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.15),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      hasDiscount ? 'Final Total' : 'Total Fee',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    if (state is FetchEstimatedRateLoading)
+                                      const SizedBox(
+                                        width: 30,
+                                        height: 30,
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                            Colors.white,
+                                          ),
+                                          strokeWidth: 3,
+                                        ),
+                                      )
+                                    else
+                                      Text(
+                                        "${totalFee.toStringAsFixed(2)} ETB",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 40,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 2,
+                                        ),
+                                      ),
+                                    if (hasDiscount)
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 8),
+                                        child: Text(
+                                          "You saved ${discountAmount.toStringAsFixed(2)} ETB!",
+                                          style: TextStyle(
+                                            color:
+                                                Colors.white.withOpacity(0.9),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         );
                       },
                     ),

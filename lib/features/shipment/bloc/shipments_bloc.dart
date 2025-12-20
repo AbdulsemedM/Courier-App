@@ -19,7 +19,7 @@ class ShipmentsBloc extends Bloc<ShipmentsEvent, ShipmentsState> {
       FetchShipments event, Emitter<ShipmentsState> emit) async {
     emit(FetchShipmentsLoading());
     try {
-      final shipments = await shipmentRepository.fetchShipments();
+      final shipments = await shipmentRepository.fetchShipments(status: event.status);
       emit(FetchShipmentsSuccess(shipments: shipments));
     } catch (e) {
       emit(FetchShipmentsFailure(errorMessage: e.toString()));
