@@ -1,6 +1,7 @@
 // import 'package:courier_app/app/app_button.dart';
 // import 'package:courier_app/app/utils/app_colors.dart';
 // import 'package:courier_app/app/utils/app_themes.dart';
+import 'package:courier_app/app/utils/responsive_helper.dart';
 import 'package:courier_app/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:courier_app/features/forgot_password/presentation/screen/forgot_pass_screen.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
@@ -127,11 +128,21 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             // Main Content
             SafeArea(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    children: [
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: ResponsiveHelper.isTablet(context) ? 500.0 : double.infinity,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: ResponsiveHelper.getResponsivePadding(
+                        context,
+                        mobile: const EdgeInsets.symmetric(horizontal: 24.0),
+                        tablet: const EdgeInsets.symmetric(horizontal: 40.0),
+                        desktop: const EdgeInsets.symmetric(horizontal: 40.0),
+                      ),
+                      child: Column(
+                        children: [
                       SizedBox(height: size.height * 0.06),
                       // Logo Animation Container
                       TweenAnimationBuilder(
@@ -493,7 +504,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                    ],
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),

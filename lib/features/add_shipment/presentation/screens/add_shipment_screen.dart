@@ -1,3 +1,4 @@
+import 'package:courier_app/app/utils/responsive_helper.dart';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/configuration/payment_service.dart';
 import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
@@ -571,17 +572,22 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                   ),
                 ],
               ),
-              body: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    _buildStepIndicator(isDarkMode),
-                    Expanded(
-                      child: PageView(
-                        controller: _pageController,
-                        physics: const NeverScrollableScrollPhysics(),
-                        onPageChanged: _onPageChanged,
-                        children: [
+              body: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: ResponsiveHelper.getMaxContentWidth(context),
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        _buildStepIndicator(isDarkMode),
+                        Expanded(
+                          child: PageView(
+                            controller: _pageController,
+                            physics: const NeverScrollableScrollPhysics(),
+                            onPageChanged: _onPageChanged,
+                            children: [
                           FirstPage(
                             formData: formData1,
                             onNext: _nextPage,
@@ -629,10 +635,12 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                               }
                             },
                           ),
-                        ],
-                      ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             );

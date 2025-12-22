@@ -139,6 +139,7 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
         ),
       ),
       body: ApplicationWidgets.buildMenuGrid(
+        context: context,
         isDarkMode: isDarkMode,
         options: defaultMenuOptions,
         onOptionSelected: (screen) {

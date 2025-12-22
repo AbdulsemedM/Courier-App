@@ -1,4 +1,5 @@
 import 'package:courier_app/app/utils/dialog_utils.dart';
+import 'package:courier_app/app/utils/responsive_helper.dart';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/configuration/phone_number_manager.dart';
 import 'package:courier_app/features/accounting/presentation/screens/accounting_screen.dart';
@@ -123,11 +124,21 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 8),
           ],
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        body: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveHelper.getMaxContentWidth(context),
+            ),
+            child: SingleChildScrollView(
+              padding: ResponsiveHelper.getResponsivePadding(
+                context,
+                mobile: const EdgeInsets.all(20.0),
+                tablet: const EdgeInsets.all(32.0),
+                desktop: const EdgeInsets.all(40.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
               // User welcome section with enhanced design
               Container(
                 padding:
@@ -218,10 +229,15 @@ class _HomeScreenState extends State<HomeScreen> {
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 3,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.85,
+                crossAxisCount: ResponsiveHelper.getGridCrossAxisCount(
+                  context,
+                  mobile: 3,
+                  tablet: 4,
+                  desktop: 5,
+                ),
+                mainAxisSpacing: ResponsiveHelper.isTablet(context) ? 16 : 12,
+                crossAxisSpacing: ResponsiveHelper.isTablet(context) ? 16 : 12,
+                childAspectRatio: ResponsiveHelper.isTablet(context) ? 0.9 : 0.85,
                 children: [
                   HomeWidgets.buildEnhancedActionCard(
                     context: context,
@@ -452,7 +468,9 @@ class _HomeScreenState extends State<HomeScreen> {
               //     ],
               //   ),
               // ),
-            ],
+                ],
+              ),
+            ),
           ),
         ),
       ),

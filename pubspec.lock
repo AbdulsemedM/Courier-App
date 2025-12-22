@@ -765,6 +765,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  sunmi_printer_plus:
+    dependency: "direct main"
+    description:
+      name: sunmi_printer_plus
+      sha256: "3ef52c32c555e95cb26b276e4cc4e750beabf9205ea712dadfe3d692e4d47505"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
   term_glyph:
     dependency: transitive
     description:

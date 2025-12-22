@@ -1,4 +1,5 @@
 // import 'package:courier_app/features/add_shipment/presentation/screens/payment_screen.dart';
+import 'package:courier_app/app/utils/responsive_helper.dart';
 import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
 import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
@@ -12,17 +13,30 @@ import 'package:flutter/material.dart';
 
 class ApplicationWidgets {
   static Widget buildMenuGrid({
+    required BuildContext context,
     required bool isDarkMode,
     required List<MenuOption> options,
     required Function(Widget) onOptionSelected,
   }) {
+    final crossAxisCount = ResponsiveHelper.getGridCrossAxisCount(
+      context,
+      mobile: 2,
+      tablet: 3,
+      desktop: 4,
+    );
+    
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 1.1,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+      padding: ResponsiveHelper.getResponsivePadding(
+        context,
+        mobile: const EdgeInsets.all(16),
+        tablet: const EdgeInsets.all(24),
+        desktop: const EdgeInsets.all(32),
+      ),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: ResponsiveHelper.isTablet(context) ? 1.0 : 1.1,
+        crossAxisSpacing: ResponsiveHelper.isTablet(context) ? 20 : 16,
+        mainAxisSpacing: ResponsiveHelper.isTablet(context) ? 20 : 16,
       ),
       itemCount: options.length,
       itemBuilder: (context, index) {

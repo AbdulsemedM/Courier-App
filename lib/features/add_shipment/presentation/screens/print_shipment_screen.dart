@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:courier_app/app/utils/responsive_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -9,6 +10,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:device_info_plus/device_info_plus.dart';
 import '../../bloc/add_shipment_bloc.dart';
+import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
+import 'package:sunmi_printer_plus/sunmi_style.dart';
+import 'package:sunmi_printer_plus/enums.dart';
 
 class PrintShipmentScreen extends StatefulWidget {
   final String trackingNumber;
@@ -121,99 +125,118 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
             return const Center(child: Text('No shipment details available'));
           }
 
-          return Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSection('SENDER:', {
-                        'Name': shipmentData!['senderName'] ?? '',
-                        'Mobile': shipmentData!['senderMobile'] ?? '',
-                      }),
-                      const Divider(),
-                      _buildSection('RECEIVER:', {
-                        'Name': shipmentData!['receiverName'] ?? '',
-                        'Mobile': shipmentData!['receiverMobile'] ?? '',
-                      }),
-                      const Divider(),
-                      _buildSection('SHIPMENT DETAIL:', {
-                        'Shipment Date':
-                            _formatDate(shipmentData!['createdAt']),
-                        'Payment Method': shipmentData!['paymentMethod'] ?? '',
-                        'Delivery Type': shipmentData!['deliveryType'] ?? '',
-                        'Description':
-                            shipmentData!['shipmentDescription'] ?? '',
-                        // 'Quantity': '${shipmentData!['quantity'] ?? 1}',
-                        // 'Number of Pieces': '${shipmentData!['numPcs'] ?? 0}',
-                        // 'Number of Boxes': '${shipmentData!['numBoxes'] ?? 0}',
-                        // 'Unit': shipmentData!['unit'] ?? '',
-                      }),
-                      // const Divider(),
-                      // _buildSection('PAYMENT DETAIL:', {
-                      //   'Rate': 'ETB ${shipmentData!['rate'] ?? 0}',
-                      //   'Extra Fee': 'ETB ${shipmentData!['extraFee'] ?? 0}',
-                      //   'Extra Fee Description':
-                      //       shipmentData!['extraFeeDescription'] ?? '',
-                      //   'Hudhud Percent':
-                      //       '${shipmentData!['hudhudPercent'] ?? 0}%',
-                      //   'Hudhud Net': 'ETB ${shipmentData!['hudhudNet'] ?? 0}',
-                      //   'Total Fee':
-                      //       'ETB ${(shipmentData!['rate'] ?? 0) * (shipmentData!['quantity'] ?? 1) + (shipmentData!['extraFee'] ?? 0)}',
-                      // }),
-                      const SizedBox(height: 20),
-                      Center(
-                        child: QrImageView(
-                          data: widget.trackingNumber,
-                          version: QrVersions.auto,
-                          size: 200.0,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Center(
-                        child: Text(
-                          widget.trackingNumber,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: ResponsiveHelper.getMaxContentWidth(context),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    if (_isSunmiDevice)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: ElevatedButton.icon(
-                          onPressed: () => _printPdf(context),
-                          icon: const Icon(Icons.print),
-                          label: const Text('Print PDF'),
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: const Size.fromHeight(50),
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: ResponsiveHelper.getResponsivePadding(
+                        context,
+                        mobile: const EdgeInsets.all(16),
+                        tablet: const EdgeInsets.all(24),
+                        desktop: const EdgeInsets.all(32),
                       ),
-                    ElevatedButton(
-                      onPressed: () => _generatePdf(context),
-                      child: const Text('Download PDF'),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(50),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSection('SENDER:', {
+                            'Name': shipmentData!['senderName'] ?? '',
+                            'Mobile': shipmentData!['senderMobile'] ?? '',
+                          }),
+                          const Divider(),
+                          _buildSection('RECEIVER:', {
+                            'Name': shipmentData!['receiverName'] ?? '',
+                            'Mobile': shipmentData!['receiverMobile'] ?? '',
+                          }),
+                          const Divider(),
+                          _buildSection('SHIPMENT DETAIL:', {
+                            'Shipment Date':
+                                _formatDate(shipmentData!['createdAt']),
+                            'Payment Method':
+                                shipmentData!['paymentMethod'] ?? '',
+                            'Delivery Type':
+                                shipmentData!['deliveryType'] ?? '',
+                            'Description':
+                                shipmentData!['shipmentDescription'] ?? '',
+                            // 'Quantity': '${shipmentData!['quantity'] ?? 1}',
+                            // 'Number of Pieces': '${shipmentData!['numPcs'] ?? 0}',
+                            // 'Number of Boxes': '${shipmentData!['numBoxes'] ?? 0}',
+                            // 'Unit': shipmentData!['unit'] ?? '',
+                          }),
+                          // const Divider(),
+                          // _buildSection('PAYMENT DETAIL:', {
+                          //   'Rate': 'ETB ${shipmentData!['rate'] ?? 0}',
+                          //   'Extra Fee': 'ETB ${shipmentData!['extraFee'] ?? 0}',
+                          //   'Extra Fee Description':
+                          //       shipmentData!['extraFeeDescription'] ?? '',
+                          //   'Hudhud Percent':
+                          //       '${shipmentData!['hudhudPercent'] ?? 0}%',
+                          //   'Hudhud Net': 'ETB ${shipmentData!['hudhudNet'] ?? 0}',
+                          //   'Total Fee':
+                          //       'ETB ${(shipmentData!['rate'] ?? 0) * (shipmentData!['quantity'] ?? 1) + (shipmentData!['extraFee'] ?? 0)}',
+                          // }),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: QrImageView(
+                              data: widget.trackingNumber,
+                              version: QrVersions.auto,
+                              size: 200.0,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Center(
+                            child: Text(
+                              widget.trackingNumber,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  Padding(
+                    padding: ResponsiveHelper.getResponsivePadding(
+                      context,
+                      mobile: const EdgeInsets.all(16.0),
+                      tablet: const EdgeInsets.all(24.0),
+                      desktop: const EdgeInsets.all(32.0),
+                    ),
+                    child: Column(
+                      children: [
+                        if (_isSunmiDevice)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: ElevatedButton.icon(
+                              onPressed: () => _printPdf(context),
+                              icon: const Icon(Icons.print),
+                              label: const Text('Print PDF'),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size.fromHeight(50),
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ElevatedButton(
+                          onPressed: () => _generatePdf(context),
+                          child: const Text('Download PDF'),
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(50),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           );
         },
       ),
@@ -276,17 +299,30 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
 
   Future<void> _printPdf(BuildContext context) async {
     try {
+      // If on Sunmi device, try to use Sunmi printer directly
+      if (_isSunmiDevice) {
+        final success = await _printWithSunmiPrinter(context);
+        if (success) {
+          return; // Successfully printed with Sunmi printer
+        }
+        // If Sunmi printer fails, fall back to standard printing
+        print(
+            '[PrintShipmentScreen] Sunmi printer failed, falling back to standard printing');
+      }
+
       // Generate PDF first
       final pdf = await _generatePdfDocument();
 
-      // Print directly to printer
+      // Print directly to printer using standard printing package
       await Printing.layoutPdf(
         onLayout: (PdfPageFormat format) async => pdf.save(),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Printing to Sunmi printer...'),
+        SnackBar(
+          content: Text(_isSunmiDevice
+              ? 'Printed successfully'
+              : 'Printing to printer...'),
           backgroundColor: Colors.green,
         ),
       );
@@ -298,6 +334,245 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  Future<bool> _printWithSunmiPrinter(BuildContext context) async {
+    try {
+      // Bind printer first (required)
+      final bool? binded = await SunmiPrinter.bindingPrinter();
+      if (binded != true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to connect to printer.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return false;
+      }
+
+      // Initialize printer
+      await SunmiPrinter.initPrinter();
+
+      // Start transaction print
+      await SunmiPrinter.startTransactionPrint(true);
+
+      // Extract data for printing
+      final senderName =
+          (shipmentData!['senderName'] ?? '').toString().toUpperCase();
+      final senderMobile = (shipmentData!['senderMobile'] ?? '').toString();
+      final senderBranch = (shipmentData!['senderBranch'] ?? '').toString();
+
+      final receiverName =
+          (shipmentData!['receiverName'] ?? '').toString().toUpperCase();
+      final receiverMobile = (shipmentData!['receiverMobile'] ?? '').toString();
+      final receiverBranch = (shipmentData!['receiverBranch'] ?? '').toString();
+
+      final shipDate = _formatShipDate(shipmentData!['createdAt']);
+      final weight =
+          '${shipmentData!['qty'] ?? 1} ${(shipmentData!['unit'] ?? 'kg').toString().toUpperCase()}';
+      final account = (shipmentData!['transactionReference'] ?? '').toString();
+      final paymentMode = (shipmentData!['paymentMode'] ?? '').toString();
+      final billText = paymentMode == 'CASH' ? 'BILL CASH ON DELIVERY' : '';
+
+      final refNumber =
+          (shipmentData!['transactionReference'] ?? '').toString();
+      final refShort = refNumber.length > 6
+          ? refNumber.substring(refNumber.length - 6)
+          : refNumber;
+
+      final dateTime = _formatDateTime(shipmentData!['createdAt']);
+
+      // Get origin location
+      final originLocation =
+          senderBranch.isNotEmpty ? senderBranch.toUpperCase() : 'ADDIS ABABA';
+
+      // Get service mode
+      String courierText = 'COURIER';
+      if (shipmentData!.containsKey('serviceMode')) {
+        final serviceMode = shipmentData!['serviceMode'];
+        if (serviceMode is Map) {
+          courierText =
+              (serviceMode['description'] ?? serviceMode['code'] ?? 'COURIER')
+                  .toString()
+                  .toUpperCase();
+        } else {
+          courierText = serviceMode.toString().toUpperCase();
+        }
+      }
+
+      // Print header
+      await SunmiPrinter.setAlignment(SunmiPrintAlign.CENTER);
+      await SunmiPrinter.printText(
+        'HudHud Express',
+        style: SunmiStyle(
+          bold: true,
+          fontSize: SunmiFontSize.LG,
+        ),
+      );
+      await SunmiPrinter.lineWrap(1);
+
+      // Print tracking number (large and bold)
+      await SunmiPrinter.printText(
+        'TRK# ${widget.trackingNumber}',
+        style: SunmiStyle(
+          bold: true,
+          fontSize: SunmiFontSize.XL,
+        ),
+      );
+      await SunmiPrinter.lineWrap(2);
+
+      // Print line separator
+      await SunmiPrinter.line();
+      await SunmiPrinter.lineWrap(1);
+
+      // Print origin info
+      await SunmiPrinter.setAlignment(SunmiPrintAlign.LEFT);
+      await SunmiPrinter.printText(
+        'ORIGIN ID: $originLocation',
+        style: SunmiStyle(bold: true),
+      );
+      await SunmiPrinter.lineWrap(1);
+
+      if (senderName.isNotEmpty) {
+        await SunmiPrinter.printText(
+          senderName,
+          style: SunmiStyle(bold: true),
+        );
+        await SunmiPrinter.lineWrap(1);
+      }
+
+      if (senderMobile.isNotEmpty) {
+        await SunmiPrinter.printText(senderMobile);
+        await SunmiPrinter.lineWrap(1);
+      }
+
+      // Print ship date, weight, account (right aligned)
+      await SunmiPrinter.setAlignment(SunmiPrintAlign.RIGHT);
+      await SunmiPrinter.printText(
+        'SHIP DATE: $shipDate',
+        style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
+      );
+      await SunmiPrinter.lineWrap(1);
+      await SunmiPrinter.printText(
+        'WT: $weight',
+        style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
+      );
+      await SunmiPrinter.lineWrap(1);
+      if (account.isNotEmpty) {
+        await SunmiPrinter.printText(
+          'ACCT: $account',
+          style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
+        );
+        await SunmiPrinter.lineWrap(1);
+      }
+      if (billText.isNotEmpty) {
+        await SunmiPrinter.printText(
+          billText,
+          style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
+        );
+        await SunmiPrinter.lineWrap(1);
+      }
+
+      await SunmiPrinter.lineWrap(1);
+
+      // Print TO section
+      await SunmiPrinter.setAlignment(SunmiPrintAlign.LEFT);
+      await SunmiPrinter.printText(
+        'TO:',
+        style: SunmiStyle(bold: true),
+      );
+      await SunmiPrinter.lineWrap(1);
+
+      if (receiverName.isNotEmpty) {
+        await SunmiPrinter.printText(
+          receiverName,
+          style: SunmiStyle(bold: true),
+        );
+        await SunmiPrinter.lineWrap(1);
+      }
+
+      if (receiverMobile.isNotEmpty) {
+        await SunmiPrinter.printText(receiverMobile);
+        await SunmiPrinter.lineWrap(1);
+      }
+
+      if (receiverBranch.isNotEmpty) {
+        await SunmiPrinter.printText('BRANCH $receiverBranch');
+        await SunmiPrinter.lineWrap(1);
+      }
+
+      await SunmiPrinter.lineWrap(1);
+
+      // Print reference
+      await SunmiPrinter.printText(
+        'REF: $refNumber',
+        style: SunmiStyle(bold: true),
+      );
+      await SunmiPrinter.lineWrap(2);
+
+      // Print QR code (centered)
+      await SunmiPrinter.setAlignment(SunmiPrintAlign.CENTER);
+      final qrCodeUrl =
+          'https://hudhudexpress.com/order?awb=${widget.trackingNumber}';
+      await SunmiPrinter.printQRCode(qrCodeUrl);
+      await SunmiPrinter.lineWrap(2);
+
+      // Print barcode if available
+      final barcodeUrl = shipmentData!['barcodeUrl'] as String?;
+      if (barcodeUrl != null && barcodeUrl.isNotEmpty) {
+        try {
+          final barcodeImageBytes = await _downloadImage(barcodeUrl);
+          if (barcodeImageBytes != null) {
+            await SunmiPrinter.printImage(barcodeImageBytes);
+            await SunmiPrinter.lineWrap(2);
+          }
+        } catch (e) {
+          print('[PrintShipmentScreen] Error printing barcode: $e');
+        }
+      }
+
+      // Print footer
+      await SunmiPrinter.line();
+      await SunmiPrinter.lineWrap(1);
+      await SunmiPrinter.printText(
+        courierText,
+        style: SunmiStyle(bold: true),
+      );
+      await SunmiPrinter.lineWrap(1);
+      await SunmiPrinter.printText(
+        'REF# $refShort',
+        style: SunmiStyle(fontSize: SunmiFontSize.SM),
+      );
+      await SunmiPrinter.lineWrap(1);
+      await SunmiPrinter.printText(
+        dateTime,
+        style: SunmiStyle(fontSize: SunmiFontSize.SM),
+      );
+      await SunmiPrinter.lineWrap(2);
+
+      // Exit transaction and cut paper
+      await SunmiPrinter.exitTransactionPrint(true);
+      await SunmiPrinter.cut();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Printed successfully!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      return true;
+    } catch (e) {
+      print('[PrintShipmentScreen] Error printing with Sunmi printer: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
     }
   }
 
@@ -370,7 +645,7 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
 
     // A4 page dimensions: 595x842 points (at 72 DPI)
     const pageWidth = 595.0;
-    const margin = 20.0;
+    const margin = 15.0;
 
     pdf.addPage(
       pw.Page(
@@ -379,170 +654,157 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
         build: (pw.Context context) {
           return pw.Stack(
             children: [
-              // Top Left - ORIGIN ID, sender name, and mobile
+              // Top Left - ORIGIN ID and sender info in compact row
               pw.Positioned(
                 left: margin,
                 top: margin,
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text(
-                      'ORIGIN ID: $originLocation',
-                      style: pw.TextStyle(
-                        fontSize: 11,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                    pw.SizedBox(height: 4),
-                    pw.Text(
-                      senderName,
-                      style: pw.TextStyle(
-                        fontSize: 11,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                    if (senderMobile.isNotEmpty) ...[
-                      pw.SizedBox(height: 2),
-                      pw.Text(
-                        senderMobile,
-                        style: const pw.TextStyle(
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-
-              // Top Right - SHIP DATE, WT, ACCT with small barcode on same row
-              pw.Positioned(
-                right: margin,
-                top: margin,
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.end,
-                  children: [
-                    // Row with text and barcode
                     pw.Row(
                       mainAxisSize: pw.MainAxisSize.min,
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.end,
-                          children: [
-                            pw.Text(
-                              'SHIP DATE: $shipDate',
-                              style: pw.TextStyle(
-                                fontSize: 9,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                            pw.SizedBox(height: 2),
-                            pw.Text(
-                              'WT: $weight',
-                              style: pw.TextStyle(
-                                fontSize: 9,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                            pw.SizedBox(height: 2),
-                            pw.Text(
-                              'ACCT: $account',
-                              style: pw.TextStyle(
-                                fontSize: 9,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                            if (billText.isNotEmpty) ...[
-                              pw.SizedBox(height: 4),
-                              pw.Text(
-                                billText,
-                                style: pw.TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: pw.FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                        if (smallBarcodeImage != null) ...[
-                          pw.SizedBox(width: 8),
-                          pw.Container(
-                            width: 35,
-                            height: 55,
-                            child: pw.Image(smallBarcodeImage),
+                        pw.Text(
+                          'ORIGIN: ',
+                          style: pw.TextStyle(
+                            fontSize: 10,
+                            fontWeight: pw.FontWeight.bold,
                           ),
-                        ],
+                        ),
+                        pw.Text(
+                          '$originLocation | ',
+                          style: pw.TextStyle(
+                            fontSize: 10,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
+                        pw.Text(
+                          senderName,
+                          style: pw.TextStyle(
+                            fontSize: 10,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
+                        if (senderMobile.isNotEmpty)
+                          pw.Text(
+                            ' | $senderMobile',
+                            style: const pw.TextStyle(
+                              fontSize: 9,
+                            ),
+                          ),
                       ],
                     ),
                   ],
                 ),
               ),
 
-              // Logo - Centered, slightly above middle of top half
+              // Top Right - SHIP DATE, WT, ACCT in one row with small barcode
               pw.Positioned(
-                left: (pageWidth - 150) / 2,
-                top: 180,
-                child: pw.Container(
-                  height: 50,
-                  width: 150,
-                  child: pw.Image(logo),
-                ),
-              ),
-
-              // TO Section - Left side, below logo
-              pw.Positioned(
-                left: margin,
-                top: 250,
-                child: pw.Column(
+                right: margin,
+                top: margin,
+                child: pw.Row(
+                  mainAxisSize: pw.MainAxisSize.min,
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text(
-                      'TO:',
-                      style: pw.TextStyle(
-                        fontSize: 11,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                    pw.SizedBox(height: 4),
-                    pw.Text(
-                      receiverName,
-                      style: pw.TextStyle(
-                        fontSize: 11,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                    if (receiverMobile.isNotEmpty) ...[
-                      pw.SizedBox(height: 2),
-                      pw.Text(
-                        receiverMobile,
-                        style: const pw.TextStyle(
-                          fontSize: 10,
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      mainAxisSize: pw.MainAxisSize.min,
+                      children: [
+                        pw.Text(
+                          'DATE: $shipDate | WT: $weight | ACCT: $account',
+                          style: pw.TextStyle(
+                            fontSize: 8,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
-                    if (receiverBranch.isNotEmpty) ...[
-                      pw.SizedBox(height: 2),
-                      pw.Text(
-                        'BRANCH $receiverBranch',
-                        style: const pw.TextStyle(
-                          fontSize: 10,
-                        ),
+                        if (billText.isNotEmpty)
+                          pw.Text(
+                            billText,
+                            style: pw.TextStyle(
+                              fontSize: 8,
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                      ],
+                    ),
+                    if (smallBarcodeImage != null) ...[
+                      pw.SizedBox(width: 6),
+                      pw.Container(
+                        width: 30,
+                        height: 45,
+                        child: pw.Image(smallBarcodeImage),
                       ),
                     ],
                   ],
                 ),
               ),
 
-              // Reference Bar - Middle left
+              // Logo - Centered, moved up
+              pw.Positioned(
+                left: (pageWidth - 120) / 2,
+                top: 50,
+                child: pw.Container(
+                  height: 40,
+                  width: 120,
+                  child: pw.Image(logo),
+                ),
+              ),
+
+              // TO Section - Left side, compact
               pw.Positioned(
                 left: margin,
-                top: 320,
+                top: 100,
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  mainAxisSize: pw.MainAxisSize.min,
+                  children: [
+                    pw.Row(
+                      mainAxisSize: pw.MainAxisSize.min,
+                      children: [
+                        pw.Text(
+                          'TO: ',
+                          style: pw.TextStyle(
+                            fontSize: 10,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
+                        pw.Text(
+                          receiverName,
+                          style: pw.TextStyle(
+                            fontSize: 10,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
+                        if (receiverMobile.isNotEmpty)
+                          pw.Text(
+                            ' | $receiverMobile',
+                            style: const pw.TextStyle(
+                              fontSize: 9,
+                            ),
+                          ),
+                        if (receiverBranch.isNotEmpty)
+                          pw.Text(
+                            ' | BRANCH: $receiverBranch',
+                            style: const pw.TextStyle(
+                              fontSize: 9,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Reference Bar - Compact row
+              pw.Positioned(
+                left: margin,
+                top: 125,
                 child: pw.Row(
                   mainAxisSize: pw.MainAxisSize.min,
                   children: [
                     pw.Container(
-                      width: 180,
-                      height: 22,
+                      width: 150,
+                      height: 18,
                       decoration: pw.BoxDecoration(
                         color: PdfColors.black,
                         borderRadius: pw.BorderRadius.circular(3),
@@ -552,16 +814,16 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                           'ksjf fk',
                           style: pw.TextStyle(
                             color: PdfColors.white,
-                            fontSize: 9,
+                            fontSize: 8,
                           ),
                         ),
                       ),
                     ),
-                    pw.SizedBox(width: 8),
+                    pw.SizedBox(width: 6),
                     pw.Text(
                       'REF: $refNumber',
                       style: pw.TextStyle(
-                        fontSize: 9,
+                        fontSize: 8,
                         fontWeight: pw.FontWeight.bold,
                       ),
                     ),
@@ -569,53 +831,55 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                 ),
               ),
 
-              // Main Barcode - Centered horizontally
+              // Main Barcode - Centered, moved up
               if (mainBarcodeImage != null)
                 pw.Positioned(
-                  left: (pageWidth - 280) / 2,
-                  top: 370,
+                  left: (pageWidth - 250) / 2,
+                  top: 155,
                   child: pw.Container(
-                    width: 280,
-                    height: 90,
+                    width: 250,
+                    height: 80,
                     child: pw.Image(mainBarcodeImage),
                   ),
                 ),
 
-              // Bottom Left - HudHud Express, E square, TRK#
+              // Bottom Left - HudHud Express, E square, TRK# in compact row
               pw.Positioned(
                 left: margin,
-                bottom: 120,
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                bottom: 100,
+                child: pw.Row(
+                  mainAxisSize: pw.MainAxisSize.min,
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
                   children: [
                     pw.Text(
                       'HudHud Express',
                       style: pw.TextStyle(
-                        fontSize: 11,
+                        fontSize: 10,
                         color: PdfColor.fromHex('#8B5CF6'),
                         fontWeight: pw.FontWeight.normal,
                       ),
                     ),
-                    pw.SizedBox(height: 4),
+                    pw.SizedBox(width: 6),
                     pw.Container(
-                      width: 18,
-                      height: 18,
+                      width: 16,
+                      height: 16,
                       decoration: pw.BoxDecoration(
                         color: PdfColors.white,
-                        border: pw.Border.all(color: PdfColors.black, width: 2),
+                        border:
+                            pw.Border.all(color: PdfColors.black, width: 1.5),
                       ),
                       child: pw.Center(
                         child: pw.Text(
                           'E',
                           style: pw.TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: pw.FontWeight.bold,
                             color: PdfColors.black,
                           ),
                         ),
                       ),
                     ),
-                    pw.SizedBox(height: 4),
+                    pw.SizedBox(width: 6),
                     pw.Text(
                       'TRK# ${widget.trackingNumber}',
                       style: pw.TextStyle(
@@ -627,25 +891,18 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                 ),
               ),
 
-              // Bottom Right - REF# and date/time
+              // Bottom Right - REF# and date/time in one row
               pw.Positioned(
                 right: margin,
-                bottom: 120,
+                bottom: 100,
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  mainAxisSize: pw.MainAxisSize.min,
                   children: [
                     pw.Text(
-                      'REF# $refShort',
+                      'REF# $refShort | $dateTime',
                       style: pw.TextStyle(
-                        fontSize: 9,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                    pw.SizedBox(height: 2),
-                    pw.Text(
-                      dateTime,
-                      style: pw.TextStyle(
-                        fontSize: 9,
+                        fontSize: 8,
                         fontWeight: pw.FontWeight.bold,
                       ),
                     ),
@@ -653,14 +910,14 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                 ),
               ),
 
-              // COURIER text - Centered
+              // COURIER text - Centered, moved up
               pw.Positioned(
                 left: (pageWidth - 100) / 2,
-                bottom: 100,
+                bottom: 80,
                 child: pw.Text(
                   courierText,
                   style: pw.TextStyle(
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: pw.FontWeight.bold,
                   ),
                 ),
@@ -673,7 +930,7 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                 child: pw.Text(
                   awbPrefix,
                   style: pw.TextStyle(
-                    fontSize: 52,
+                    fontSize: 48,
                     fontWeight: pw.FontWeight.bold,
                   ),
                 ),
@@ -686,7 +943,7 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                 child: pw.Text(
                   awbSuffix,
                   style: pw.TextStyle(
-                    fontSize: 52,
+                    fontSize: 48,
                     fontWeight: pw.FontWeight.bold,
                   ),
                 ),

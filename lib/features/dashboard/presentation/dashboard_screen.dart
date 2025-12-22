@@ -1,8 +1,10 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:courier_app/configuration/auth_service.dart';
+import 'package:courier_app/configuration/phone_number_manager.dart';
 import 'package:courier_app/features/analytics/presentation/screens/analytics_screen.dart';
 import 'package:courier_app/features/applications/presentation/screens/applications_screen.dart';
 import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
+import 'package:courier_app/features/login/presentation/screen/login_screen.dart';
 // import 'package:courier_app/features/notification_screen/presentation/screen/notification_screen.dart';
 import 'package:courier_app/features/settings_screen/presentation/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
@@ -44,29 +46,119 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.dispose();
   }
 
+  Future<void> _handleLogout() async {
+    try {
+      // Clear all authentication data
+      await _authService.deleteToken();
+      await _authService.deleteUserId();
+      await _authService.deleteBranch();
+      await _authService.deleteRoleName();
+      
+      // Clear permissions
+      await PermissionManager().setPermission([]);
+      
+      // Navigate to login screen
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      // Handle any errors during logout
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error during logout: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<bool> _onWillPop() async {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = themeProvider.isDarkMode;
+    
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: isDarkMode ? const Color(0xFF1A1F37) : Colors.white,
+          title: Text(
+            'Logout',
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to logout?',
+            style: TextStyle(
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout == true) {
+      await _handleLogout();
+      return false; // Prevent default back button behavior
+    }
+    return false; // Prevent default back button behavior
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     // final customColors = Theme.of(context).extension<CustomColors>()!;
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDarkMode
-              ? [
-                  const Color(0xFF0A1931), // Dark blue
-                  const Color(0xFF152642), // Slightly lighter blue
-                ]
-              : [
-                  const Color(0xFFF5F6FA),
-                  const Color(0xFFFFFFFF),
-                ],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (!didPop) {
+          await _onWillPop();
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDarkMode
+                ? [
+                    const Color(0xFF0A1931), // Dark blue
+                    const Color(0xFF152642), // Slightly lighter blue
+                  ]
+                : [
+                    const Color(0xFFF5F6FA),
+                    const Color(0xFFFFFFFF),
+                  ],
+          ),
         ),
-      ),
-      child: Scaffold(
+        child: Scaffold(
         backgroundColor: Colors.transparent,
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -199,6 +291,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ],
                 ),
               ),
+        ),
       ),
     );
   }
