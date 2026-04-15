@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/configuration/phone_number_manager.dart';
+import 'package:courier_app/core/services/remembered_credentials_vault.dart';
 import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -11,7 +12,11 @@ class LoginRepository {
   // final UserManager userManager;
   LoginRepository(this.loginDataProvider);
 
-  Future<String> sendLogin(String email, String password) async {
+  Future<String> sendLogin(
+    String email,
+    String password, {
+    bool rememberMe = false,
+  }) async {
     final authService = AuthService();
     try {
       // print("here we gooooo");
@@ -40,6 +45,12 @@ class LoginRepository {
       }
       await PermissionManager().setPermission(
           permissions.permissions?.map((e) => e.name ?? '').toList() ?? []);
+      final vault = RememberedCredentialsVault();
+      if (rememberMe) {
+        await vault.save(email: email, password: password);
+      } else {
+        await vault.clear();
+      }
       return data['message'];
     } catch (e) {
       // Print and re-throw the exception for the message only

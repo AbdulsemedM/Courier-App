@@ -2,6 +2,7 @@
 // import 'package:courier_app/app/utils/app_colors.dart';
 // import 'package:courier_app/app/utils/app_themes.dart';
 import 'package:courier_app/app/utils/responsive_helper.dart';
+import 'package:courier_app/core/services/remembered_credentials_vault.dart';
 import 'package:courier_app/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:courier_app/features/forgot_password/presentation/screen/forgot_pass_screen.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
@@ -23,6 +24,23 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final creds = await RememberedCredentialsVault().load();
+    if (!mounted) return;
+    if (creds != null) {
+      _emailController.text = creds.email;
+      _passwordController.text = creds.password;
+      setState(() => _rememberMe = true);
+    }
+  }
 
   @override
   void dispose() {
@@ -37,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
             LoginFetched(
               email: _emailController.text.trim(),
               password: _passwordController.text,
+              rememberMe: _rememberMe,
             ),
           );
     }
@@ -429,7 +448,43 @@ class _LoginScreenState extends State<LoginScreen> {
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _rememberMe,
+                                      onChanged: _isLoading
+                                          ? null
+                                          : (v) {
+                                              setState(() {
+                                                _rememberMe = v ?? false;
+                                              });
+                                            },
+                                      activeColor: const Color(0xFF5b3895),
+                                    ),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: _isLoading
+                                            ? null
+                                            : () {
+                                                setState(() {
+                                                  _rememberMe = !_rememberMe;
+                                                });
+                                              },
+                                        child: Text(
+                                          'Remember me',
+                                          style: TextStyle(
+                                            color: isDarkMode
+                                                ? Colors.white70
+                                                : Colors.black87,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
                                 Align(
                                   alignment: Alignment.centerRight,
                                   child: TextButton(

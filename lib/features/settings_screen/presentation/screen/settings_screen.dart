@@ -156,7 +156,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'About App',
               icon: Icons.info_outline,
               iconColor: Colors.blue,
-              subtitle: 'Version 1.0.0',
+              subtitle: 'Version 1.0.3',
               onTap: () {
                 Navigator.push(
                   context,
