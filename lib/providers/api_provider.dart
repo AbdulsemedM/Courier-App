@@ -24,6 +24,14 @@ class ApiProvider {
     this.timeout = const Duration(seconds: 30),
   });
 
+  bool _isLoginEndpoint(String endpoint) {
+    return endpoint == '/api/v1/login' || endpoint.endsWith('/api/v1/login');
+  }
+
+  Future<Map<String, String>> _headersFor(String endpoint) {
+    return authInterceptor.getHeaders(includeAuth: !_isLoginEndpoint(endpoint));
+  }
+
   Future<http.Response> getRequest(String endpoint,
       {Map<String, dynamic>? params}) async {
     var url = Uri.parse('${ApiConstants.baseUrl}$endpoint');
@@ -32,7 +40,7 @@ class ApiProvider {
           queryParameters:
               params.map((key, value) => MapEntry(key, value.toString())));
     }
-    final headers = await authInterceptor.getHeaders();
+    final headers = await _headersFor(endpoint);
 
     try {
       final response = await http.get(url, headers: headers).timeout(
@@ -54,7 +62,7 @@ class ApiProvider {
   Future<http.Response> postRequest(
       String endpoint, Map<dynamic, dynamic> body) async {
     final url = Uri.parse('${ApiConstants.baseUrl}$endpoint');
-    final headers = await authInterceptor.getHeaders();
+    final headers = await _headersFor(endpoint);
 
     try {
       final response = await http
@@ -82,7 +90,7 @@ class ApiProvider {
   Future<http.Response> putRequest(
       String endpoint, Map<dynamic, dynamic> body) async {
     final url = Uri.parse('${ApiConstants.baseUrl}$endpoint');
-    final headers = await authInterceptor.getHeaders();
+    final headers = await _headersFor(endpoint);
 
     try {
       final response = await http
@@ -110,7 +118,7 @@ class ApiProvider {
   Future<http.Response> postMultipartRequest(
       String endpoint, Map<String, String> fields, File? file, String fileFieldName) async {
     final url = Uri.parse('${ApiConstants.baseUrl}$endpoint');
-    final headers = await authInterceptor.getHeaders();
+    final headers = await _headersFor(endpoint);
     
     // Remove Content-Type from headers as multipart will set it
     final multipartHeaders = Map<String, String>.from(headers);

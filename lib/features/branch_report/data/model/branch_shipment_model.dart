@@ -80,6 +80,13 @@ class BranchShipmentModel {
   });
 
   factory BranchShipmentModel.fromJson(Map<String, dynamic> json) {
+    int? _toInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      return int.tryParse(value.toString());
+    }
+
     // Helper to safely parse User - can be int (ID) or Map (object)
     User? _parseUser(dynamic userData) {
       if (userData == null) return null;
@@ -126,13 +133,13 @@ class BranchShipmentModel {
       receiverName: json['receiverName'],
       receiverMobile: json['receiverMobile'],
       receiverBranch: parseReceiverBranch(),
-      qty: json['qty'],
+      qty: _toInt(json['qty']),
       unit: json['unit'],
-      numPcs: json['numPcs'],
-      numBoxes: json['numBoxes'],
+      numPcs: _toInt(json['numPcs']),
+      numBoxes: _toInt(json['numBoxes']),
       netFee: (json['netFee'] as num?)?.toDouble(),
       rate: (json['rate'] as num?)?.toDouble(),
-      splitInto: json['splitInto'],
+      splitInto: _toInt(json['splitInto']),
       shipmentDescription: json['shipmentDescription'],
       serviceMode: json['serviceMode'] != null
           ? ServiceMode.fromJson(json['serviceMode'])

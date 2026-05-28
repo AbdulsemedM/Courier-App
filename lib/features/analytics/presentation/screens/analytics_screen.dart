@@ -114,43 +114,70 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildErrorState(String message, bool isDarkMode) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: isDarkMode ? Colors.red[300] : Colors.red,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Error loading analytics',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.grey[900],
+    final lower = message.toLowerCase();
+    final isForbidden = lower.contains('403') ||
+        lower.contains('forbidden') ||
+        lower.contains('access denied') ||
+        lower.contains('permission');
+    final isUnauthorized = lower.contains('401') ||
+        lower.contains('unauthorized') ||
+        lower.contains('session') && lower.contains('sign in');
+
+    final String title;
+    final IconData icon;
+    final Color iconColor;
+    if (isForbidden) {
+      title = 'Analytics access restricted';
+      icon = Icons.lock_outline;
+      iconColor = isDarkMode ? Colors.amber[300]! : Colors.amber[800]!;
+    } else if (isUnauthorized) {
+      title = 'Sign in required';
+      icon = Icons.login;
+      iconColor = isDarkMode ? Colors.orange[300]! : Colors.deepOrange;
+    } else {
+      title = 'Couldn\'t load analytics';
+      icon = Icons.error_outline;
+      iconColor = isDarkMode ? Colors.red[300]! : Colors.red;
+    }
+
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 64, color: iconColor),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.grey[900],
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              const SizedBox(height: 12),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.4,
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _refreshData,
-              child: const Text('Retry'),
-            ),
-          ],
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _refreshData,
+                child: const Text('Try again'),
+              ),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 

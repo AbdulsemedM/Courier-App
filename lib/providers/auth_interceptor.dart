@@ -17,14 +17,14 @@ class AuthInterceptor {
     }
   }
 
-  // Generates headers with the token (if available)
-  Future<Map<String, String>> getHeaders() async {
-    if (token == null) {
+  // Generates headers and includes auth unless explicitly skipped.
+  Future<Map<String, String>> getHeaders({bool includeAuth = true}) async {
+    if (includeAuth && token == null) {
       await fetchToken(); // Ensure the token is fetched
     }
     return {
       'Content-Type': 'application/json',
-      // if (token != null) 'Authorization': 'Bearer $token',
+      if (includeAuth && token != null) 'Authorization': 'Bearer $token',
     };
   }
 }
