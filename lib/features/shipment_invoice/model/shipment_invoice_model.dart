@@ -76,20 +76,37 @@ class ShipmentInvoiceModel {
     };
   }
 
+  static String _branchNameFrom(dynamic branch) {
+    if (branch == null) return 'N/A';
+    if (branch is Map<String, dynamic>) {
+      return branch['name'] as String? ?? 'N/A';
+    }
+    if (branch is int) return branch.toString();
+    return branch.toString();
+  }
+
+  static String _paymentMethodNameFrom(dynamic paymentMethod) {
+    if (paymentMethod == null) return 'N/A';
+    if (paymentMethod is Map<String, dynamic>) {
+      return paymentMethod['method'] as String? ?? 'N/A';
+    }
+    return paymentMethod.toString();
+  }
+
   factory ShipmentInvoiceModel.fromMap(Map<String, dynamic> map) {
     return ShipmentInvoiceModel(
       awb: map['awb'] as String,
       senderName: map['senderName'] as String,
       senderMobile: map['senderMobile'] as String,
-      senderbranchName: map['senderBranch']['name'] as String,
+      senderbranchName: _branchNameFrom(map['senderBranch']),
       receiverName: map['receiverName'] as String,
       receiverMobile: map['receiverMobile'] as String,
-      receiverBranchName: map['receiverBranch']['name'] as String,
-      paymentMethodName: map['paymentMethod']['method'] as String,
+      receiverBranchName: _branchNameFrom(map['receiverBranch']),
+      paymentMethodName: _paymentMethodNameFrom(map['paymentMethod']),
       shipmentDate: map['createdAt'] as String,
       invoiceDate: map['updatedAt'] as String,
       shipmentDescription: map['shipmentDescription'] as String,
-      netFee: map['netFee'] as double,
+      netFee: (map['netFee'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
