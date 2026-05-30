@@ -16,6 +16,7 @@ class ThirdPage extends StatefulWidget {
   final Map<String, dynamic> formData1;
   final List<PaymentModeModel> paymentModes;
   final List<PaymentMethodModel> paymentMethods;
+  final bool isSubmitting;
 
   ThirdPage({
     super.key,
@@ -26,6 +27,7 @@ class ThirdPage extends StatefulWidget {
     required this.paymentMethods,
     required this.quantity,
     required this.formData1,
+    this.isSubmitting = false,
   });
   @override
   State<ThirdPage> createState() => _ThirdPageState();
@@ -44,7 +46,11 @@ class _ThirdPageState extends State<ThirdPage> {
     // widget.formData['paymentMethodId'] = widget.paymentMethods[0].id;
     return BlocBuilder<AddShipmentBloc, AddShipmentState>(
       builder: (context, state) {
-        final isLoading = state is AddShipmentLoading;
+        final isLoading =
+            widget.isSubmitting || state is AddShipmentLoading;
+        final isDisabled = widget.formData['paymentModeId'] == null ||
+            widget.formData['paymentModeId'] == '' ||
+            isLoading;
         return Stack(
           children: [
             SingleChildScrollView(
@@ -544,7 +550,7 @@ class _ThirdPageState extends State<ThirdPage> {
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: widget.onPrevious,
+                          onPressed: isLoading ? null : widget.onPrevious,
                           icon: const Icon(Icons.arrow_back),
                           label: const Text('Previous'),
                           style: ElevatedButton.styleFrom(
@@ -566,47 +572,35 @@ class _ThirdPageState extends State<ThirdPage> {
                       ),
                       const SizedBox(width: 24),
                       Expanded(
-                        child: BlocBuilder<AddShipmentBloc, AddShipmentState>(
-                          builder: (context, state) {
-                            final isLoading = state is AddShipmentLoading;
-                            final isDisabled =
-                                widget.formData['paymentModeId'] == null ||
-                                    widget.formData['paymentModeId'] == '' ||
-                                    isLoading;
-
-                            return ElevatedButton.icon(
-                              onPressed: isDisabled ? null : widget.onSubmit,
-                              icon: isLoading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                Colors.white),
-                                      ),
-                                    )
-                                  : const Icon(Icons.check_circle),
-                              label:
-                                  Text(isLoading ? 'Submitting...' : 'Submit'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isDarkMode
-                                    ? Colors.green[700]
-                                    : Colors.green,
-                                foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 20),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                textStyle: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            );
-                          },
+                        child: ElevatedButton.icon(
+                          onPressed: isDisabled ? null : widget.onSubmit,
+                          icon: isLoading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                )
+                              : const Icon(Icons.check_circle),
+                          label: Text(isLoading ? 'Submitting...' : 'Submit'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isDarkMode
+                                ? Colors.green[700]
+                                : Colors.green,
+                            foregroundColor: Colors.white,
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ],

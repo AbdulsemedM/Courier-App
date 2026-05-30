@@ -21,6 +21,7 @@ part 'add_shipment_state.dart';
 class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
   final AddShipmentRepository addShipmentRepository;
   static const maxRetries = 3;
+  bool _isSubmittingShipment = false;
 
   AddShipmentBloc(this.addShipmentRepository) : super(AddShipmentInitial()) {
     on<FetchBranches>(_fetchBranches);
@@ -177,8 +178,11 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
   }
 
   void _addShipment(AddShipment event, Emitter<AddShipmentState> emit) async {
+    if (_isSubmittingShipment) return;
+
     print('[Bloc] _addShipment called');
     print('[Bloc] Event body: ${event.body}');
+    _isSubmittingShipment = true;
     emit(AddShipmentLoading());
     try {
       print('[Bloc] Calling repository.addShipment');
@@ -192,6 +196,8 @@ class AddShipmentBloc extends Bloc<AddShipmentEvent, AddShipmentState> {
       String errorMessage = _extractErrorMessage(e);
       print('[Bloc] Error in _addShipment: $errorMessage');
       emit(AddShipmentFailure(errorMessage: errorMessage));
+    } finally {
+      _isSubmittingShipment = false;
     }
   }
 

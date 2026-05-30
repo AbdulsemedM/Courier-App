@@ -39,6 +39,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
   List<ServiceModeModel> services = [];
   List<ShipmentTypeModel> shipmentTypes = [];
   List<TransportModeModel> transportModes = [];
+  bool _isSubmitting = false;
 
   final Map<String, dynamic> formData1 = {
     "senderName": null,
@@ -424,6 +425,18 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
           },
         ),
         BlocListener<AddShipmentBloc, AddShipmentState>(
+          listenWhen: (previous, current) => current is AddShipmentFailure,
+          listener: (context, state) {
+            if (state is AddShipmentFailure) {
+              if (!mounted) return;
+              setState(() => _isSubmitting = false);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.errorMessage.toString())),
+              );
+            }
+          },
+        ),
+        BlocListener<AddShipmentBloc, AddShipmentState>(
           listenWhen: (previous, current) => current is AddShipmentSuccess,
           listener: (context, state) {
             if (state is AddShipmentSuccess) {
@@ -505,11 +518,6 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                   );
                 }
               });
-            } else if (state is AddShipmentFailure) {
-              if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.errorMessage.toString())),
-              );
             }
           },
         ),
@@ -609,7 +617,9 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                             paymentMethods: paymentMethods,
                             quantity: formData2,
                             formData1: formData1,
+                            isSubmitting: _isSubmitting,
                             onSubmit: () {
+                              if (_isSubmitting) return;
                               print('[UI] Submit button pressed on step 3');
                               print('[UI] Form validation started');
                               if (_formKey.currentState!.validate()) {
@@ -626,6 +636,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                                     '[UI] Complete form data: $completeFormData');
                                 print(
                                     '[UI] Dispatching AddShipment event to bloc');
+                                setState(() => _isSubmitting = true);
                                 context
                                     .read<AddShipmentBloc>()
                                     .add(AddShipment(body: completeFormData));
