@@ -1,9 +1,8 @@
 import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
 import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class FirstPage extends StatefulWidget {
   final Map<String, dynamic> formData;
@@ -68,8 +67,7 @@ class _FirstPageState extends State<FirstPage> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -138,7 +136,7 @@ class _FirstPageState extends State<FirstPage> {
                   );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5A00),
+              backgroundColor: context.palette.accent,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -239,7 +237,7 @@ class _FirstPageState extends State<FirstPage> {
                   );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5A00),
+              backgroundColor: context.palette.accent,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -347,8 +345,8 @@ class _FirstPageState extends State<FirstPage> {
                   : widget.onNext,
               style: ElevatedButton.styleFrom(
                 backgroundColor: isDarkMode
-                    ? const Color(0xFFFF5A00)
-                    : const Color(0xFFFF5A00),
+                    ? context.palette.accent
+                    : context.palette.accent,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -383,7 +381,7 @@ class _FirstPageState extends State<FirstPage> {
         Text(
           label,
           style: TextStyle(
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -393,22 +391,22 @@ class _FirstPageState extends State<FirstPage> {
           onChanged: onChanged,
           keyboardType: keyboardType,
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
           decoration: InputDecoration(
             filled: true,
             fillColor:
-                isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.white,
+                context.palette.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -445,7 +443,7 @@ class _FirstPageState extends State<FirstPage> {
         Text(
           label,
           style: TextStyle(
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -454,23 +452,23 @@ class _FirstPageState extends State<FirstPage> {
           items: items,
           onChanged: onChanged,
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
-          dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+          dropdownColor: context.palette.surface,
           decoration: InputDecoration(
             filled: true,
             fillColor:
-                isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.white,
+                context.palette.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             focusedBorder: OutlineInputBorder(

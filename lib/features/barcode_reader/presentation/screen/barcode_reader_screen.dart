@@ -8,10 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/services/scanner_service.dart';
 import '../widgets/barcode_reader_widget.dart';
 import 'package:flutter/services.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class BarcodeReaderScreen extends StatefulWidget {
   const BarcodeReaderScreen({super.key});
@@ -368,11 +368,11 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //   final isDarkMode = themeProvider.isDarkMode;
 
   //   return AlertDialog(
-  //     backgroundColor: isDarkMode ? const Color(0xFF1E2837) : Colors.white,
+  //     backgroundColor: context.palette.surface,
   //     title: Text(
   //       'Barcode Detected',
   //       style: TextStyle(
-  //         color: isDarkMode ? Colors.white : Colors.black87,
+  //         color: context.palette.textPrimary,
   //       ),
   //     ),
   //     content: Column(
@@ -382,14 +382,14 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //         Text(
   //           'Value: $barcode',
   //           style: TextStyle(
-  //             color: isDarkMode ? Colors.grey[300] : Colors.grey[800],
+  //             color: context.palette.textSecondary,
   //           ),
   //         ),
   //         const SizedBox(height: 16),
   //         Text(
   //           'Total scanned: ${_scannedBarcodesList.length}',
   //           style: TextStyle(
-  //             color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+  //             color: context.palette.textSecondary,
   //             fontSize: 12,
   //           ),
   //         ),
@@ -401,7 +401,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //         child: Text(
   //           'Skip',
   //           style: TextStyle(
-  //             color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+  //             color: context.palette.textSecondary,
   //           ),
   //         ),
   //       ),
@@ -430,10 +430,10 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color:
-            isDarkMode ? Colors.grey[900]!.withOpacity(0.5) : Colors.grey[100],
+            isDarkMode ? Colors.grey[900]!.withOpacity(0.5) : context.palette.surfaceMuted,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+          color: context.palette.border,
         ),
       ),
       child: Column(
@@ -447,7 +447,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                 'Scanned Barcodes (${_scannedBarcodesList.length})',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: context.palette.textPrimary,
                 ),
               ),
               Row(
@@ -483,7 +483,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                   const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.clear_all),
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                     onPressed: () {
                       setState(() {
                         _scannedBarcodes.clear();
@@ -505,7 +505,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                       label: Text(
                         barcode,
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black87,
+                          color: context.palette.textPrimary,
                         ),
                       ),
                       backgroundColor: isDarkMode
@@ -514,7 +514,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                       deleteIcon: Icon(
                         Icons.close,
                         size: 16,
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        color: context.palette.textSecondary,
                       ),
                       onDeleted: () {
                         setState(() {
@@ -540,7 +540,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //         Text(
   //           'Select Status',
   //           style: TextStyle(
-  //             color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+  //             color: context.palette.textSecondary,
   //             fontSize: 14,
   //           ),
   //         ),
@@ -553,7 +553,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //                 : Colors.white,
   //             borderRadius: BorderRadius.circular(12),
   //             border: Border.all(
-  //               color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+  //               color: context.palette.border,
   //             ),
   //           ),
   //           child: DropdownButtonHideUnderline(
@@ -562,22 +562,22 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //               hint: Text(
   //                 'Select status',
   //                 style: TextStyle(
-  //                   color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+  //                   color: context.palette.textSecondary,
   //                 ),
   //               ),
   //               isExpanded: true,
   //               icon: Icon(
   //                 Icons.arrow_drop_down,
-  //                 color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+  //                 color: context.palette.textSecondary,
   //               ),
-  //               dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+  //               dropdownColor: context.palette.surface,
   //               items: statuses
   //                   .map((status) => DropdownMenuItem<String>(
   //                         value: status.code,
   //                         child: Text(
   //                           '${status.code} - ${status.description}',
   //                           style: TextStyle(
-  //                             color: isDarkMode ? Colors.white : Colors.black87,
+  //                             color: context.palette.textPrimary,
   //                           ),
   //                         ),
   //                       ))
@@ -651,8 +651,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return MultiBlocListener(
       listeners: [
@@ -730,14 +729,14 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
         },
         child: Scaffold(
           backgroundColor:
-              isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
+              context.palette.appBarBackground,
           appBar: AppBar(
             elevation: 0,
-            backgroundColor: const Color.fromARGB(255, 75, 23, 160),
+            backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
             title: Text(
               'Track Shipment',
               style: TextStyle(
-                color: isDarkMode ? Colors.white : Colors.black87,
+                color: context.palette.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -772,9 +771,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                                       ? Icons.qr_code_scanner
                                       : Icons.scanner,
                                   size: 64,
-                                  color: isDarkMode
-                                      ? Colors.grey[400]
-                                      : Colors.grey[600],
+                                  color: context.palette.textSecondary,
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
@@ -782,9 +779,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                                       ? 'Sunmi Scanner Active'
                                       : 'Urovo Scanner Active',
                                   style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
+                                    color: context.palette.textPrimary,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -793,18 +788,14 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                                 Text(
                                   'Device: $_deviceName',
                                   style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.grey[400]
-                                        : Colors.grey[600],
+                                    color: context.palette.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
                                   'Press the scan button on your device',
                                   style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.grey[400]
-                                        : Colors.grey[600],
+                                    color: context.palette.textSecondary,
                                   ),
                                 ),
                               ],
@@ -834,7 +825,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
               ),
               const SizedBox(width: 16),
               FloatingActionButton(
-                backgroundColor: const Color(0xFFFF5A00),
+                backgroundColor: context.palette.accent,
                 onPressed: () {
                   Navigator.push(
                     context,

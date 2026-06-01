@@ -1,6 +1,7 @@
 import 'package:courier_app/features/income_statement/data/model/income_statement_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class IncomeSummaryCard extends StatelessWidget {
   final String title;
@@ -22,14 +23,14 @@ class IncomeSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      color: isDarkMode ? Colors.grey[850] : Colors.white,
+      color: context.palette.surface,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -50,7 +51,7 @@ class IncomeSummaryCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
+                color: context.palette.textSecondary,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -74,7 +75,7 @@ class IncomeSummaryCard extends StatelessWidget {
                 marginText!,
                 style: TextStyle(
                   fontSize: 12,
-                  color: marginColor ?? (isDarkMode ? Colors.grey[400] : Colors.grey[600]),
+                  color: marginColor ?? (context.palette.textSecondary),
                 ),
               ),
             ],
@@ -103,12 +104,12 @@ class BreakdownSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850] : Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -120,7 +121,7 @@ class BreakdownSection extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: isDarkMode ? Colors.grey[700]! : Colors.grey[200]!,
+                  color: context.palette.border,
                   width: 1,
                 ),
               ),
@@ -141,7 +142,7 @@ class BreakdownSection extends StatelessWidget {
               child: Text(
                 'No ${isRevenue ? 'revenue' : 'expense'} items recorded.',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  color: context.palette.textSecondary,
                 ),
               ),
             )
@@ -152,7 +153,7 @@ class BreakdownSection extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                      color: context.palette.border,
                       width: 1,
                     ),
                   ),
@@ -164,7 +165,7 @@ class BreakdownSection extends StatelessWidget {
                       item['label'] as String,
                       style: TextStyle(
                         fontSize: 14,
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                     Row(
@@ -174,7 +175,7 @@ class BreakdownSection extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: isDarkMode ? Colors.white : Colors.black87,
+                            color: context.palette.textPrimary,
                           ),
                         ),
                         if (item['hasCopy'] == true) ...[
@@ -182,7 +183,7 @@ class BreakdownSection extends StatelessWidget {
                           Icon(
                             Icons.copy,
                             size: 16,
-                            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                            color: context.palette.textSecondary,
                           ),
                         ],
                       ],
@@ -211,7 +212,7 @@ class BreakdownSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                 ),
                 Row(
@@ -228,7 +229,7 @@ class BreakdownSection extends StatelessWidget {
                     Icon(
                       Icons.settings,
                       size: 18,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: context.palette.textSecondary,
                     ),
                   ],
                 ),
@@ -251,7 +252,7 @@ class AccountBalancesTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     if (accounts.isEmpty) {
       return Container(
@@ -260,7 +261,7 @@ class AccountBalancesTable extends StatelessWidget {
           child: Text(
             'No accounts found',
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: context.palette.textSecondary,
             ),
           ),
         ),
@@ -277,7 +278,7 @@ class AccountBalancesTable extends StatelessWidget {
               label: Text(
                 'Account #',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -286,7 +287,7 @@ class AccountBalancesTable extends StatelessWidget {
               label: Text(
                 'Type',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -295,7 +296,7 @@ class AccountBalancesTable extends StatelessWidget {
               label: Text(
                 'Branch',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -304,7 +305,7 @@ class AccountBalancesTable extends StatelessWidget {
               label: Text(
                 'Expense Balance',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -313,7 +314,7 @@ class AccountBalancesTable extends StatelessWidget {
               label: Text(
                 'Running Balance',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -325,7 +326,7 @@ class AccountBalancesTable extends StatelessWidget {
                 DataCell(Text(
                   account.accountNumber,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(
@@ -351,21 +352,21 @@ class AccountBalancesTable extends StatelessWidget {
                 DataCell(Text(
                   account.branchName,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   NumberFormat.currency(symbol: '', decimalDigits: 2)
                       .format(account.expenseBalance),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   NumberFormat.currency(symbol: '', decimalDigits: 2)
                       .format(account.runningBalance),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.w500,
                   ),
                 )),

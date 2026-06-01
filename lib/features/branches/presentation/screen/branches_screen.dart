@@ -1,6 +1,7 @@
 import 'package:courier_app/features/branches/presentation/widget/add_branch_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../bloc/branches_bloc.dart';
 import '../../model/branches_model.dart';
 import '../widget/branches_widget.dart';
@@ -49,7 +50,7 @@ class _BranchesScreenState extends State<BranchesScreen> {
   //   showDialog(
   //     context: context,
   //     builder: (context) => AlertDialog(
-  //       title: const Text('Confirm Delete'),
+  //       title: Text('Confirm Delete', style: TextStyle(color: context.palette.textPrimary)),
   //       content: Text('Are you sure you want to delete ${branch.name}?'),
   //       actions: [
   //         TextButton(
@@ -71,10 +72,15 @@ class _BranchesScreenState extends State<BranchesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF5b3895),
+      backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 75, 23, 160),
-        title: const Text('Branches'),
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
+        title: Text(
+          'Branches',
+          style: TextStyle(color: context.palette.textPrimary),
+        ),
+        iconTheme: IconThemeData(color: context.palette.textPrimary),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),

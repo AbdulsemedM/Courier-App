@@ -1,3 +1,4 @@
+import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -14,11 +15,11 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+            color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -45,7 +46,7 @@ class AnalyticsWidgets {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -55,7 +56,7 @@ class AnalyticsWidgets {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
         ],
@@ -73,11 +74,11 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+            color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -104,7 +105,7 @@ class AnalyticsWidgets {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -114,7 +115,7 @@ class AnalyticsWidgets {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
         ],
@@ -136,11 +137,11 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+            color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -157,7 +158,7 @@ class AnalyticsWidgets {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.grey[900],
+                  color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
                 ),
               ),
               Container(
@@ -183,7 +184,7 @@ class AnalyticsWidgets {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -224,11 +225,11 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+            color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -248,7 +249,7 @@ class AnalyticsWidgets {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -274,11 +275,11 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+            color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -292,7 +293,7 @@ class AnalyticsWidgets {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -321,7 +322,7 @@ class AnalyticsWidgets {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
           ),
         ),
         Text(
@@ -346,11 +347,11 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+            color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -370,7 +371,7 @@ class AnalyticsWidgets {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -407,14 +408,14 @@ class AnalyticsWidgets {
         height: 200,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
           child: Text(
             'No data available',
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
             ),
           ),
         ),
@@ -425,11 +426,11 @@ class AnalyticsWidgets {
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+            color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -492,7 +493,7 @@ class AnalyticsWidgets {
                     value.toInt().toString(),
                     style: TextStyle(
                       fontSize: 10,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                     ),
                   );
                 },
@@ -547,14 +548,14 @@ class AnalyticsWidgets {
         height: 200,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
           child: Text(
             'No data available',
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
             ),
           ),
         ),
@@ -574,11 +575,11 @@ class AnalyticsWidgets {
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+            color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -601,7 +602,7 @@ class AnalyticsWidgets {
                       period,
                       style: TextStyle(
                         fontSize: 10,
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                       ),
                     );
                   }
@@ -618,7 +619,7 @@ class AnalyticsWidgets {
                     value.toInt().toString(),
                     style: TextStyle(
                       fontSize: 10,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                     ),
                   );
                 },
@@ -677,14 +678,14 @@ class AnalyticsWidgets {
         height: 200,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
           child: Text(
             'No data available',
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
             ),
           ),
         ),
@@ -697,11 +698,11 @@ class AnalyticsWidgets {
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+            color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -732,7 +733,7 @@ class AnalyticsWidgets {
                         style: TextStyle(
                           fontSize: 9,
                           color:
-                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                              isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -751,7 +752,7 @@ class AnalyticsWidgets {
                     value.toInt().toString(),
                     style: TextStyle(
                       fontSize: 10,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                     ),
                   );
                 },
@@ -800,11 +801,11 @@ class AnalyticsWidgets {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+              color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -818,7 +819,7 @@ class AnalyticsWidgets {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.grey[900],
+                color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
               ),
             ),
             const SizedBox(height: 16),
@@ -830,7 +831,7 @@ class AnalyticsWidgets {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -862,11 +863,11 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+            color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -880,7 +881,7 @@ class AnalyticsWidgets {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
@@ -889,7 +890,7 @@ class AnalyticsWidgets {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -897,7 +898,7 @@ class AnalyticsWidgets {
             '${topLocation.count ?? 0} deliveries',
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -906,7 +907,7 @@ class AnalyticsWidgets {
               Expanded(
                 child: LinearProgressIndicator(
                   value: (topLocation.percentage ?? 0) / 100,
-                  backgroundColor: const Color(0xFF5b3895).withOpacity(0.2),
+                  backgroundColor: AppPalette.light.accentMuted,
                   valueColor:
                       const AlwaysStoppedAnimation<Color>(Color(0xFF5b3895)),
                   minHeight: 8,
@@ -918,7 +919,7 @@ class AnalyticsWidgets {
                 '${topLocation.percentage?.toStringAsFixed(1) ?? 0}% of total',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                 ),
               ),
             ],

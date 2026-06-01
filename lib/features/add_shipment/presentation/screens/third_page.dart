@@ -3,10 +3,10 @@ import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
 import 'package:courier_app/features/add_shipment/model/estimated_rate_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_method_model.dart';
 import 'package:courier_app/features/add_shipment/model/payment_mode_model.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class ThirdPage extends StatefulWidget {
   final Map<String, dynamic> formData;
@@ -41,8 +41,7 @@ class _ThirdPageState extends State<ThirdPage> {
   @override
   Widget build(BuildContext context) {
     final paymentService = Provider.of<PaymentService>(context);
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
     // widget.formData['paymentMethodId'] = widget.paymentMethods[0].id;
     return BlocBuilder<AddShipmentBloc, AddShipmentState>(
       builder: (context, state) {
@@ -337,7 +336,7 @@ class _ThirdPageState extends State<ThirdPage> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color:
-                            isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                            context.palette.border,
                       ),
                       boxShadow: [
                         BoxShadow(
@@ -474,9 +473,7 @@ class _ThirdPageState extends State<ThirdPage> {
                                 : Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: isDarkMode
-                                  ? Colors.grey[800]!
-                                  : Colors.grey[200]!,
+                              color: context.palette.border,
                             ),
                             boxShadow: [
                               BoxShadow(
@@ -493,9 +490,7 @@ class _ThirdPageState extends State<ThirdPage> {
                                 children: [
                                   Icon(
                                     Icons.account_balance,
-                                    color: isDarkMode
-                                        ? Colors.grey[400]
-                                        : Colors.grey[600],
+                                    color: context.palette.textSecondary,
                                     size: 24,
                                   ),
                                   const SizedBox(width: 12),
@@ -504,9 +499,7 @@ class _ThirdPageState extends State<ThirdPage> {
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      color: isDarkMode
-                                          ? Colors.grey[400]
-                                          : Colors.grey[600],
+                                      color: context.palette.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -554,11 +547,9 @@ class _ThirdPageState extends State<ThirdPage> {
                           icon: const Icon(Icons.arrow_back),
                           label: const Text('Previous'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: isDarkMode
-                                ? Colors.grey[800]
-                                : Colors.grey[200],
+                            backgroundColor: context.palette.border,
                             foregroundColor:
-                                isDarkMode ? Colors.white : Colors.black87,
+                                context.palette.textPrimary,
                             padding: const EdgeInsets.symmetric(vertical: 20),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -642,7 +633,7 @@ class _ThirdPageState extends State<ThirdPage> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+            color: context.palette.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -651,32 +642,32 @@ class _ThirdPageState extends State<ThirdPage> {
           onChanged: onChanged,
           keyboardType: keyboardType,
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
             fontSize: 16,
           ),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(
-              color: isDarkMode ? Colors.grey[600] : Colors.grey[400],
+              color: context.palette.textSecondary,
             ),
             filled: true,
-            fillColor: isDarkMode ? const Color(0xFF1A1F37) : Colors.white,
+            fillColor: context.palette.surface,
             prefixIcon: icon != null
                 ? Icon(
                     icon,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   )
                 : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -714,7 +705,7 @@ class _ThirdPageState extends State<ThirdPage> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+            color: context.palette.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -723,30 +714,30 @@ class _ThirdPageState extends State<ThirdPage> {
           items: items,
           onChanged: onChanged,
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
             fontSize: 16,
           ),
           icon: const Icon(Icons.arrow_drop_down_circle_outlined),
-          dropdownColor: isDarkMode ? const Color(0xFF1A1F37) : Colors.white,
+          dropdownColor: context.palette.surface,
           decoration: InputDecoration(
             filled: true,
-            fillColor: isDarkMode ? const Color(0xFF1A1F37) : Colors.white,
+            fillColor: context.palette.surface,
             prefixIcon: icon != null
                 ? Icon(
                     icon,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   )
                 : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             focusedBorder: OutlineInputBorder(

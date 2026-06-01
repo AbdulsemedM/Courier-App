@@ -5,6 +5,7 @@ import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class BalanceSheetScreen extends StatefulWidget {
   const BalanceSheetScreen({super.key});
@@ -48,14 +49,14 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
       firstDate: DateTime(2015),
       lastDate: DateTime.now(),
       builder: (context, child) {
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        final isDarkMode = context.isDarkMode;
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: const Color(0xFFFF5a00),
+              primary: context.palette.accent,
               onPrimary: Colors.white,
-              surface: isDarkMode ? Colors.grey[850]! : Colors.white,
-              onSurface: isDarkMode ? Colors.white : Colors.black,
+              surface: context.palette.surface,
+              onSurface: context.palette.textPrimary,
             ),
           ),
           child: child!,
@@ -84,7 +85,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       body: Container(
@@ -97,10 +98,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                     const Color.fromARGB(255, 75, 23, 160),
                     const Color(0xFF5b3895),
                   ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: SafeArea(
@@ -114,7 +112,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -124,7 +122,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                     const Spacer(),
@@ -132,7 +130,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.file_download,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () {
                         // TODO: Implement export functionality
@@ -167,7 +165,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                           children: [
                             Icon(
                               Icons.calendar_today,
-                              color: isDarkMode ? Colors.white : Colors.black87,
+                              color: context.palette.textPrimary,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -189,7 +187,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
-                                      color: isDarkMode ? Colors.white : Colors.black87,
+                                      color: context.palette.textPrimary,
                                     ),
                                   ),
                                 ],
@@ -197,7 +195,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                             ),
                             Icon(
                               Icons.arrow_drop_down,
-                              color: isDarkMode ? Colors.white : Colors.black87,
+                              color: context.palette.textPrimary,
                             ),
                           ],
                         ),
@@ -217,19 +215,15 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: isDarkMode
-                                  ? Colors.white.withOpacity(0.1)
-                                  : Colors.white.withOpacity(0.9),
+                              fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 12,
                               ),
                             ),
-                            dropdownColor: isDarkMode
-                                ? const Color(0xFF1A1C2E)
-                                : Colors.white,
+                            dropdownColor: context.palette.surface,
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: context.palette.textPrimary,
                             ),
                             items: state.branches.map((branch) {
                               return DropdownMenuItem<int>(
@@ -237,7 +231,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                 child: Text(
                                   '${branch.name} (${branch.code})',
                                   style: TextStyle(
-                                    color: isDarkMode ? Colors.white : Colors.black,
+                                    color: context.palette.textPrimary,
                                   ),
                                 ),
                               );
@@ -514,7 +508,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: isDarkMode ? Colors.white : Colors.black87,
+                                      color: context.palette.textPrimary,
                                     ),
                                   ),
                                   Text(
@@ -543,7 +537,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                             Text(
                               'Error: ${state.message}',
                               style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
+                                color: context.palette.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -560,7 +554,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                       child: Text(
                         'Select a branch and date to view balance sheet',
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                          color: context.palette.textSecondary,
                         ),
                         textAlign: TextAlign.center,
                       ),

@@ -1,8 +1,13 @@
+import 'package:courier_app/configuration/auth_service.dart';
+import 'package:courier_app/configuration/phone_number_manager.dart';
+import 'package:courier_app/core/utils/role_display_helper.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
+import 'package:courier_app/features/login/presentation/screen/login_screen.dart';
 import 'package:flutter/material.dart';
-import '../widgets/settings_widget.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../widgets/settings_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -14,186 +19,223 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool notificationsEnabled = true;
   bool locationEnabled = true;
+  String _displayRole = '...';
+  String? _email;
+  bool _isLoadingProfile = true;
+  final AuthService _authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileInfo();
+  }
+
+  Future<void> _loadProfileInfo() async {
+    final roleInfo = await RoleDisplayHelper.loadRoleDisplayInfo();
+    final email = await PhoneNumberManager().getPhoneNumber();
+    if (!mounted) return;
+    setState(() {
+      _displayRole = roleInfo.formattedRole;
+      _email = email;
+      _isLoadingProfile = false;
+    });
+  }
+
+  Future<void> _handleLogout() async {
+    final palette = context.palette;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: palette.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Log out?',
+          style: TextStyle(
+            color: palette.textPrimary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Text(
+          'You will need to sign in again to access your account.',
+          style: TextStyle(color: palette.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancel', style: TextStyle(color: palette.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Log out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    try {
+      await _authService.deleteToken();
+      await _authService.deleteUserId();
+      await _authService.deleteBranch();
+      await _authService.deleteRoleName();
+      await _authService.deleteRoleNames();
+      await PermissionManager().setPermission([]);
+
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error during logout: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _openComingSoon() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final palette = context.palette;
     final isDarkMode = themeProvider.isDarkMode;
-    // final customColors = Theme.of(context).extension<CustomColors>()!;
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-           const Color(0xFF5b3895),
-            const Color(0xFF5b3895),
-          ],
+    return Scaffold(
+      backgroundColor: palette.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        title: Text(
+          'Settings',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: palette.textPrimary,
+          ),
         ),
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: const Text('Settings'),
-        ),
-        body: ListView(
+      body: SettingsWidgets.buildPageBackground(
+        isDarkMode: isDarkMode,
+        child: ListView(
+          physics: const BouncingScrollPhysics(),
           children: [
-            SettingsWidgets.buildProfileCard(
-              name: 'Amin Muhamed',
-              email: 'aminmuhamed@gmail.com',
-              imageUrl:
-                  'https://www.shutterstock.com/image-vector/businessman-icon-can-be-used-260nw-247098721.jpg',
-              onTap: () {
-                // Handle profile tap
-              },
+            SettingsWidgets.buildProfileHero(
+              name: _isLoadingProfile ? '...' : _displayRole,
+              email: _email,
+              onTap: _openComingSoon,
             ),
-            SettingsWidgets.buildSectionHeader('Account Settings'),
-            SettingsWidgets.buildSettingItem(
-              title: 'Personal Information',
-              icon: Icons.person_outline,
-              iconColor: Colors.blue,
-              subtitle: 'Update your personal details',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ComingSoonScreen(),
-                  ),
-                );
-              },
-            ),
-            SettingsWidgets.buildSettingItem(
-              title: 'Payment Methods',
-              icon: Icons.payment,
-              iconColor: Colors.green,
-              subtitle: 'Manage your payment options',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ComingSoonScreen(),
-                  ),
-                );
-              },
-            ),
-            SettingsWidgets.buildSettingItem(
-              title: 'Address Book',
-              icon: Icons.location_on_outlined,
-              iconColor: Colors.orange,
-              subtitle: 'Manage delivery addresses',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ComingSoonScreen(),
-                  ),
-                );
-              },
-            ),
-            SettingsWidgets.buildSectionHeader('App Settings'),
-            SettingsWidgets.buildToggleItem(
-              title: 'Push Notifications',
-              icon: Icons.notifications_none,
-              iconColor: Colors.purple,
-              value: notificationsEnabled,
-              subtitle: 'Receive updates about your deliveries',
-              onChanged: (value) {
-                setState(() => notificationsEnabled = value);
-              },
-            ),
-            SettingsWidgets.buildToggleItem(
-              title: 'Dark Mode',
-              icon: Icons.dark_mode_outlined,
-              iconColor: isDarkMode ? Colors.blue.shade200 : Colors.indigo,
-              value: isDarkMode,
-              subtitle: 'Switch to ${isDarkMode ? "light" : "dark"} theme',
-              onChanged: (value) {
-                themeProvider.toggleTheme();
-              },
-            ),
-            SettingsWidgets.buildToggleItem(
-              title: 'Location Services',
-              icon: Icons.location_on_outlined,
-              iconColor: Colors.red,
-              value: locationEnabled,
-              subtitle: 'Enable location tracking for deliveries',
-              onChanged: (value) {
-                setState(() => locationEnabled = value);
-              },
-            ),
-            SettingsWidgets.buildSectionHeader('Support'),
-            SettingsWidgets.buildSettingItem(
-              title: 'Help Center',
-              icon: Icons.help_outline,
-              iconColor: Colors.teal,
-              subtitle: 'Get help with your orders',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ComingSoonScreen(),
-                  ),
-                );
-              },
-            ),
-            SettingsWidgets.buildSettingItem(
-              title: 'Terms & Privacy Policy',
-              icon: Icons.privacy_tip_outlined,
-              iconColor: Colors.grey,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ComingSoonScreen(),
-                  ),
-                );
-              },
-            ),
-            SettingsWidgets.buildSettingItem(
-              title: 'About App',
-              icon: Icons.info_outline,
-              iconColor: Colors.blue,
-              subtitle: 'Version 1.0.3',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ComingSoonScreen(),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle logout
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade50,
-                  padding: const EdgeInsets.all(16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+            SettingsWidgets.buildSectionLabel('ACCOUNT'),
+            SettingsWidgets.buildSettingsGroup(
+              children: [
+                SettingsWidgets.buildNavRow(
+                  title: 'Personal Information',
+                  icon: Icons.person_outline_rounded,
+                  accentColor: const Color(0xFF2563EB),
+                  subtitle: 'Name, contact & profile',
+                  onTap: _openComingSoon,
                 ),
-                child: Text(
-                  'Log Out',
-                  style: TextStyle(
-                    color: Colors.red.shade700,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                SettingsWidgets.buildNavRow(
+                  title: 'Payment Methods',
+                  icon: Icons.payments_outlined,
+                  accentColor: const Color(0xFF059669),
+                  subtitle: 'Cards and payment options',
+                  onTap: _openComingSoon,
                 ),
-              ),
+                SettingsWidgets.buildNavRow(
+                  title: 'Address Book',
+                  icon: Icons.location_on_outlined,
+                  accentColor: const Color(0xFFEA580C),
+                  subtitle: 'Saved delivery addresses',
+                  onTap: _openComingSoon,
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
+            SettingsWidgets.buildSectionLabel('PREFERENCES'),
+            SettingsWidgets.buildSettingsGroup(
+              children: [
+                SettingsWidgets.buildToggleRow(
+                  title: 'Push Notifications',
+                  icon: Icons.notifications_outlined,
+                  accentColor: const Color(0xFF7C3AED),
+                  value: notificationsEnabled,
+                  subtitle: 'Delivery and status alerts',
+                  onChanged: (value) {
+                    setState(() => notificationsEnabled = value);
+                  },
+                ),
+                SettingsWidgets.buildToggleRow(
+                  title: 'Dark Mode',
+                  icon: Icons.dark_mode_outlined,
+                  accentColor: const Color(0xFF4F46E5),
+                  value: isDarkMode,
+                  subtitle: isDarkMode ? 'Switch to light theme' : 'Switch to dark theme',
+                  onChanged: (_) => themeProvider.toggleTheme(),
+                ),
+                SettingsWidgets.buildToggleRow(
+                  title: 'Location Services',
+                  icon: Icons.my_location_outlined,
+                  accentColor: const Color(0xFFDC2626),
+                  value: locationEnabled,
+                  subtitle: 'Track deliveries on map',
+                  onChanged: (value) {
+                    setState(() => locationEnabled = value);
+                  },
+                ),
+              ],
+            ),
+            SettingsWidgets.buildSectionLabel('SUPPORT'),
+            SettingsWidgets.buildSettingsGroup(
+              children: [
+                SettingsWidgets.buildNavRow(
+                  title: 'Help Center',
+                  icon: Icons.help_outline_rounded,
+                  accentColor: const Color(0xFF0D9488),
+                  subtitle: 'FAQs and contact support',
+                  onTap: _openComingSoon,
+                ),
+                SettingsWidgets.buildNavRow(
+                  title: 'Terms & Privacy',
+                  icon: Icons.shield_outlined,
+                  accentColor: const Color(0xFF64748B),
+                  subtitle: 'Legal information',
+                  onTap: _openComingSoon,
+                ),
+                SettingsWidgets.buildNavRow(
+                  title: 'About App',
+                  icon: Icons.info_outline_rounded,
+                  accentColor: const Color(0xFF2563EB),
+                  subtitle: 'Version 1.0.3',
+                  onTap: _openComingSoon,
+                ),
+              ],
+            ),
+            SettingsWidgets.buildLogoutButton(onPressed: _confirmLogout),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _confirmLogout() async {
+    await _handleLogout();
   }
 }

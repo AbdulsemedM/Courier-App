@@ -2,6 +2,7 @@ import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class AddBranchModal extends StatefulWidget {
   const AddBranchModal({super.key});
@@ -29,7 +30,7 @@ class _AddBranchModalState extends State<AddBranchModal> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -47,13 +48,13 @@ class _AddBranchModalState extends State<AddBranchModal> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 ),
                 IconButton(
                   icon: Icon(
                     Icons.close,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),

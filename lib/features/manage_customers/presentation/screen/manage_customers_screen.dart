@@ -1,6 +1,7 @@
 import 'package:courier_app/features/manage_customers/bloc/manage_customers_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../model/customer_model.dart';
 import '../widget/manage_customers_widget.dart';
 import '../widget/add_customer_modal.dart';
@@ -24,26 +25,11 @@ class _ManageCustomersScreenState extends State<ManageCustomersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
+      body: SafeArea(
           child: Column(
             children: [
               // Custom App Bar
@@ -54,7 +40,7 @@ class _ManageCustomersScreenState extends State<ManageCustomersScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -64,7 +50,7 @@ class _ManageCustomersScreenState extends State<ManageCustomersScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                     const Spacer(),
@@ -73,7 +59,7 @@ class _ManageCustomersScreenState extends State<ManageCustomersScreen> {
                       icon: const Icon(Icons.add),
                       label: const Text('Add'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5a00),
+                        backgroundColor: context.palette.accent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         shape: RoundedRectangleBorder(
@@ -117,7 +103,7 @@ class _ManageCustomersScreenState extends State<ManageCustomersScreen> {
                         child: Text(
                           'Error: ${state.error}',
                           style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.black,
+                            color: context.palette.textPrimary,
                           ),
                         ),
                       );
@@ -130,7 +116,6 @@ class _ManageCustomersScreenState extends State<ManageCustomersScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 

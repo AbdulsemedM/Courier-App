@@ -2,6 +2,7 @@ import 'package:courier_app/features/manage_customers/bloc/manage_customers_bloc
 import 'package:courier_app/features/manage_customers/model/customer_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../../branches/bloc/branches_bloc.dart';
 import '../../../../configuration/auth_service.dart';
 
@@ -42,7 +43,7 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
     final isEditing = widget.customerToEdit != null;
 
     return BlocListener<ManageCustomersBloc, ManageCustomersState>(
@@ -69,7 +70,7 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
         }
       },
       child: Dialog(
-        backgroundColor: isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+        backgroundColor: context.palette.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
           padding: const EdgeInsets.all(24),
@@ -85,7 +86,7 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -206,7 +207,7 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                       child: Text(
                         'Cancel',
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white70 : Colors.black54,
+                          color: context.palette.textSecondary,
                         ),
                       ),
                     ),

@@ -1,6 +1,7 @@
 import 'package:courier_app/features/transaction_hq_to_branch/data/model/transaction_hq_to_branch_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class TransactionHqToBranchTable extends StatelessWidget {
   final List<TransactionItem> transactions;
@@ -12,7 +13,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
     final currencyFormat = NumberFormat.currency(symbol: '', decimalDigits: 2);
     final dateFormat = DateFormat('MMM dd, yyyy HH:mm');
 
@@ -31,7 +32,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'ID',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -40,7 +41,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'Date',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -49,7 +50,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'Description',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -58,7 +59,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'Reference',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -67,7 +68,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'Amount',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -76,7 +77,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'From Account',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -85,7 +86,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'To Account',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -94,7 +95,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'Category',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -103,7 +104,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'Status',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -112,7 +113,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'Payment Mode',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -121,7 +122,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'AWB',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -130,7 +131,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'Previous Balance',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -139,7 +140,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
               label: Text(
                 'New Balance',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -154,7 +155,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
                 DataCell(Text(
                   transaction.id.toString(),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                   ),
                 )),
                 DataCell(Text(
@@ -162,7 +163,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
                       ? dateFormat.format(createdAt)
                       : transaction.createdAt,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
@@ -172,7 +173,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
                     child: Text(
                       transaction.description,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white70 : Colors.black87,
+                        color: AppPalette.forMode(isDarkMode).textSecondary,
                         fontSize: 12,
                       ),
                       maxLines: 2,
@@ -183,35 +184,35 @@ class TransactionHqToBranchTable extends StatelessWidget {
                 DataCell(Text(
                   transaction.reference,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   currencyFormat.format(transaction.amount),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontWeight: FontWeight.bold,
                   ),
                 )),
                 DataCell(Text(
                   transaction.fromAccount,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   transaction.toAccount,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   transaction.transactionCategory,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
@@ -242,28 +243,28 @@ class TransactionHqToBranchTable extends StatelessWidget {
                 DataCell(Text(
                   transaction.paymentMode ?? 'N/A',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   transaction.shipment?.awb ?? 'N/A',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   currencyFormat.format(transaction.previousBalance),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   currencyFormat.format(transaction.newBalance),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontWeight: FontWeight.bold,
                   ),
                 )),
@@ -287,7 +288,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
       case 'ERROR':
         return Colors.red;
       default:
-        return isDarkMode ? Colors.white70 : Colors.grey;
+        return AppPalette.forMode(isDarkMode).textSecondary;
     }
   }
 }

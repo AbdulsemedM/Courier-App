@@ -2,6 +2,7 @@ import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/tellers/bloc/tellers_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../../branches/bloc/branches_bloc.dart';
 
 class AddTellerModal extends StatefulWidget {
@@ -25,7 +26,7 @@ class _AddTellerModalState extends State<AddTellerModal> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return BlocListener<TellersBloc, TellersState>(
       listener: (context, state) {
@@ -50,7 +51,7 @@ class _AddTellerModalState extends State<AddTellerModal> {
         }
       },
       child: Dialog(
-        backgroundColor: isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+        backgroundColor: context.palette.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -67,7 +68,7 @@ class _AddTellerModalState extends State<AddTellerModal> {
                   children: [
                     Icon(
                       Icons.person_add,
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: context.palette.textPrimary,
                       size: 28,
                     ),
                     const SizedBox(width: 12),
@@ -76,7 +77,7 @@ class _AddTellerModalState extends State<AddTellerModal> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ],
@@ -92,12 +93,10 @@ class _AddTellerModalState extends State<AddTellerModal> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: isDarkMode
-                        ? Colors.white.withOpacity(0.05)
-                        : Colors.grey.withOpacity(0.1),
+                    fillColor: context.palette.surfaceMuted,
                   ),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -120,14 +119,12 @@ class _AddTellerModalState extends State<AddTellerModal> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           filled: true,
-                          fillColor: isDarkMode
-                              ? Colors.white.withOpacity(0.05)
-                              : Colors.grey.withOpacity(0.1),
+                          fillColor: context.palette.surfaceMuted,
                         ),
                         dropdownColor:
-                            isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+                            context.palette.surface,
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black,
+                          color: context.palette.textPrimary,
                         ),
                         items: state.branches.map((branch) {
                           return DropdownMenuItem(
@@ -135,7 +132,7 @@ class _AddTellerModalState extends State<AddTellerModal> {
                             child: Text(
                               '${branch.name} (${branch.code})',
                               style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
+                                color: context.palette.textPrimary,
                               ),
                             ),
                           );
@@ -192,7 +189,7 @@ class _AddTellerModalState extends State<AddTellerModal> {
                       child: Text(
                         'Cancel',
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white70 : Colors.black54,
+                          color: context.palette.textSecondary,
                         ),
                       ),
                     ),
@@ -223,7 +220,7 @@ class _AddTellerModalState extends State<AddTellerModal> {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF5a00),
+                            backgroundColor: context.palette.accent,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24, vertical: 12),

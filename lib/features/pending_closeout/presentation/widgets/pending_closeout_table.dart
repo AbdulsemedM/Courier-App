@@ -1,6 +1,7 @@
 import 'package:courier_app/features/pending_closeout/data/model/pending_closeout_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class PendingCloseoutTable extends StatelessWidget {
   final List<PendingCloseout> pendingCloseouts;
@@ -12,7 +13,7 @@ class PendingCloseoutTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
     final currencyFormat = NumberFormat.currency(symbol: '', decimalDigits: 2);
     final dateFormat = DateFormat('MMM dd, yyyy HH:mm');
 
@@ -31,7 +32,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Liability ID',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -40,7 +41,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Created At',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -49,7 +50,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Teller Name',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -58,7 +59,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Branch',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -67,7 +68,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Status',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -76,7 +77,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Expected Amount',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -85,7 +86,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Actual Amount',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -94,7 +95,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Shortfall',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -103,7 +104,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Reason',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -112,7 +113,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Transaction Ref',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -121,7 +122,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Recorded By',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -130,7 +131,7 @@ class PendingCloseoutTable extends StatelessWidget {
               label: Text(
                 'Days Pending',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -141,14 +142,14 @@ class PendingCloseoutTable extends StatelessWidget {
             final statusColor = _getStatusColor(closeout.status, isDarkMode);
             final shortfallColor = closeout.shortfallAmount > 0
                 ? Colors.red
-                : (isDarkMode ? Colors.white70 : Colors.black87);
+                : (AppPalette.forMode(isDarkMode).textSecondary);
 
             return DataRow(
               cells: [
                 DataCell(Text(
                   closeout.liabilityId.toString(),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                   ),
                 )),
                 DataCell(Text(
@@ -156,21 +157,21 @@ class PendingCloseoutTable extends StatelessWidget {
                       ? dateFormat.format(createdAt)
                       : closeout.createdAt,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   closeout.tellerName,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   '${closeout.branchName} (${closeout.branchCode})',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
@@ -201,7 +202,7 @@ class PendingCloseoutTable extends StatelessWidget {
                 DataCell(Text(
                   currencyFormat.format(closeout.expectedAmount),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -209,7 +210,7 @@ class PendingCloseoutTable extends StatelessWidget {
                 DataCell(Text(
                   currencyFormat.format(closeout.actualAmount),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -228,7 +229,7 @@ class PendingCloseoutTable extends StatelessWidget {
                     child: Text(
                       closeout.reason,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white70 : Colors.black87,
+                        color: AppPalette.forMode(isDarkMode).textSecondary,
                         fontSize: 12,
                       ),
                       maxLines: 2,
@@ -239,14 +240,14 @@ class PendingCloseoutTable extends StatelessWidget {
                 DataCell(Text(
                   closeout.transactionReference,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   closeout.recordedByName,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
@@ -297,7 +298,7 @@ class PendingCloseoutTable extends StatelessWidget {
       case 'RESOLVED':
         return Colors.blue;
       default:
-        return isDarkMode ? Colors.white70 : Colors.grey;
+        return AppPalette.forMode(isDarkMode).textSecondary;
     }
   }
 }

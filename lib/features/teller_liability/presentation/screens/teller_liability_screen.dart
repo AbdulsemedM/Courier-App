@@ -7,6 +7,7 @@ import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class TellerLiabilityScreen extends StatefulWidget {
   const TellerLiabilityScreen({super.key});
@@ -93,7 +94,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       body: Container(
@@ -106,10 +107,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
                     const Color.fromARGB(255, 75, 23, 160),
                     const Color(0xFF5b3895),
                   ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: SafeArea(
@@ -123,7 +121,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -133,7 +131,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ],
@@ -163,18 +161,16 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             filled: true,
-                            fillColor: isDarkMode
-                                ? Colors.white.withOpacity(0.1)
-                                : Colors.white.withOpacity(0.9),
+                            fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
                             ),
                           ),
                           dropdownColor:
-                              isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+                              context.palette.surface,
                           style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.black,
+                            color: context.palette.textPrimary,
                           ),
                           items: [
                             const DropdownMenuItem<int>(
@@ -214,18 +210,16 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: isDarkMode
-                                  ? Colors.white.withOpacity(0.1)
-                                  : Colors.white.withOpacity(0.9),
+                              fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 12,
                               ),
                             ),
                             dropdownColor:
-                                isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+                                context.palette.surface,
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: context.palette.textPrimary,
                             ),
                             items: const [
                               DropdownMenuItem<String>(
@@ -271,16 +265,14 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: isDarkMode
-                                  ? Colors.white.withOpacity(0.1)
-                                  : Colors.white.withOpacity(0.9),
+                              fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 12,
                               ),
                             ),
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: context.palette.textPrimary,
                             ),
                           ),
                         ),
@@ -329,7 +321,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
                                 Text(
                                   'Error: ${state.message}',
                                   style: TextStyle(
-                                    color: isDarkMode ? Colors.white : Colors.black,
+                                    color: context.palette.textPrimary,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -349,7 +341,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
                               child: Text(
                                 'No teller liabilities found',
                                 style: TextStyle(
-                                  color: isDarkMode ? Colors.white : Colors.black,
+                                  color: context.palette.textPrimary,
                                 ),
                               ),
                             );
@@ -397,7 +389,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
                           child: Text(
                             'No data available',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white70 : Colors.black54,
+                              color: context.palette.textSecondary,
                             ),
                           ),
                         );
@@ -419,7 +411,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
     String value,
     IconData icon,
   ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -437,7 +429,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
         children: [
           Icon(
             icon,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: context.palette.textPrimary,
             size: 24,
           ),
           const SizedBox(height: 8),
@@ -445,7 +437,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.white70 : Colors.black54,
+              color: context.palette.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
@@ -454,7 +446,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black,
+              color: context.palette.textPrimary,
             ),
           ),
         ],

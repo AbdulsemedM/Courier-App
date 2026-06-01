@@ -1,6 +1,7 @@
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../bloc/payment_methods_bloc.dart';
 
 class AddPaymentMethodModal extends StatefulWidget {
@@ -17,7 +18,7 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -32,7 +33,7 @@ class _AddPaymentMethodModalState extends State<AddPaymentMethodModal> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
+                color: context.palette.textPrimary,
               ),
             ),
             const SizedBox(height: 24),

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:courier_app/core/theme/theme_provider.dart';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/branch_expenses/bloc/branch_expenses_bloc.dart';
 import 'package:courier_app/features/branch_report/data/model/branch_shipment_model.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class BranchExpensesScreen extends StatefulWidget {
   const BranchExpensesScreen({super.key});
@@ -44,14 +43,14 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
       firstDate: DateTime(2015),
       lastDate: _toDate,
       builder: (context, child) {
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        final isDarkMode = context.isDarkMode;
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: const Color(0xFFFF5A00),
+              primary: context.palette.accent,
               onPrimary: Colors.white,
-              surface: isDarkMode ? Colors.grey[850]! : Colors.white,
-              onSurface: isDarkMode ? Colors.white : Colors.black,
+              surface: context.palette.surface,
+              onSurface: context.palette.textPrimary,
             ),
           ),
           child: child!,
@@ -76,14 +75,14 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
       firstDate: _fromDate,
       lastDate: DateTime.now(),
       builder: (context, child) {
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        final isDarkMode = context.isDarkMode;
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: const Color(0xFFFF5A00),
+              primary: context.palette.accent,
               onPrimary: Colors.white,
-              surface: isDarkMode ? Colors.grey[850]! : Colors.white,
-              onSurface: isDarkMode ? Colors.white : Colors.black,
+              surface: context.palette.surface,
+              onSurface: context.palette.textPrimary,
             ),
           ),
           child: child!,
@@ -117,21 +116,18 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       backgroundColor:
-          isDarkMode ? const Color(0xFF1A1C2E) : const Color(0xFFF5F6FA),
+          context.palette.background,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: isDarkMode
-            ? const Color.fromARGB(255, 91, 19, 207)
-            : const Color(0xFF5b3895),
+        backgroundColor: context.palette.appBarBackground,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: context.palette.textPrimary,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -140,7 +136,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
         ),
       ),
@@ -154,10 +150,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                     const Color(0xFF1A1C2E),
                     const Color(0xFF2D3250),
                   ]
-                : [
-                    const Color(0xFFF5F6FA),
-                    const Color(0xFFFFFFFF),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: Column(
@@ -166,9 +159,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode
-                    ? Colors.grey[850]!.withOpacity(0.5)
-                    : Colors.white,
+                color: context.palette.surface,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -186,12 +177,10 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color:
-                              isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                              context.palette.surfaceMuted,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isDarkMode
-                                ? Colors.grey[700]!
-                                : Colors.grey[300]!,
+                            color: context.palette.border,
                           ),
                         ),
                         child: Row(
@@ -204,9 +193,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                                   'From Date',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: isDarkMode
-                                        ? Colors.white70
-                                        : Colors.black54,
+                                    color: context.palette.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -215,9 +202,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
+                                    color: context.palette.textPrimary,
                                   ),
                                 ),
                               ],
@@ -225,7 +210,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                             Icon(
                               Icons.calendar_today,
                               color:
-                                  isDarkMode ? Colors.white70 : Colors.black54,
+                                  context.palette.textSecondary,
                             ),
                           ],
                         ),
@@ -240,12 +225,10 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color:
-                              isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                              context.palette.surfaceMuted,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isDarkMode
-                                ? Colors.grey[700]!
-                                : Colors.grey[300]!,
+                            color: context.palette.border,
                           ),
                         ),
                         child: Row(
@@ -258,9 +241,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                                   'To Date',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: isDarkMode
-                                        ? Colors.white70
-                                        : Colors.black54,
+                                    color: context.palette.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -269,9 +250,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
+                                    color: context.palette.textPrimary,
                                   ),
                                 ),
                               ],
@@ -279,7 +258,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                             Icon(
                               Icons.calendar_today,
                               color:
-                                  isDarkMode ? Colors.white70 : Colors.black54,
+                                  context.palette.textSecondary,
                             ),
                           ],
                         ),
@@ -296,7 +275,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                   if (state is BranchExpensesLoading) {
                     return Center(
                       child: CircularProgressIndicator(
-                        color: const Color(0xFFFF5A00),
+                        color: context.palette.accent,
                       ),
                     );
                   }
@@ -314,7 +293,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                           Text(
                             'Error: ${state.message}',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black87,
+                              color: context.palette.textPrimary,
                               fontSize: 16,
                             ),
                             textAlign: TextAlign.center,
@@ -323,7 +302,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                           ElevatedButton(
                             onPressed: _fetchExpenses,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF5A00),
+                              backgroundColor: context.palette.accent,
                             ),
                             child: const Text('Retry'),
                           ),
@@ -348,9 +327,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                             Text(
                               'No expenses found',
                               style: TextStyle(
-                                color: isDarkMode
-                                    ? Colors.white70
-                                    : Colors.black54,
+                                color: context.palette.textSecondary,
                                 fontSize: 16,
                               ),
                             ),
@@ -435,7 +412,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -452,7 +429,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.white70 : Colors.black54,
+              color: context.palette.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -461,7 +438,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: context.palette.textPrimary,
             ),
           ),
         ],
@@ -479,7 +456,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -495,7 +472,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
           child: DataTable(
             headingRowColor: MaterialStateProperty.resolveWith<Color>(
               (Set<MaterialState> states) =>
-                  isDarkMode ? const Color(0xFF0F172A) : Colors.blue[50]!,
+                  context.palette.surfaceMuted,
             ),
             dataRowColor: MaterialStateProperty.resolveWith<Color>(
               (Set<MaterialState> states) {
@@ -504,7 +481,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                       ? Colors.blue.withOpacity(0.1)
                       : Colors.blue[100]!;
                 }
-                return isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+                return context.palette.surface;
               },
             ),
             columns: [
@@ -512,7 +489,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                 label: Text(
                   'AWB',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -521,7 +498,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                 label: Text(
                   'Sender',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -530,7 +507,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                 label: Text(
                   'Receiver',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -539,7 +516,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                 label: Text(
                   'Qty',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -548,7 +525,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                 label: Text(
                   'Net Fee',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -557,7 +534,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                 label: Text(
                   'Total Amount',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -566,7 +543,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                 label: Text(
                   'Status',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -575,7 +552,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                 label: Text(
                   'Created At',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -590,44 +567,44 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                   DataCell(Text(
                     shipment.awb ?? 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
                     shipment.senderName ?? 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
                     shipment.receiverName ?? 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
                     '${shipment.qty ?? 0} ${shipment.unit ?? 'kg'}',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
                     currencyFormat.format(shipment.netFee ?? 0),
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
                     currencyFormat.format(shipment.totalAmount ?? 0),
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                       fontWeight: FontWeight.bold,
                     ),
                   )),
                   DataCell(Text(
                     shipment.shipmentStatus?.code ?? 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
@@ -635,7 +612,7 @@ class _BranchExpensesScreenState extends State<BranchExpensesScreen> {
                         ? DateFormat('MMM dd, yyyy').format(createdAt)
                         : 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                       fontSize: 12,
                     ),
                   )),

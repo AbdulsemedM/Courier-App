@@ -1,6 +1,7 @@
 import 'package:courier_app/features/teller_by_branch/data/model/teller_by_branch_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class TellerByBranchTable extends StatelessWidget {
   final List<TellerByBranchWithStatus> tellers;
@@ -14,7 +15,7 @@ class TellerByBranchTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -26,7 +27,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Teller Name',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -35,7 +36,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Account #',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -44,7 +45,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Branch',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -53,7 +54,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Status',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -62,7 +63,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Account Status',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -71,7 +72,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Running Balance',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -80,7 +81,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Expense Balance',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -89,7 +90,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Account Limit',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -98,7 +99,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Is Open',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -107,7 +108,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Assigned User',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -116,7 +117,7 @@ class TellerByBranchTable extends StatelessWidget {
               label: Text(
                 'Created At',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -126,7 +127,7 @@ class TellerByBranchTable extends StatelessWidget {
                 label: Text(
                   'Action',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -141,19 +142,19 @@ class TellerByBranchTable extends StatelessWidget {
                 DataCell(Text(
                   teller.tellerName,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   teller.accountNumber,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   '${teller.getBranchName()} (${teller.getBranchCode()})',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(
@@ -199,7 +200,7 @@ class TellerByBranchTable extends StatelessWidget {
                       : Text(
                           'N/A',
                           style: TextStyle(
-                            color: isDarkMode ? Colors.grey : Colors.grey[600],
+                            color: context.palette.textSecondary,
                           ),
                         ),
                 ),
@@ -210,7 +211,7 @@ class TellerByBranchTable extends StatelessWidget {
                       : NumberFormat.currency(symbol: 'ETB ', decimalDigits: 2)
                           .format(teller.balance),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.w500,
                   ),
                 )),
@@ -220,7 +221,7 @@ class TellerByBranchTable extends StatelessWidget {
                           .format(status.expenseBalance)
                       : 'ETB 0.00',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
@@ -230,7 +231,7 @@ class TellerByBranchTable extends StatelessWidget {
                       : NumberFormat.currency(symbol: 'ETB ', decimalDigits: 2)
                           .format(teller.limit),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(
@@ -256,21 +257,21 @@ class TellerByBranchTable extends StatelessWidget {
                       : Text(
                           'N/A',
                           style: TextStyle(
-                            color: isDarkMode ? Colors.grey : Colors.grey[600],
+                            color: context.palette.textSecondary,
                           ),
                         ),
                 ),
                 DataCell(Text(
                   status?.assignedUserFullName ?? status?.assignedUserEmail ?? 'N/A',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   DateFormat('MMM-dd-yyyy')
                       .format(DateTime.parse(teller.createdAt)),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 if (onStatusToggle != null)

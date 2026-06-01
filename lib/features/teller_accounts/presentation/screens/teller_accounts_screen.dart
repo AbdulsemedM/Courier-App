@@ -4,6 +4,7 @@ import 'package:courier_app/features/teller_accounts/presentation/widgets/teller
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class TellerAccountsScreen extends StatefulWidget {
   const TellerAccountsScreen({super.key});
@@ -35,7 +36,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       body: Container(
@@ -48,10 +49,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                     const Color.fromARGB(255, 75, 23, 160),
                     const Color(0xFF5b3895),
                   ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: SafeArea(
@@ -65,7 +63,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -75,7 +73,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ],
@@ -97,19 +95,15 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: isDarkMode
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.white.withOpacity(0.9),
+                        fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,
                         ),
                       ),
-                      dropdownColor: isDarkMode
-                          ? const Color(0xFF1A1C2E)
-                          : Colors.white,
+                      dropdownColor: context.palette.surface,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       items: const [
                         DropdownMenuItem<String>(
@@ -156,19 +150,15 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: isDarkMode
-                                  ? Colors.white.withOpacity(0.1)
-                                  : Colors.white.withOpacity(0.9),
+                              fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 12,
                               ),
                             ),
-                            dropdownColor: isDarkMode
-                                ? const Color(0xFF1A1C2E)
-                                : Colors.white,
+                            dropdownColor: context.palette.surface,
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: context.palette.textPrimary,
                             ),
                             items: [
                               const DropdownMenuItem<String>(
@@ -181,7 +171,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                                   child: Text(
                                     '${branch.name} (${branch.code})',
                                     style: TextStyle(
-                                      color: isDarkMode ? Colors.white : Colors.black,
+                                      color: context.palette.textPrimary,
                                     ),
                                   ),
                                 );
@@ -210,19 +200,15 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: isDarkMode
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.white.withOpacity(0.9),
+                        fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,
                         ),
                       ),
-                      dropdownColor: isDarkMode
-                          ? const Color(0xFF1A1C2E)
-                          : Colors.white,
+                      dropdownColor: context.palette.surface,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       items: const [
                         DropdownMenuItem<String>(
@@ -258,12 +244,10 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                         hintText: 'Search by account number, teller name, branch...',
                         prefixIcon: Icon(
                           Icons.search,
-                          color: isDarkMode ? Colors.grey : Colors.grey[600],
+                          color: context.palette.textSecondary,
                         ),
                         filled: true,
-                        fillColor: isDarkMode
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.white.withOpacity(0.9),
+                        fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -278,7 +262,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                         ),
                       ),
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ],
@@ -302,7 +286,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                           child: Text(
                             'No teller accounts found',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: context.palette.textPrimary,
                             ),
                           ),
                         );
@@ -329,7 +313,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                                 IconButton(
                                   icon: Icon(
                                     Icons.chevron_left,
-                                    color: isDarkMode ? Colors.white : Colors.black,
+                                    color: context.palette.textPrimary,
                                   ),
                                   onPressed: _currentPage > 0
                                       ? () {
@@ -343,7 +327,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                                 Text(
                                   'Page ${_currentPage + 1} of ${totalPages == 0 ? 1 : totalPages}',
                                   style: TextStyle(
-                                    color: isDarkMode ? Colors.white : Colors.black,
+                                    color: context.palette.textPrimary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -351,7 +335,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                                 IconButton(
                                   icon: Icon(
                                     Icons.chevron_right,
-                                    color: isDarkMode ? Colors.white : Colors.black,
+                                    color: context.palette.textPrimary,
                                   ),
                                   onPressed: _currentPage < totalPages - 1
                                       ? () {
@@ -365,7 +349,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                                 Text(
                                   'Total: ${filteredAccounts.length}',
                                   style: TextStyle(
-                                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                                    color: context.palette.textSecondary,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -384,7 +368,7 @@ class _TellerAccountsScreenState extends State<TellerAccountsScreen> {
                             Text(
                               'Error: ${state.message}',
                               style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
+                                color: context.palette.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 16),

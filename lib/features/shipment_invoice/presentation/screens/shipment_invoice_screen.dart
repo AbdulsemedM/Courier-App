@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../bloc/shipment_invoice_bloc.dart';
 import '../widgets/shipment_invoice_widget.dart';
 
@@ -30,8 +29,7 @@ class _ShipmentInvoiceScreenState extends State<ShipmentInvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDarkMode
@@ -54,7 +52,7 @@ class _ShipmentInvoiceScreenState extends State<ShipmentInvoiceScreen> {
             child: BlocBuilder<ShipmentInvoiceBloc, ShipmentInvoiceState>(
               builder: (context, state) {
                 if (state is FetchShipmentInvoiceLoading) {
-                  return ShipmentInvoiceWidgets.buildShimmerEffect(isDarkMode);
+                  return ShipmentInvoiceWidgets.buildShimmerEffect(context);
                 }
 
                 if (state is FetchShipmentInvoiceSuccess) {
@@ -69,13 +67,13 @@ class _ShipmentInvoiceScreenState extends State<ShipmentInvoiceScreen> {
                     child: Text(
                       state.errorMessage,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   );
                 }
 
-                return ShipmentInvoiceWidgets.buildEmptyState(isDarkMode);
+                return ShipmentInvoiceWidgets.buildEmptyState(context);
               },
             ),
           ),

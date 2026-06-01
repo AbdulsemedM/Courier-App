@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
 import 'accounting_create_screen.dart';
 import '../../../accounts/presentation/screens/accounts_screen.dart';
 import '../../../balance_sheet/presentation/screens/balance_sheet_screen.dart';
@@ -15,6 +13,7 @@ import '../../../branches/bloc/branches_bloc.dart';
 import '../../../branches/data/repository/branches_repository.dart';
 import '../../../branches/data/data_provider/branches_data_provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../../transaction_branch_to_hq/presentation/screens/transaction_branch_to_hq_screen.dart';
 import '../../../transaction_hq_to_branch/presentation/screens/transaction_hq_to_branch_screen.dart';
 import '../../../closeout_transaction/presentation/screens/closeout_transaction_screen.dart';
@@ -112,12 +111,11 @@ class _AccountingScreenState extends State<AccountingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       backgroundColor:
-          isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
+          context.palette.appBarBackground,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -128,10 +126,7 @@ class _AccountingScreenState extends State<AccountingScreen> {
                     const Color.fromARGB(255, 75, 23, 160),
                     const Color(0xFF5b3895),
                   ]
-                : [
-                    const Color(0xFF5b3895),
-                    const Color(0xFF5b3895),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: SafeArea(
@@ -145,7 +140,7 @@ class _AccountingScreenState extends State<AccountingScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -155,7 +150,7 @@ class _AccountingScreenState extends State<AccountingScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ],
@@ -429,7 +424,7 @@ class _AccountingScreenState extends State<AccountingScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: context.palette.textPrimary,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,

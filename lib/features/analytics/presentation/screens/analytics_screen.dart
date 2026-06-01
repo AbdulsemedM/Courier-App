@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:courier_app/configuration/auth_service.dart';
-import 'package:courier_app/core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/features/analytics/bloc/analytics_bloc.dart';
 import 'package:courier_app/features/analytics/presentation/widgets/analytics_widgets.dart';
 
@@ -63,11 +62,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final palette = context.palette;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: palette.background,
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: BlocBuilder<AnalyticsBloc, AnalyticsState>(
@@ -156,7 +155,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.grey[900],
+                  color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
@@ -166,7 +165,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.4,
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+                  color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                 ),
               ),
               const SizedBox(height: 24),
@@ -204,14 +203,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   Icon(
                     Icons.calendar_today,
                     size: 16,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'From: $_fromDate to $_toDate',
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                     ),
                   ),
                 ],
@@ -224,7 +223,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -275,7 +274,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -326,7 +325,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -370,7 +369,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -426,7 +425,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -460,7 +459,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+                        color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -476,7 +475,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         'Cash AWBs (kg)',
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                          color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -486,7 +485,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.grey[900],
+                          color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
                         ),
                       ),
                     ],
@@ -501,7 +500,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+                        color: isDarkMode ? Colors.black.withOpacity(0.2) : AppPalette.light.cardShadow,
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -517,7 +516,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         'COD AWBs (kg)',
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                          color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -527,7 +526,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.grey[900],
+                          color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
                         ),
                       ),
                     ],
@@ -545,7 +544,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -580,7 +579,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -596,7 +595,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -613,7 +612,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
+              color: isDarkMode ? Colors.white : AppPalette.light.textPrimary,
             ),
           ),
           const SizedBox(height: 12),

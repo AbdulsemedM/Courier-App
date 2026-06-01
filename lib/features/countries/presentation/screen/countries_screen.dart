@@ -1,6 +1,7 @@
 import 'package:courier_app/features/branches/model/country_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../bloc/countries_bloc.dart';
 import '../widget/countries_widget.dart';
 import '../widget/add_country_modal.dart';
@@ -44,10 +45,11 @@ class _CountriesScreenState extends State<CountriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF5b3895),
+      backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 75, 23, 160),
-        title: const Text('Countries'),
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
+        title: Text('Countries', style: TextStyle(color: context.palette.textPrimary)),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),

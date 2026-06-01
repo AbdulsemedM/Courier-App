@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:courier_app/features/roles/model/permission_model.dart';
 import 'package:courier_app/features/roles/bloc/roles_bloc.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../../../configuration/auth_service.dart';
 
 class PermissionsModal extends StatefulWidget {
@@ -90,13 +89,12 @@ class _PermissionsModalState extends State<PermissionsModal> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF5b3895) : Colors.white,
+        color: context.palette.appBarBackground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -109,7 +107,7 @@ class _PermissionsModalState extends State<PermissionsModal> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[600] : Colors.grey[400],
+              color: context.palette.textSecondary,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -119,7 +117,7 @@ class _PermissionsModalState extends State<PermissionsModal> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: context.palette.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -127,7 +125,7 @@ class _PermissionsModalState extends State<PermissionsModal> {
             '${_selectedPermissionIds.length} of ${widget.allPermissions.length} permissions selected',
             style: TextStyle(
               fontSize: 14,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: context.palette.textSecondary,
             ),
           ),
           const SizedBox(height: 24),
@@ -147,14 +145,12 @@ class _PermissionsModalState extends State<PermissionsModal> {
                         ? (isDarkMode
                             ? Colors.green.withOpacity(0.2)
                             : Colors.green.withOpacity(0.1))
-                        : (isDarkMode
-                            ? const Color(0xFF1E293B)
-                            : Colors.grey[100]),
+                        : (context.palette.surfaceMuted),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isSelected
                           ? Colors.green
-                          : (isDarkMode ? Colors.grey[700]! : Colors.grey[300]!),
+                          : (context.palette.border),
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -165,21 +161,21 @@ class _PermissionsModalState extends State<PermissionsModal> {
                       permission.name,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                     subtitle: permission.description != null
                         ? Text(
                             permission.description!,
                             style: TextStyle(
-                              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                              color: context.palette.textSecondary,
                               fontSize: 12,
                             ),
                           )
                         : null,
                     activeColor: Colors.green,
-                    inactiveThumbColor: isDarkMode ? Colors.grey[600] : Colors.grey[400],
-                    inactiveTrackColor: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                    inactiveThumbColor: context.palette.textSecondary,
+                    inactiveTrackColor: context.palette.surfaceMuted,
                   ),
                 );
               },
@@ -222,7 +218,7 @@ class _PermissionsModalState extends State<PermissionsModal> {
                   child: OutlinedButton(
                     onPressed: _isSaving ? null : () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: isDarkMode ? Colors.white : Colors.black87,
+                      foregroundColor: context.palette.textPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

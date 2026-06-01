@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class OptionItem extends StatefulWidget {
   final IconData icon;
@@ -23,17 +24,15 @@ class _OptionItemState extends State<OptionItem> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
-          color: _isHovered
-              ? (widget.isDarkMode
-                  ? Colors.white.withOpacity(0.1)
-                  : Colors.grey.withOpacity(0.1))
-              : Colors.transparent,
+          color: _isHovered ? palette.surfaceMuted : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -42,12 +41,6 @@ class _OptionItemState extends State<OptionItem> {
           child: InkWell(
             onTap: widget.onTap,
             borderRadius: BorderRadius.circular(8),
-            splashColor: widget.isDarkMode
-                ? Colors.white.withOpacity(0.1)
-                : Colors.grey.withOpacity(0.1),
-            highlightColor: widget.isDarkMode
-                ? Colors.white.withOpacity(0.05)
-                : Colors.grey.withOpacity(0.05),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
@@ -55,13 +48,13 @@ class _OptionItemState extends State<OptionItem> {
                   Icon(
                     widget.icon,
                     size: 24,
-                    color: widget.isDarkMode ? Colors.white : Colors.black87,
+                    color: palette.textPrimary,
                   ),
                   const SizedBox(width: 16),
                   Text(
                     widget.title,
                     style: TextStyle(
-                      color: widget.isDarkMode ? Colors.white : Colors.black87,
+                      color: palette.textPrimary,
                       fontSize: 16,
                     ),
                   ),
@@ -95,13 +88,15 @@ class OptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+
     return Card(
       elevation: 0,
-      color: isDarkMode ? color.withOpacity(0.15) : color.withOpacity(0.1),
+      color: isDarkMode ? color.withOpacity(0.15) : palette.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: color.withOpacity(isDarkMode ? 0.3 : 0.2),
+          color: isDarkMode ? color.withOpacity(0.3) : palette.border,
           width: 1,
         ),
       ),
@@ -116,13 +111,15 @@ class OptionCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: isDarkMode
+                      ? color.withOpacity(0.2)
+                      : palette.accentMuted,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
                   size: 28,
-                  color: color,
+                  color: isDarkMode ? color : palette.accent,
                 ),
               ),
               const SizedBox(height: 12),
@@ -131,7 +128,7 @@ class OptionCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: palette.textPrimary,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
@@ -142,7 +139,7 @@ class OptionCard extends StatelessWidget {
                 subtitle,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDarkMode ? Colors.white60 : Colors.black54,
+                  color: palette.textSecondary,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,
@@ -176,14 +173,16 @@ class ListOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+
     return Card(
       elevation: 0,
-      color: isDarkMode ? color.withOpacity(0.15) : color.withOpacity(0.1),
+      color: isDarkMode ? color.withOpacity(0.15) : palette.surface,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: color.withOpacity(isDarkMode ? 0.3 : 0.2),
+          color: isDarkMode ? color.withOpacity(0.3) : palette.border,
           width: 1,
         ),
       ),
@@ -193,13 +192,15 @@ class ListOptionCard extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.2),
+            color: isDarkMode
+                ? color.withOpacity(0.2)
+                : palette.accentMuted,
             shape: BoxShape.circle,
           ),
           child: Icon(
             icon,
             size: 24,
-            color: color,
+            color: isDarkMode ? color : palette.accent,
           ),
         ),
         title: Text(
@@ -207,7 +208,7 @@ class ListOptionCard extends StatelessWidget {
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: palette.textPrimary,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -218,7 +219,7 @@ class ListOptionCard extends StatelessWidget {
             subtitle,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.white60 : Colors.black54,
+              color: palette.textSecondary,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -226,7 +227,7 @@ class ListOptionCard extends StatelessWidget {
         ),
         trailing: Icon(
           Icons.chevron_right,
-          color: isDarkMode ? Colors.white54 : Colors.black45,
+          color: palette.textSecondary,
           size: 24,
         ),
       ),

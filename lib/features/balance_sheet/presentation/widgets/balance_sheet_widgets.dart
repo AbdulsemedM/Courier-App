@@ -1,6 +1,7 @@
 import 'package:courier_app/features/balance_sheet/data/model/balance_sheet_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class SummaryCard extends StatelessWidget {
   final String title;
@@ -18,14 +19,14 @@ class SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      color: isDarkMode ? Colors.grey[850] : Colors.white,
+      color: context.palette.surface,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -46,7 +47,7 @@ class SummaryCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
+                color: context.palette.textSecondary,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -60,7 +61,7 @@ class SummaryCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: context.palette.textPrimary,
                 ),
               ),
             ),
@@ -89,14 +90,14 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return InkWell(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[850] : Colors.white,
+          color: context.palette.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -118,7 +119,7 @@ class SectionHeader extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: context.palette.textSecondary,
                     ),
                   ),
                 ],
@@ -126,7 +127,7 @@ class SectionHeader extends StatelessWidget {
             ),
             Icon(
               isExpanded ? Icons.expand_less : Icons.expand_more,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: context.palette.textSecondary,
             ),
           ],
         ),
@@ -147,7 +148,7 @@ class BalanceSheetTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     if (items.isEmpty) {
       return Container(
@@ -156,7 +157,7 @@ class BalanceSheetTable extends StatelessWidget {
           child: Text(
             emptyMessage,
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: context.palette.textSecondary,
             ),
           ),
         ),
@@ -175,7 +176,7 @@ class BalanceSheetTable extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+              color: context.palette.surfaceMuted,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -190,7 +191,7 @@ class BalanceSheetTable extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
+                      color: context.palette.textSecondary,
                     ),
                   ),
                 ),
@@ -201,7 +202,7 @@ class BalanceSheetTable extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
+                      color: context.palette.textSecondary,
                     ),
                   ),
                 ),
@@ -215,7 +216,7 @@ class BalanceSheetTable extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                    color: context.palette.border,
                     width: 1,
                   ),
                 ),
@@ -232,7 +233,7 @@ class BalanceSheetTable extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: isDarkMode ? Colors.white : Colors.black87,
+                            color: context.palette.textPrimary,
                           ),
                         ),
                         if (item.description.isNotEmpty) ...[
@@ -241,7 +242,7 @@ class BalanceSheetTable extends StatelessWidget {
                             item.description,
                             style: TextStyle(
                               fontSize: 12,
-                              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                              color: context.palette.textSecondary,
                             ),
                           ),
                         ],
@@ -255,7 +256,7 @@ class BalanceSheetTable extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ),
@@ -285,7 +286,7 @@ class CategoryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
     final bgColor = backgroundColor ??
         (isTotal
             ? (isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50])
@@ -307,7 +308,7 @@ class CategoryRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: isTotal ? 16 : 14,
                 fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
-                color: isDarkMode ? Colors.white : Colors.black87,
+                color: context.palette.textPrimary,
               ),
             ),
           ),
@@ -316,7 +317,7 @@ class CategoryRow extends StatelessWidget {
             style: TextStyle(
               fontSize: isTotal ? 16 : 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: context.palette.textPrimary,
             ),
           ),
         ],

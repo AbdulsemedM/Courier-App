@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:courier_app/core/services/scanner_service.dart';
-import 'package:courier_app/core/theme/theme_provider.dart';
 import 'package:courier_app/features/track_order/presentation/widgets/track_order_widget.dart';
+import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:courier_app/features/track_shipment/bloc/track_shipment_bloc.dart';
 import 'package:courier_app/features/track_shipment/presentation/widgets/track_shipment_widget.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class TrackShipmentScreen extends StatefulWidget {
   const TrackShipmentScreen({super.key});
@@ -36,6 +37,11 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     super.initState();
     _initializeScanner();
     _requestCameraPermission();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<BranchesBloc>().add(FetchBranches());
+      }
+    });
   }
 
   @override
@@ -167,7 +173,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       barrierDismissible: true,
       builder: (context) => _CameraScannerDialog(
         isDarkMode:
-            Provider.of<ThemeProvider>(context, listen: false).isDarkMode,
+            context.isDarkMode,
         onBarcodeDetected: (barcode) {
           Navigator.pop(context);
           _onBarcodeDetected(barcode);
@@ -193,12 +199,11 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       backgroundColor:
-          isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
+          context.palette.appBarBackground,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: isDarkMode
@@ -207,7 +212,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
         title: Text(
           'Track Shipment',
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -248,7 +253,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: isDarkMode ? const Color(0xFF152642) : Colors.white,
+                  color: context.palette.appBarBackground,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -262,16 +267,16 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                   controller: _searchController,
                   focusNode: _textFieldFocusNode,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Enter AWB Number or Scan',
                     hintStyle: TextStyle(
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: context.palette.textSecondary,
                     ),
                     prefixIcon: Icon(
                       Icons.search,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: context.palette.textSecondary,
                     ),
                     suffixIcon: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -317,9 +322,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                         IconButton(
                           icon: Icon(
                             Icons.clear,
-                            color: isDarkMode
-                                ? Colors.grey[400]
-                                : Colors.grey[600],
+                            color: context.palette.textSecondary,
                           ),
                           onPressed: () {
                             _searchController.clear();
@@ -333,7 +336,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                     ),
                     filled: true,
                     fillColor:
-                        isDarkMode ? const Color(0xFF152642) : Colors.white,
+                        context.palette.appBarBackground,
                   ),
                   textInputAction: TextInputAction.search,
                   onSubmitted: (_) => _onSearch(),
@@ -344,15 +347,21 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
               child: BlocBuilder<TrackShipmentBloc, TrackShipmentState>(
                 builder: (context, state) {
                   if (state is TrackShipmentLoading) {
-                    return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
+                    return TrackOrderWidgets.buildShimmerEffect(context);
                   }
 
                   if (state is TrackShipmentSuccess) {
-                    return TrackShipmentWidgets.buildTrackingDetails(
-                      isDarkMode: isDarkMode,
-                      shipments: state.trackShipmentModel,
-                      branches:
-                          null, // Branches can be fetched and passed here if needed
+                    return BlocBuilder<BranchesBloc, BranchesState>(
+                      builder: (context, branchesState) {
+                        final branches = branchesState is FetchBranchesLoaded
+                            ? branchesState.branches
+                            : null;
+                        return TrackShipmentWidgets.buildTrackingDetails(
+                          isDarkMode: isDarkMode,
+                          shipments: state.trackShipmentModel,
+                          branches: branches,
+                        );
+                      },
                     );
                   }
 
@@ -378,9 +387,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                           Text(
                             state.message,
                             style: TextStyle(
-                              color: isDarkMode
-                                  ? Colors.grey[400]
-                                  : Colors.grey[600],
+                              color: context.palette.textSecondary,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -397,16 +404,14 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                           Icons.local_shipping_outlined,
                           size: 64,
                           color:
-                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                              context.palette.textSecondary,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'Enter AWB number to track shipment',
                           style: TextStyle(
                             fontSize: 18,
-                            color: isDarkMode
-                                ? Colors.grey[400]
-                                : Colors.grey[600],
+                            color: context.palette.textSecondary,
                           ),
                         ),
                       ],
@@ -451,7 +456,7 @@ class _CameraScannerDialogState extends State<_CameraScannerDialog> {
       insetPadding: const EdgeInsets.all(16),
       child: Container(
         decoration: BoxDecoration(
-          color: widget.isDarkMode ? const Color(0xFF1E2837) : Colors.white,
+          color: context.palette.surface,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -461,7 +466,7 @@ class _CameraScannerDialogState extends State<_CameraScannerDialog> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: widget.isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                color: context.palette.surfaceMuted,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -474,16 +479,14 @@ class _CameraScannerDialogState extends State<_CameraScannerDialog> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: widget.isDarkMode ? Colors.white : Colors.black87,
+                      color: context.palette.textPrimary,
                     ),
                   ),
                   const Spacer(),
                   IconButton(
                     icon: Icon(
                       Icons.close,
-                      color: widget.isDarkMode
-                          ? Colors.grey[400]
-                          : Colors.grey[600],
+                      color: context.palette.textSecondary,
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -523,7 +526,7 @@ class _CameraScannerDialogState extends State<_CameraScannerDialog> {
                 'Align barcode within the frame',
                 style: TextStyle(
                   color:
-                      widget.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      context.palette.textSecondary,
                   fontSize: 14,
                 ),
                 textAlign: TextAlign.center,

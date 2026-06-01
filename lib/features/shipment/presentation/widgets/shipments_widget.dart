@@ -2,6 +2,7 @@ import 'package:courier_app/features/track_order/model/shipmet_status_model.dart
 import 'package:courier_app/features/add_shipment/presentation/screens/print_shipment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class ShipmentsWidgets {
   static Widget buildSearchAndFilter({
@@ -23,20 +24,20 @@ class ShipmentsWidgets {
                 child: TextField(
                   controller: searchController,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textPrimary,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Search by AWB Number',
                     hintStyle: TextStyle(
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: AppPalette.forMode(isDarkMode).textSecondary,
                     ),
                     prefixIcon: Icon(
                       Icons.search,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: AppPalette.forMode(isDarkMode).textSecondary,
                     ),
                     filled: true,
                     fillColor:
-                        isDarkMode ? const Color(0xFF1E293B) : Colors.grey[100],
+                        AppPalette.forMode(isDarkMode).surfaceMuted,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -51,16 +52,16 @@ class ShipmentsWidgets {
               Container(
                 decoration: BoxDecoration(
                   color:
-                      isDarkMode ? const Color(0xFF1E293B) : Colors.grey[100],
+                      AppPalette.forMode(isDarkMode).surfaceMuted,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: DropdownButton<String>(
                   value: selectedStatus,
                   dropdownColor:
-                      isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                      AppPalette.forMode(isDarkMode).surface,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textPrimary,
                   ),
                   underline: const SizedBox(),
                   items: statusOptions.map((String status) {
@@ -92,7 +93,7 @@ class ShipmentsWidgets {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        color: AppPalette.forMode(isDarkMode).surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -108,7 +109,7 @@ class ShipmentsWidgets {
           child: DataTable(
             headingRowColor: MaterialStateProperty.resolveWith<Color>(
               (Set<MaterialState> states) =>
-                  isDarkMode ? const Color(0xFF0F172A) : Colors.blue[50]!,
+                  AppPalette.forMode(isDarkMode).surfaceMuted,
             ),
             dataRowColor: MaterialStateProperty.resolveWith<Color>(
               (Set<MaterialState> states) {
@@ -117,7 +118,7 @@ class ShipmentsWidgets {
                       ? Colors.blue.withOpacity(0.1)
                       : Colors.blue[100]!;
                 }
-                return isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+                return AppPalette.forMode(isDarkMode).surface;
               },
             ),
             columns: [
@@ -126,7 +127,7 @@ class ShipmentsWidgets {
                   'AWB Number',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textPrimary,
                   ),
                 ),
               ),
@@ -135,7 +136,7 @@ class ShipmentsWidgets {
                   'Status',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textPrimary,
                   ),
                 ),
               ),
@@ -144,7 +145,7 @@ class ShipmentsWidgets {
                   'Net Fee',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textPrimary,
                   ),
                 ),
               ),
@@ -153,7 +154,7 @@ class ShipmentsWidgets {
                   'Sender',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textPrimary,
                   ),
                 ),
               ),
@@ -162,7 +163,7 @@ class ShipmentsWidgets {
                   'Receiver',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textPrimary,
                   ),
                 ),
               ),
@@ -171,7 +172,7 @@ class ShipmentsWidgets {
                   'Action',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textPrimary,
                   ),
                 ),
               ),
@@ -182,7 +183,7 @@ class ShipmentsWidgets {
                   DataCell(Text(
                     shipment.awb ?? '',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: AppPalette.forMode(isDarkMode).textPrimary,
                     ),
                   )),
                   DataCell(
@@ -207,19 +208,19 @@ class ShipmentsWidgets {
                   DataCell(Text(
                     'ETB ${shipment.netFee}',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: AppPalette.forMode(isDarkMode).textPrimary,
                     ),
                   )),
                   DataCell(Text(
                     shipment.senderName ?? '',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: AppPalette.forMode(isDarkMode).textPrimary,
                     ),
                   )),
                   DataCell(Text(
                     shipment.receiverName ?? '',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: AppPalette.forMode(isDarkMode).textPrimary,
                     ),
                   )),
                   DataCell(
@@ -295,12 +296,13 @@ class ShipmentsWidgets {
     }
   }
 
-  static Widget buildShimmerEffect(bool isDarkMode) {
+  static Widget buildShimmerEffect(BuildContext context) {
+    final isDarkMode = context.isDarkMode;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Shimmer.fromColors(
-        baseColor: isDarkMode ? Colors.grey[850]! : Colors.grey[300]!,
-        highlightColor: isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+        baseColor: isDarkMode ? Colors.grey[850]! : AppPalette.forMode(isDarkMode).border,
+        highlightColor: isDarkMode ? Colors.grey[700]! : AppPalette.forMode(isDarkMode).surfaceMuted,
         child: Column(
           children: [
             // Search and Filter Shimmer
@@ -326,7 +328,8 @@ class ShipmentsWidgets {
     );
   }
 
-  static Widget buildEmptyState(bool isDarkMode) {
+  static Widget buildEmptyState(BuildContext context) {
+    final palette = context.palette;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -334,14 +337,14 @@ class ShipmentsWidgets {
           Icon(
             Icons.local_shipping_outlined,
             size: 64,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: palette.textSecondary,
           ),
           const SizedBox(height: 16),
           Text(
             'No shipments found',
             style: TextStyle(
               fontSize: 18,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: palette.textSecondary,
             ),
           ),
         ],

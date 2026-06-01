@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../model/shipmet_status_model.dart';
 import '../widgets/track_order_widget.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class TrackOrderScreen extends StatefulWidget {
   const TrackOrderScreen({super.key});
@@ -57,17 +56,16 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
   }
 
   Future<void> _showStatusChangeDialog() async {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     final String? newStatus = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDarkMode ? const Color(0xFF1E2837) : Colors.white,
+        backgroundColor: context.palette.surface,
         title: Text(
           'Change Status',
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
         ),
         content: Column(
@@ -76,19 +74,17 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
             Text(
               '${selectedShipments.length} shipments selected',
               style: TextStyle(
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                color: context.palette.textSecondary,
               ),
             ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: isDarkMode
-                    ? Colors.grey[800]!.withOpacity(0.5)
-                    : Colors.white,
+                color: context.palette.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                  color: context.palette.border,
                 ),
               ),
               child: DropdownButtonHideUnderline(
@@ -97,10 +93,10 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                   hint: Text(
                     'Select new status',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: context.palette.textSecondary,
                     ),
                   ),
-                  dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                  dropdownColor: context.palette.surface,
                   items: statuses
                       .map((status) => DropdownMenuItem<String>(
                             value: status.code,
@@ -108,7 +104,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                               '${status.code} - ${status.description}',
                               style: TextStyle(
                                 color:
-                                    isDarkMode ? Colors.white : Colors.black87,
+                                    context.palette.textPrimary,
                               ),
                             ),
                           ))
@@ -137,7 +133,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
             child: Text(
               'Cancel',
               style: TextStyle(
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                color: context.palette.textSecondary,
               ),
             ),
           ),
@@ -167,19 +163,17 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
         children: [
           Icon(
             Icons.filter_list,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: isDarkMode
-                    ? Colors.grey[800]!.withOpacity(0.5)
-                    : Colors.white,
+                color: context.palette.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                  color: context.palette.border,
                 ),
               ),
               child: DropdownButtonHideUnderline(
@@ -188,22 +182,22 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                   hint: Text(
                     'Filter by status',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      color: context.palette.textSecondary,
                     ),
                   ),
                   isExpanded: true,
                   icon: Icon(
                     Icons.arrow_drop_down,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
-                  dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                  dropdownColor: context.palette.surface,
                   items: [
                     DropdownMenuItem<String>(
                       value: null,
                       child: Text(
                         'All Statuses',
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black87,
+                          color: context.palette.textPrimary,
                         ),
                       ),
                     ),
@@ -213,9 +207,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                               child: Text(
                                 '${status.code} - ${status.description}',
                                 style: TextStyle(
-                                  color: isDarkMode
-                                      ? Colors.white
-                                      : Colors.black87,
+                                  color: context.palette.textPrimary,
                                 ),
                               ),
                             ))
@@ -235,7 +227,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
             IconButton(
               icon: Icon(
                 Icons.clear,
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                color: context.palette.textSecondary,
               ),
               onPressed: () {
                 setState(() {
@@ -294,13 +286,11 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
 
     return AppBar(
       elevation: 0,
-      backgroundColor: isDarkMode
-          ? const Color(0xFF0A1931).withOpacity(0.95)
-          : Colors.white.withOpacity(0.8),
+      backgroundColor: context.palette.appBarBackground,
       title: Text(
         'Shipments',
         style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black87,
+          color: context.palette.textPrimary,
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
@@ -310,8 +300,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return MultiBlocListener(
       listeners: [
@@ -331,17 +320,17 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
         ),
       ],
       child: Scaffold(
-        backgroundColor: const Color(0xFF5b3895),
+        backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
         appBar: _buildAppBar(isDarkMode),
         body: RefreshIndicator(
           onRefresh: _loadShipments,
           child: BlocBuilder<TrackOrderBloc, TrackOrderState>(
             builder: (context, state) {
               if (state is TrackOrderLoading) {
-                return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
+                return TrackOrderWidgets.buildShimmerEffect(context);
               }
               if (state is FetchStatusLoading) {
-                return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
+                return TrackOrderWidgets.buildShimmerEffect(context);
               }
               if (state is FetchStatusSuccess) {
                 statuses = state.statuses;
@@ -363,7 +352,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           color:
-                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                              context.palette.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -372,7 +361,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           color:
-                              isDarkMode ? Colors.grey[500] : Colors.grey[700],
+                              context.palette.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -400,7 +389,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                     if (!isSelectionMode) _buildStatusFilter(isDarkMode),
                     Expanded(
                       child: state.shipments.isEmpty
-                          ? TrackOrderWidgets.buildEmptyState(isDarkMode)
+                          ? TrackOrderWidgets.buildEmptyState(context)
                           : ListView.builder(
                               padding: const EdgeInsets.all(16),
                               itemCount:
@@ -409,6 +398,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                                 final shipment =
                                     _filterShipments(state.shipments)[index];
                                 return TrackOrderWidgets.buildShipmentCard(
+                                  context: context,
                                   isDarkMode: isDarkMode,
                                   shipment: shipment,
                                   isSelected:
@@ -430,7 +420,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                 );
               }
 
-              return TrackOrderWidgets.buildShimmerEffect(isDarkMode);
+              return TrackOrderWidgets.buildShimmerEffect(context);
             },
           ),
         ),

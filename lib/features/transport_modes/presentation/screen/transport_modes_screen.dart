@@ -1,6 +1,7 @@
 import 'package:courier_app/features/transport_modes/model/transport_modes_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../bloc/transport_modes_bloc.dart';
 import '../widget/transport_modes_widget.dart';
 import '../widget/add_transport_mode_modal.dart';
@@ -24,26 +25,11 @@ class _TransportModesScreenState extends State<TransportModesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
+      body: SafeArea(
           child: Column(
             children: [
               // Custom App Bar
@@ -54,7 +40,7 @@ class _TransportModesScreenState extends State<TransportModesScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -64,7 +50,7 @@ class _TransportModesScreenState extends State<TransportModesScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                     const Spacer(),
@@ -73,7 +59,7 @@ class _TransportModesScreenState extends State<TransportModesScreen> {
                       icon: const Icon(Icons.add),
                       label: const Text('Add'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5a00),
+                        backgroundColor: context.palette.accent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         shape: RoundedRectangleBorder(
@@ -115,7 +101,7 @@ class _TransportModesScreenState extends State<TransportModesScreen> {
                         child: Text(
                           'Error: ${state.message}',
                           style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.black,
+                            color: context.palette.textPrimary,
                           ),
                         ),
                       );
@@ -128,7 +114,6 @@ class _TransportModesScreenState extends State<TransportModesScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 

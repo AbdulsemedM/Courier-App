@@ -4,8 +4,7 @@ import 'package:courier_app/features/add_shipment/presentation/screens/print_shi
 import 'package:courier_app/features/add_shipment/model/payment_invoice_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class PayByAwbScreen extends StatefulWidget {
   const PayByAwbScreen({super.key});
@@ -73,8 +72,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
     final authService = AuthService();
     return MultiBlocListener(
       listeners: [
@@ -122,7 +120,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
 
           return Scaffold(
             backgroundColor:
-                isDarkMode ? const Color(0xFF0A1931) : Colors.grey[50],
+                context.palette.background,
             appBar: AppBar(
               title: const Text(
                 'Payment Details',

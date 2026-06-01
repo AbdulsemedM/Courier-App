@@ -1,11 +1,10 @@
-// import 'package:courier_app/app/app_button.dart';
-// import 'package:courier_app/app/utils/app_colors.dart';
-// import 'package:courier_app/app/utils/app_themes.dart';
 import 'package:courier_app/app/utils/responsive_helper.dart';
 import 'package:courier_app/core/services/remembered_credentials_vault.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:courier_app/features/forgot_password/presentation/screen/forgot_pass_screen.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
+import 'package:courier_app/features/login/presentation/widgets/login_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -65,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    final size = MediaQuery.of(context).size;
+    final palette = context.palette;
 
     return BlocListener<LoginBloc, LoginState>(
       listener: (context, state) {
@@ -84,489 +83,73 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage),
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           );
         }
       },
       child: Scaffold(
-        body: Stack(
-          children: [
-            // Animated Background
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDarkMode
-                      ? [
-                          const Color.fromARGB(255, 103, 21, 234),
-                          const Color.fromARGB(255, 75, 23, 160),
-                          const Color(0xFF5b3895),
-                          // const Color(0xFF1A237E), // Deep Indigo
-                          // const Color(0xFF0D47A1), // Deep Blue
-                          // const Color(0xFF01579B), // Light Blue
-                        ]
-                      : [
-                          const Color.fromARGB(255, 103, 21, 234),
-                          const Color.fromARGB(255, 75, 23, 160),
-                          const Color(0xFF5b3895),
-                          // const Color(0xFFE3F2FD),
-                          // const Color(0xFFBBDEFB),
-                          // const Color(0xFF90CAF9),
-                        ],
+        body: LoginWidgets.buildBackground(
+          isDarkMode: isDarkMode,
+          child: SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: ResponsiveHelper.isTablet(context) ? 440 : double.infinity,
                 ),
-              ),
-            ),
-            // Decorative Circles
-            Positioned(
-              top: -100,
-              right: -100,
-              child: Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: (isDarkMode ? Colors.white : const Color(0xFF5b3895))
-                      .withOpacity(0.1),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -50,
-              left: -50,
-              child: Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: (isDarkMode ? Colors.white : const Color(0xFF5b3895))
-                      .withOpacity(0.1),
-                ),
-              ),
-            ),
-            // Main Content
-            SafeArea(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: ResponsiveHelper.isTablet(context) ? 500.0 : double.infinity,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: ResponsiveHelper.getResponsivePadding(
-                        context,
-                        mobile: const EdgeInsets.symmetric(horizontal: 24.0),
-                        tablet: const EdgeInsets.symmetric(horizontal: 40.0),
-                        desktop: const EdgeInsets.symmetric(horizontal: 40.0),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      LoginWidgets.buildBrandHero(
+                        isDarkMode: isDarkMode,
+                        isDarkModeActive: isDarkMode,
+                        onToggleTheme: themeProvider.toggleTheme,
                       ),
-                      child: Column(
-                        children: [
-                      SizedBox(height: size.height * 0.06),
-                      // Logo Animation Container
-                      TweenAnimationBuilder(
-                        duration: const Duration(milliseconds: 800),
-                        tween: Tween<double>(begin: 0, end: 1),
-                        builder: (context, double value, child) {
-                          return Transform.scale(
-                            scale: value,
-                            child: child,
-                          );
+                      LoginWidgets.buildLoginCard(
+                        isDarkMode: isDarkMode,
+                        formKey: _formKey,
+                        emailController: _emailController,
+                        passwordController: _passwordController,
+                        obscurePassword: _obscurePassword,
+                        rememberMe: _rememberMe,
+                        isLoading: _isLoading,
+                        onTogglePassword: () {
+                          setState(() => _obscurePassword = !_obscurePassword);
                         },
-                        child: Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? Colors.white.withOpacity(0.05)
-                                : Colors.white.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: isDarkMode
-                                  ? Colors.white.withOpacity(0.1)
-                                  : Colors.white,
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 20,
-                                spreadRadius: 2,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              // Animated Logo Container
-                              Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: isDarkMode
-                                      ? Colors.white.withOpacity(0.1)
-                                      : const Color(0xFF5b3895)
-                                          .withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: (isDarkMode
-                                              ? const Color(0xFF5b3895)
-                                              : Colors.blue.shade200)
-                                          .withOpacity(0.3),
-                                      blurRadius: 15,
-                                      spreadRadius: 5,
-                                    ),
-                                  ],
-                                ),
-                                child: Image.asset(
-                                  "assets/images/courier.png",
-                                  height: 80,
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              ShaderMask(
-                                shaderCallback: (bounds) => LinearGradient(
-                                  colors: isDarkMode
-                                      ? [Colors.white, Colors.white70]
-                                      : [
-                                          const Color(0xFF5b3895),
-                                          const Color.fromARGB(255, 75, 23, 160)
-                                        ],
-                                ).createShader(bounds),
-                                child: const Text(
-                                  'Welcome Back!',
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Sign in to continue',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: isDarkMode
-                                      ? Colors.white60
-                                      : Colors.black54,
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: size.height * 0.04),
-                      // Login Form with Animation
-                      TweenAnimationBuilder(
-                        duration: const Duration(milliseconds: 1000),
-                        tween: Tween<double>(begin: 0, end: 1),
-                        builder: (context, double value, child) {
-                          return Transform.translate(
-                            offset: Offset(0, 50 * (1 - value)),
-                            child: Opacity(
-                              opacity: value,
-                              child: child,
+                        onRememberMeChanged: (value) {
+                          setState(() => _rememberMe = value);
+                        },
+                        onLogin: _handleLogin,
+                        onForgotPassword: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ForgotPasswordScreen(),
                             ),
                           );
                         },
-                        child: Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? Colors.white.withOpacity(0.05)
-                                : Colors.white.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: isDarkMode
-                                  ? Colors.white.withOpacity(0.1)
-                                  : Colors.white,
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 20,
-                                spreadRadius: 2,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // Email TextField with enhanced styling
-                                TextFormField(
-                                  controller: _emailController,
-                                  enabled: !_isLoading,
-                                  keyboardType: TextInputType.emailAddress,
-                                  style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
-                                    letterSpacing: 0.5,
-                                  ),
-                                  decoration: InputDecoration(
-                                    labelText: 'Email',
-                                    labelStyle: TextStyle(
-                                      color: isDarkMode
-                                          ? Colors.white60
-                                          : Colors.black54,
-                                      letterSpacing: 0.5,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.email_outlined,
-                                      color: isDarkMode
-                                          ? Colors.white60
-                                          : Colors.black54,
-                                      size: 22,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: isDarkMode
-                                            ? Colors.white.withOpacity(0.1)
-                                            : Colors.grey.shade300,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: isDarkMode
-                                            ? Colors.white.withOpacity(0.1)
-                                            : Colors.grey.shade300,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: isDarkMode
-                                            ? const Color(0xFF5b3895)
-                                            : const Color.fromARGB(
-                                                255, 75, 23, 160),
-                                        width: 2,
-                                      ),
-                                    ),
-                                    filled: true,
-                                    fillColor: isDarkMode
-                                        ? Colors.white.withOpacity(0.05)
-                                        : Colors.white.withOpacity(0.7),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your email';
-                                    }
-                                    if (!value.contains('@')) {
-                                      return 'Please enter a valid email';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 24),
-                                // Password TextField with enhanced styling
-                                TextFormField(
-                                  controller: _passwordController,
-                                  enabled: !_isLoading,
-                                  obscureText: _obscurePassword,
-                                  style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
-                                    letterSpacing: 0.5,
-                                  ),
-                                  decoration: InputDecoration(
-                                    labelText: 'Password',
-                                    labelStyle: TextStyle(
-                                      color: isDarkMode
-                                          ? Colors.white60
-                                          : Colors.black54,
-                                      letterSpacing: 0.5,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.lock_outline,
-                                      color: isDarkMode
-                                          ? Colors.white60
-                                          : Colors.black54,
-                                      size: 22,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _obscurePassword
-                                            ? Icons.visibility_off
-                                            : Icons.visibility,
-                                        color: isDarkMode
-                                            ? Colors.white60
-                                            : Colors.black54,
-                                        size: 22,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _obscurePassword = !_obscurePassword;
-                                        });
-                                      },
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: isDarkMode
-                                            ? Colors.white.withOpacity(0.1)
-                                            : Colors.grey.shade300,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: isDarkMode
-                                            ? Colors.white.withOpacity(0.1)
-                                            : Colors.grey.shade300,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: isDarkMode
-                                            ? Colors.blue.shade200
-                                            : Colors.blue.shade700,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    filled: true,
-                                    fillColor: isDarkMode
-                                        ? Colors.white.withOpacity(0.05)
-                                        : Colors.white.withOpacity(0.7),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your password';
-                                    }
-                                    if (value.length < 6) {
-                                      return 'Password must be at least 6 characters';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                      value: _rememberMe,
-                                      onChanged: _isLoading
-                                          ? null
-                                          : (v) {
-                                              setState(() {
-                                                _rememberMe = v ?? false;
-                                              });
-                                            },
-                                      activeColor: const Color(0xFF5b3895),
-                                    ),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: _isLoading
-                                            ? null
-                                            : () {
-                                                setState(() {
-                                                  _rememberMe = !_rememberMe;
-                                                });
-                                              },
-                                        child: Text(
-                                          'Remember me',
-                                          style: TextStyle(
-                                            color: isDarkMode
-                                                ? Colors.white70
-                                                : Colors.black87,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton(
-                                    onPressed: _isLoading
-                                        ? null
-                                        : () {
-                                            // Handle forgot password
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const ForgotPasswordScreen(),
-                                              ),
-                                            );
-                                          },
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: isDarkMode
-                                          ? Colors.white70
-                                          : const Color(0xFF5b3895),
-                                    ),
-                                    child: const Text(
-                                      'Forgot Password?',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.3,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-                                // Enhanced Login Button with Gradient
-                                SizedBox(
-                                  height: 56,
-                                  child: ElevatedButton(
-                                    onPressed: _isLoading ? null : _handleLogin,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: isDarkMode
-                                          ? const Color(0xFFFF5A00)
-                                          : const Color(0xFFFF5A00),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      elevation: _isLoading ? 0 : 8,
-                                      shadowColor: isDarkMode
-                                          ? const Color(0xFFFF5A00)
-                                          : const Color(0xFFFF5A00),
-                                    ),
-                                    child: _isLoading
-                                        ? const SizedBox(
-                                            width: 24,
-                                            height: 24,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.5,
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                      Colors.white),
-                                            ),
-                                          )
-                                        : const Text(
-                                            'Login',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 0.5,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, bottom: 24),
+                        child: Text(
+                          'HudHud Courier · v1.0.3',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: palette.textSecondary,
                           ),
                         ),
                       ),
-                        ],
-                      ),
-                    ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

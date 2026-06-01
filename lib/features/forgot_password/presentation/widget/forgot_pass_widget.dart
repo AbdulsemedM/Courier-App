@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class ForgotPasswordWidget extends StatefulWidget {
   final Function(String)? onSubmit;
@@ -38,12 +39,12 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Logo and Title Section
-            const Text(
+            Text(
               'HudHud express',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFFFF5A00), // Orange color from the image
+                color: context.palette.accent,
               ),
             ),
             const SizedBox(height: 32),
@@ -125,7 +126,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
             ElevatedButton(
               onPressed: _handleSubmit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5A00), // Teal color
+                backgroundColor: context.palette.accent, // Teal color
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -144,14 +145,14 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
             // Back to Login Link
             TextButton.icon(
               onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back,
-                color: Color(0xFFFF5A00), // Orange color
+                color: context.palette.accent,
               ),
-              label: const Text(
+              label: Text(
                 'Back to login',
                 style: TextStyle(
-                  color: Color(0xFFFF5A00), // Orange color
+                  color: context.palette.accent,
                   fontSize: 16,
                 ),
               ),

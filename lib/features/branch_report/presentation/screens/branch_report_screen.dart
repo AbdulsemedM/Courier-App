@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:courier_app/core/theme/theme_provider.dart';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/branch_report/bloc/branch_report_bloc.dart';
 import 'package:courier_app/features/branch_report/data/model/branch_shipment_model.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class BranchReportScreen extends StatefulWidget {
   const BranchReportScreen({super.key});
@@ -44,14 +43,14 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
       firstDate: DateTime(2015),
       lastDate: _toDate,
       builder: (context, child) {
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        final isDarkMode = context.isDarkMode;
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: const Color(0xFFFF5A00),
+              primary: context.palette.accent,
               onPrimary: Colors.white,
-              surface: isDarkMode ? Colors.grey[850]! : Colors.white,
-              onSurface: isDarkMode ? Colors.white : Colors.black,
+              surface: context.palette.surface,
+              onSurface: context.palette.textPrimary,
             ),
           ),
           child: child!,
@@ -76,14 +75,14 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
       firstDate: _fromDate,
       lastDate: DateTime.now(),
       builder: (context, child) {
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        final isDarkMode = context.isDarkMode;
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: const Color(0xFFFF5A00),
+              primary: context.palette.accent,
               onPrimary: Colors.white,
-              surface: isDarkMode ? Colors.grey[850]! : Colors.white,
-              onSurface: isDarkMode ? Colors.white : Colors.black,
+              surface: context.palette.surface,
+              onSurface: context.palette.textPrimary,
             ),
           ),
           child: child!,
@@ -117,21 +116,18 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       backgroundColor:
-          isDarkMode ? const Color(0xFF1A1C2E) : const Color(0xFFF5F6FA),
+          context.palette.background,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: isDarkMode
-            ? const Color.fromARGB(255, 91, 19, 207)
-            : const Color(0xFF5b3895),
+        backgroundColor: context.palette.appBarBackground,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: context.palette.textPrimary,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -140,7 +136,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
         ),
       ),
@@ -154,10 +150,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                     const Color(0xFF1A1C2E),
                     const Color(0xFF2D3250),
                   ]
-                : [
-                    const Color(0xFFF5F6FA),
-                    const Color(0xFFFFFFFF),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: Column(
@@ -166,9 +159,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode
-                    ? Colors.grey[850]!.withOpacity(0.5)
-                    : Colors.white,
+                color: context.palette.surface,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -187,12 +178,10 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color:
-                              isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                              context.palette.surfaceMuted,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isDarkMode
-                                ? Colors.grey[700]!
-                                : Colors.grey[300]!,
+                            color: context.palette.border,
                           ),
                         ),
                         child: Row(
@@ -205,9 +194,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                                   'From Date',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: isDarkMode
-                                        ? Colors.white70
-                                        : Colors.black54,
+                                    color: context.palette.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -216,9 +203,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
+                                    color: context.palette.textPrimary,
                                   ),
                                 ),
                               ],
@@ -226,7 +211,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                             Icon(
                               Icons.calendar_today,
                               color:
-                                  isDarkMode ? Colors.white70 : Colors.black54,
+                                  context.palette.textSecondary,
                             ),
                           ],
                         ),
@@ -241,12 +226,10 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color:
-                              isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                              context.palette.surfaceMuted,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isDarkMode
-                                ? Colors.grey[700]!
-                                : Colors.grey[300]!,
+                            color: context.palette.border,
                           ),
                         ),
                         child: Row(
@@ -259,9 +242,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                                   'To Date',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: isDarkMode
-                                        ? Colors.white70
-                                        : Colors.black54,
+                                    color: context.palette.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -270,9 +251,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
+                                    color: context.palette.textPrimary,
                                   ),
                                 ),
                               ],
@@ -280,7 +259,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                             Icon(
                               Icons.calendar_today,
                               color:
-                                  isDarkMode ? Colors.white70 : Colors.black54,
+                                  context.palette.textSecondary,
                             ),
                           ],
                         ),
@@ -297,7 +276,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   if (state is BranchReportLoading) {
                     return Center(
                       child: CircularProgressIndicator(
-                        color: const Color(0xFFFF5A00),
+                        color: context.palette.accent,
                       ),
                     );
                   }
@@ -315,7 +294,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                           Text(
                             'Error: ${state.message}',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black87,
+                              color: context.palette.textPrimary,
                               fontSize: 16,
                             ),
                             textAlign: TextAlign.center,
@@ -324,7 +303,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                           ElevatedButton(
                             onPressed: _fetchShipments,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF5A00),
+                              backgroundColor: context.palette.accent,
                             ),
                             child: const Text('Retry'),
                           ),
@@ -349,9 +328,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                             Text(
                               'No shipments found',
                               style: TextStyle(
-                                color: isDarkMode
-                                    ? Colors.white70
-                                    : Colors.black54,
+                                color: context.palette.textSecondary,
                                 fontSize: 16,
                               ),
                             ),
@@ -438,7 +415,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -455,7 +432,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.white70 : Colors.black54,
+              color: context.palette.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -464,7 +441,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: context.palette.textPrimary,
             ),
           ),
         ],
@@ -482,7 +459,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -498,7 +475,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
           child: DataTable(
             headingRowColor: MaterialStateProperty.resolveWith<Color>(
               (Set<MaterialState> states) =>
-                  isDarkMode ? const Color(0xFF0F172A) : Colors.blue[50]!,
+                  context.palette.surfaceMuted,
             ),
             dataRowColor: MaterialStateProperty.resolveWith<Color>(
               (Set<MaterialState> states) {
@@ -507,7 +484,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                       ? Colors.blue.withOpacity(0.1)
                       : Colors.blue[100]!;
                 }
-                return isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+                return context.palette.surface;
               },
             ),
             columns: [
@@ -516,7 +493,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   'AWB',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                 ),
               ),
@@ -525,7 +502,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   'Status',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                 ),
               ),
@@ -534,7 +511,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   'Payment Status',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                 ),
               ),
@@ -543,7 +520,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   'Sender',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                 ),
               ),
@@ -552,7 +529,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   'Receiver',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                 ),
               ),
@@ -561,7 +538,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   'Net Fee',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                 ),
               ),
@@ -570,7 +547,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   'Total Amount',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                 ),
               ),
@@ -579,7 +556,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   'Created At',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                 ),
               ),
@@ -590,7 +567,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   DataCell(Text(
                     shipment.awb ?? '',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: context.palette.textPrimary,
                     ),
                   )),
                   DataCell(
@@ -636,25 +613,25 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                   DataCell(Text(
                     shipment.senderName ?? '',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: context.palette.textPrimary,
                     ),
                   )),
                   DataCell(Text(
                     shipment.receiverName ?? '',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: context.palette.textPrimary,
                     ),
                   )),
                   DataCell(Text(
                     currencyFormat.format(shipment.netFee ?? 0),
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: context.palette.textPrimary,
                     ),
                   )),
                   DataCell(Text(
                     currencyFormat.format(shipment.totalAmount ?? 0),
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: context.palette.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   )),
@@ -665,7 +642,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
                           )
                         : 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: context.palette.textPrimary,
                     ),
                   )),
                 ],

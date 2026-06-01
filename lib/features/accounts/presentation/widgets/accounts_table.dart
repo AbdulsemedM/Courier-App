@@ -1,6 +1,7 @@
 import 'package:courier_app/features/accounts/data/model/account_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class AccountsTable extends StatelessWidget {
   final List<AccountModel> accounts;
@@ -12,7 +13,7 @@ class AccountsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -24,7 +25,7 @@ class AccountsTable extends StatelessWidget {
               label: Text(
                 'Account Number',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -33,7 +34,7 @@ class AccountsTable extends StatelessWidget {
               label: Text(
                 'Account Type',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -42,7 +43,7 @@ class AccountsTable extends StatelessWidget {
               label: Text(
                 'Branch',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -51,7 +52,7 @@ class AccountsTable extends StatelessWidget {
               label: Text(
                 'Teller',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -60,7 +61,7 @@ class AccountsTable extends StatelessWidget {
               label: Text(
                 'Running Balance',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -69,7 +70,7 @@ class AccountsTable extends StatelessWidget {
               label: Text(
                 'Expense Balance',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -78,7 +79,7 @@ class AccountsTable extends StatelessWidget {
               label: Text(
                 'Status',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -87,7 +88,7 @@ class AccountsTable extends StatelessWidget {
               label: Text(
                 'Created At',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -99,7 +100,7 @@ class AccountsTable extends StatelessWidget {
                 DataCell(Text(
                   account.accountNumber,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(
@@ -125,20 +126,20 @@ class AccountsTable extends StatelessWidget {
                 DataCell(Text(
                   account.branchName ?? 'N/A',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   account.tellerName ?? 'N/A',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   NumberFormat.currency(symbol: '', decimalDigits: 2)
                       .format(account.runningBalance),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.w500,
                   ),
                 )),
@@ -146,7 +147,7 @@ class AccountsTable extends StatelessWidget {
                   NumberFormat.currency(symbol: '', decimalDigits: 2)
                       .format(account.expenseBalance),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.w500,
                   ),
                 )),
@@ -176,7 +177,7 @@ class AccountsTable extends StatelessWidget {
                   DateFormat('MMM-dd-yyyy')
                       .format(DateTime.parse(account.createdAt)),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
               ],

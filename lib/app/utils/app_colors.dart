@@ -6,13 +6,12 @@ class AppColors {
   static const secondaryDarkColor = Color(0xFF00adef);
   static const greyColor = Color(0xFFE9E9E9);
 
-  static const primaryTextColor = Color(0xFF121814);
+  static const primaryTextColor = Color(0xFF0A0A0A);
+  static const secondaryTextColor = Color(0xFF6B7280);
 
-  static const secondaryTextColor = Color(0xFF78847B);
-
-  static const bgColor = Color(0xFFFCFCFC);
-  static const fieldBorder = Color(0xFFE6E6E6);
+  static const bgColor = Color(0xFFFFFFFF);
+  static const fieldBorder = Color(0xFFE8E8EC);
   static const iconColor = Color.fromARGB(255, 195, 180, 149);
 
-  static const bg1 = Color(0xFFF5F5F5);
+  static const bg1 = Color(0xFFFAFAFA);
 }

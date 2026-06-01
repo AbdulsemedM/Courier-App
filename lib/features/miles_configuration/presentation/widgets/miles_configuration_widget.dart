@@ -1,17 +1,20 @@
-import 'package:courier_app/core/theme/theme_provider.dart';
 import 'package:courier_app/features/miles_configuration/bloc/miles_configuration_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../add_shipment/bloc/add_shipment_bloc.dart';
 import '../../models/miles_configuration_model.dart';
-import 'package:provider/provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class MilesConfigurationWidgets {
   static Widget buildMilesConfigurationTable({
+    required BuildContext context,
     required bool isDarkMode,
     required List<MilesConfigurationModel> configurations,
     required VoidCallback onAddConfig,
   }) {
+    final tableHeaderColor = isDarkMode
+        ? const Color.fromARGB(255, 75, 23, 160)
+        : context.palette.appBarBackground;
     return Column(
       children: [
         Expanded(
@@ -20,10 +23,9 @@ class MilesConfigurationWidgets {
             child: Container(
               margin: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode
-                    ? const Color.fromARGB(255, 75, 23, 160)
-                    : const Color.fromARGB(255, 75, 23, 160),
+                color: context.palette.surface,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: context.palette.border),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -42,7 +44,7 @@ class MilesConfigurationWidgets {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ),
@@ -50,9 +52,7 @@ class MilesConfigurationWidgets {
                   // Table header
                   Container(
                     decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? const Color.fromARGB(255, 75, 23, 160)
-                          : const Color.fromARGB(255, 75, 23, 160),
+                      color: tableHeaderColor,
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(12),
                         topRight: Radius.circular(12),
@@ -62,12 +62,12 @@ class MilesConfigurationWidgets {
                         vertical: 12, horizontal: 16),
                     child: Row(
                       children: [
-                        _buildHeaderCell('ID', 0.1, isDarkMode),
-                        _buildHeaderCell('Origin Branch', 0.25, isDarkMode),
+                        _buildHeaderCell(context, 'ID', 0.1, isDarkMode),
+                        _buildHeaderCell(context, 'Origin Branch', 0.25, isDarkMode),
                         _buildHeaderCell(
-                            'Destination Branch', 0.25, isDarkMode),
-                        _buildHeaderCell('Unit', 0.15, isDarkMode),
-                        _buildHeaderCell('Miles/Unit', 0.25, isDarkMode),
+                            context, 'Destination Branch', 0.25, isDarkMode),
+                        _buildHeaderCell(context, 'Unit', 0.15, isDarkMode),
+                        _buildHeaderCell(context, 'Miles/Unit', 0.25, isDarkMode),
                       ],
                     ),
                   ),
@@ -78,7 +78,7 @@ class MilesConfigurationWidgets {
                     itemCount: configurations.length,
                     separatorBuilder: (context, index) => Divider(
                       height: 1,
-                      color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                      color: context.palette.surfaceMuted,
                     ),
                     itemBuilder: (context, index) {
                       final config = configurations[index];
@@ -86,25 +86,20 @@ class MilesConfigurationWidgets {
                       return Container(
                         decoration: BoxDecoration(
                           color: isEven
-                              ? (isDarkMode
-                                  ? const Color(0xFF1E293B)
-                                  : Colors.white)
-                              : (isDarkMode
-                                  ? const Color(0xFF0F172A)
-                                  : Colors.grey[50]),
+                              ? (context.palette.surface)
+                              : context.palette.surfaceMuted,
                         ),
                         padding: const EdgeInsets.symmetric(
                             vertical: 12, horizontal: 16),
                         child: Row(
                           children: [
-                            _buildCell(config.id.toString(), 0.1, isDarkMode),
+                            _buildCell(context, config.id.toString(), 0.1),
                             _buildCell(
-                                config.originBranchName, 0.25, isDarkMode),
+                                context, config.originBranchName, 0.25),
                             _buildCell(
-                                config.destinationBranchName, 0.25, isDarkMode),
-                            _buildCell(config.unit, 0.15, isDarkMode),
-                            _buildCell(config.milesPerUnit.toString(), 0.25,
-                                isDarkMode),
+                                context, config.destinationBranchName, 0.25),
+                            _buildCell(context, config.unit, 0.15),
+                            _buildCell(context, config.milesPerUnit.toString(), 0.25),
                           ],
                         ),
                       );
@@ -134,26 +129,31 @@ class MilesConfigurationWidgets {
     );
   }
 
-  static Widget _buildHeaderCell(String text, double flex, bool isDarkMode) {
+  static Widget _buildHeaderCell(
+    BuildContext context,
+    String text,
+    double flex,
+    bool isDarkMode,
+  ) {
     return Expanded(
       flex: (flex * 100).toInt(),
       child: Text(
         text,
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: isDarkMode ? Colors.white : Colors.white,
+          color: context.palette.textPrimary,
         ),
       ),
     );
   }
 
-  static Widget _buildCell(String text, double flex, bool isDarkMode) {
+  static Widget _buildCell(BuildContext context, String text, double flex) {
     return Expanded(
       flex: (flex * 100).toInt(),
       child: Text(
         text,
         style: TextStyle(
-          color: isDarkMode ? Colors.grey[300] : Colors.grey[800],
+          color: context.palette.textSecondary,
         ),
         overflow: TextOverflow.ellipsis,
       ),
@@ -177,8 +177,7 @@ class MilesConfigurationWidgets {
       context: context,
       barrierDismissible: false, // Prevent dismissing while loading
       builder: (context) {
-        final themeProvider = Provider.of<ThemeProvider>(context);
-        final isDarkMode = themeProvider.isDarkMode;
+        final isDarkMode = context.isDarkMode;
 
         return BlocListener<MilesConfigurationBloc, MilesConfigurationState>(
           listener: (context, state) {
@@ -233,13 +232,11 @@ class MilesConfigurationWidgets {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          backgroundColor: isDarkMode
-                              ? const Color(0xFF1E293B)
-                              : Colors.white,
+                          backgroundColor: context.palette.surface,
                           title: Text(
                             'Add Miles Configuration',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black87,
+                              color: context.palette.textPrimary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -253,18 +250,14 @@ class MilesConfigurationWidgets {
                                   children: [
                                     DropdownButtonFormField<String>(
                                       value: selectedOriginBranch,
-                                      dropdownColor: isDarkMode
-                                          ? const Color(0xFF1E293B)
-                                          : Colors.white,
+                                      dropdownColor: context.palette.surface,
                                       items: state.branches.map((branch) {
                                         return DropdownMenuItem(
                                           value: branch.id.toString(),
                                           child: Text(
                                             branch.name!,
                                             style: TextStyle(
-                                              color: isDarkMode
-                                                  ? Colors.white
-                                                  : Colors.black87,
+                                              color: context.palette.textPrimary,
                                             ),
                                           ),
                                         );
@@ -291,26 +284,20 @@ class MilesConfigurationWidgets {
                                               BorderRadius.circular(8),
                                         ),
                                         filled: true,
-                                        fillColor: isDarkMode
-                                            ? const Color(0xFF0F172A)
-                                            : Colors.grey[50],
+                                        fillColor: context.palette.surfaceMuted,
                                       ),
                                     ),
                                     const SizedBox(height: 16),
                                     DropdownButtonFormField<String>(
                                       value: selectedDestinationBranch,
-                                      dropdownColor: isDarkMode
-                                          ? const Color(0xFF1E293B)
-                                          : Colors.white,
+                                      dropdownColor: context.palette.surface,
                                       items: state.branches.map((branch) {
                                         return DropdownMenuItem(
                                           value: branch.id.toString(),
                                           child: Text(
                                             branch.name!,
                                             style: TextStyle(
-                                              color: isDarkMode
-                                                  ? Colors.white
-                                                  : Colors.black87,
+                                              color: context.palette.textPrimary,
                                             ),
                                           ),
                                         );
@@ -337,18 +324,14 @@ class MilesConfigurationWidgets {
                                               BorderRadius.circular(8),
                                         ),
                                         filled: true,
-                                        fillColor: isDarkMode
-                                            ? const Color(0xFF0F172A)
-                                            : Colors.grey[50],
+                                        fillColor: context.palette.surfaceMuted,
                                       ),
                                     ),
                                     const SizedBox(height: 16),
                                     TextFormField(
                                       controller: unitController,
                                       style: TextStyle(
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black87,
+                                        color: context.palette.textPrimary,
                                       ),
                                       decoration: InputDecoration(
                                         labelText: 'Unit',
@@ -362,18 +345,14 @@ class MilesConfigurationWidgets {
                                               BorderRadius.circular(8),
                                         ),
                                         filled: true,
-                                        fillColor: isDarkMode
-                                            ? const Color(0xFF0F172A)
-                                            : Colors.grey[50],
+                                        fillColor: context.palette.surfaceMuted,
                                       ),
                                     ),
                                     const SizedBox(height: 16),
                                     TextFormField(
                                       controller: milesPerUnitController,
                                       style: TextStyle(
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black87,
+                                        color: context.palette.textPrimary,
                                       ),
                                       decoration: InputDecoration(
                                         labelText: 'Miles/Unit',
@@ -387,9 +366,7 @@ class MilesConfigurationWidgets {
                                               BorderRadius.circular(8),
                                         ),
                                         filled: true,
-                                        fillColor: isDarkMode
-                                            ? const Color(0xFF0F172A)
-                                            : Colors.grey[50],
+                                        fillColor: context.palette.surfaceMuted,
                                       ),
                                       keyboardType: TextInputType.number,
                                     ),
@@ -407,9 +384,7 @@ class MilesConfigurationWidgets {
                               child: Text(
                                 'Cancel',
                                 style: TextStyle(
-                                  color: isDarkMode
-                                      ? Colors.grey[400]
-                                      : Colors.grey[700],
+                                  color: context.palette.textSecondary,
                                 ),
                               ),
                             ),

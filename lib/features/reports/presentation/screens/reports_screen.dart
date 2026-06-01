@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/theme/theme_provider.dart';
 import 'package:courier_app/features/branch_report/presentation/screens/branch_report_screen.dart';
 import 'package:courier_app/features/branch_report/bloc/branch_report_bloc.dart';
 import 'package:courier_app/features/branch_report/data/repository/branch_report_repository.dart';
@@ -21,6 +19,7 @@ import 'package:courier_app/features/admin_expenses/data/data_provider/admin_exp
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:courier_app/features/branches/data/repository/branches_repository.dart';
 import 'package:courier_app/features/branches/data/data_provider/branches_data_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -32,21 +31,18 @@ class ReportsScreen extends StatefulWidget {
 class _ReportsScreenState extends State<ReportsScreen> {
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       backgroundColor:
-          isDarkMode ? const Color(0xFF1A1C2E) : const Color(0xFFF5F6FA),
+          context.palette.background,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: isDarkMode
-            ? const Color.fromARGB(255, 91, 19, 207)
-            : const Color(0xFF5b3895),
+        backgroundColor: context.palette.appBarBackground,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: context.palette.textPrimary,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -55,7 +51,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
         ),
       ),
@@ -69,10 +65,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     const Color(0xFF1A1C2E),
                     const Color(0xFF2D3250),
                   ]
-                : [
-                    const Color(0xFFF5F6FA),
-                    const Color(0xFFFFFFFF),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: SingleChildScrollView(
@@ -88,7 +81,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   gradient: LinearGradient(
                     colors: [
                       const Color.fromARGB(255, 239, 146, 96),
-                      const Color(0xFFFF5A00),
+                      context.palette.accent,
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -130,7 +123,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.grey.shade800,
+                  color: context.palette.textPrimary,
                 ),
               ),
               const SizedBox(height: 16),
@@ -256,7 +249,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }) {
     return Card(
       elevation: 0,
-      color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : Colors.white,
+      color: context.palette.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -266,7 +259,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('$title feature coming soon'),
-                  backgroundColor: const Color(0xFFFF5A00),
+                  backgroundColor: context.palette.accent,
                 ),
               );
             },
@@ -280,7 +273,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               Icon(
                 icon,
                 size: 28,
-                color: const Color(0xFFFF5A00),
+                color: context.palette.accent,
               ),
               const SizedBox(height: 8),
               Flexible(
@@ -289,7 +282,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.grey[800],
+                    color: context.palette.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,
@@ -302,7 +295,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   description,
                   style: TextStyle(
                     fontSize: 11,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,

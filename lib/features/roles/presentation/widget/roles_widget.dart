@@ -1,11 +1,12 @@
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:courier_app/features/roles/model/roles_model.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class RolesWidget {
   static Widget buildRolesGrid(
-    List<RolesModel> roles,
-    bool isDarkMode, {
+    BuildContext context,
+    List<RolesModel> roles, {
     Function(RolesModel)? onRoleTap,
   }) {
     return GridView.builder(
@@ -17,18 +18,17 @@ class RolesWidget {
         childAspectRatio: 0.85,
       ),
       itemCount: roles.length,
-      itemBuilder: (context, index) {
+      itemBuilder: (ctx, index) {
         final role = roles[index];
         return RoleCard(
           role: role,
-          isDarkMode: isDarkMode,
           onTap: onRoleTap != null ? () => onRoleTap(role) : null,
         );
       },
     );
   }
 
-  static Widget buildEmptyState(bool isDarkMode) {
+  static Widget buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -36,7 +36,7 @@ class RolesWidget {
           Icon(
             Icons.person_off_outlined,
             size: 64,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
           const SizedBox(height: 16),
           Text(
@@ -44,14 +44,14 @@ class RolesWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: context.palette.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Add new roles to get started',
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: context.palette.textSecondary,
             ),
           ),
         ],
@@ -62,13 +62,11 @@ class RolesWidget {
 
 class RoleCard extends StatelessWidget {
   final RolesModel role;
-  final bool isDarkMode;
   final VoidCallback? onTap;
 
   const RoleCard({
     Key? key,
     required this.role,
-    required this.isDarkMode,
     this.onTap,
   }) : super(key: key);
 
@@ -97,15 +95,11 @@ class RoleCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
-          color: isDarkMode 
-              ? Colors.white.withOpacity(0.1) 
-              : Colors.grey.withOpacity(0.2),
+          color: context.palette.border,
           width: 1,
         ),
       ),
-      color: isDarkMode 
-          ? const Color(0xFF152642) 
-          : Colors.white,
+      color: context.palette.surface,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -141,7 +135,7 @@ class RoleCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: context.palette.textPrimary,
                       letterSpacing: -0.5,
                     ),
                     maxLines: 1,
@@ -153,9 +147,7 @@ class RoleCard extends StatelessWidget {
                     child: Text(
                       role.description,
                       style: TextStyle(
-                        color: isDarkMode 
-                            ? Colors.grey[400] 
-                            : Colors.grey[600],
+                        color: context.palette.textSecondary,
                         fontSize: 13,
                         height: 1.4,
                       ),
@@ -200,9 +192,7 @@ class RoleCard extends StatelessWidget {
                       Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 14,
-                        color: isDarkMode 
-                            ? Colors.grey[500] 
-                            : Colors.grey[400],
+                        color: context.palette.textSecondary,
                       ),
                     ],
                   ),
@@ -238,7 +228,7 @@ class AddRoleModal extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[900] : Colors.white,
+            color: context.palette.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Form(
@@ -252,7 +242,7 @@ class AddRoleModal extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -265,7 +255,7 @@ class AddRoleModal extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                    fillColor: context.palette.surfaceMuted,
                   ),
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
@@ -283,7 +273,7 @@ class AddRoleModal extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                    fillColor: context.palette.surfaceMuted,
                   ),
                   maxLines: 3,
                 ),
