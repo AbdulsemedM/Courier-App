@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:courier_app/features/shipment/bloc/shipments_bloc.dart';
 import 'package:courier_app/features/track_order/model/shipmet_status_model.dart';
+import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:courier_app/app/utils/dialog_utils.dart';
 import 'package:courier_app/features/shipment/data/data_provider/deliver_shipment_data_provider.dart';
 import 'package:courier_app/features/shipment/data/repository/deliver_shipment_repository.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 import '../../../track_order/bloc/track_order_bloc.dart';
 import '../widgets/shipments_widget.dart';
+import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
 import '../widgets/deliver_shipment_modal.dart';
 
 class ShipmentsScreen extends StatefulWidget {
@@ -22,14 +24,17 @@ class ShipmentsScreen extends StatefulWidget {
 
 class _ShipmentsScreenState extends State<ShipmentsScreen> {
   final _searchController = TextEditingController();
-  String _selectedStatus = 'All';
-  List<String> _statusOptions = ['All'];
+  String? _selectedStatus;
+  List<StatusModel> _statuses = [];
   List<ShipmentModel> _filteredShipments = [];
 
   @override
   void initState() {
     super.initState();
-    context.read<ShipmentsBloc>().add(FetchShipments(status: widget.initialStatus));
+    _selectedStatus = widget.initialStatus;
+    if (_selectedStatus != null) {
+      context.read<ShipmentsBloc>().add(FetchShipments(status: _selectedStatus));
+    }
     context.read<TrackOrderBloc>().add(FetchStatuses());
   }
 
@@ -43,11 +48,8 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     final searchTerm = _searchController.text.toLowerCase().trim();
     setState(() {
       _filteredShipments = shipments.where((shipment) {
-        final matchesSearch = searchTerm.isEmpty ||
+        return searchTerm.isEmpty ||
             (shipment.awb?.toLowerCase().contains(searchTerm) ?? false);
-        final matchesStatus = _selectedStatus == 'All' ||
-            (shipment.shipmentStatus?.code == _selectedStatus);
-        return matchesSearch && matchesStatus;
       }).toList();
     });
   }
@@ -56,11 +58,30 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     setState(() {
       _selectedStatus = status;
     });
-    if (context.read<ShipmentsBloc>().state is FetchShipmentsSuccess) {
-      final shipments =
-          (context.read<ShipmentsBloc>().state as FetchShipmentsSuccess)
-              .shipments;
-      _filterShipments(shipments);
+    context.read<ShipmentsBloc>().add(FetchShipments(status: status));
+  }
+
+  void _applyStatuses(List<StatusModel> statuses) {
+    if (statuses.isEmpty) return;
+
+    final hasValidSelection = _selectedStatus != null &&
+        statuses.any((s) => s.code == _selectedStatus);
+    final nextStatus = hasValidSelection
+        ? _selectedStatus!
+        : (widget.initialStatus != null &&
+                statuses.any((s) => s.code == widget.initialStatus)
+            ? widget.initialStatus!
+            : statuses.first.code);
+
+    final previousStatus = _selectedStatus;
+
+    setState(() {
+      _statuses = statuses;
+      _selectedStatus = nextStatus;
+    });
+
+    if (previousStatus != nextStatus) {
+      context.read<ShipmentsBloc>().add(FetchShipments(status: nextStatus));
     }
   }
 
@@ -71,6 +92,15 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
               .shipments;
       _filterShipments(shipments);
     }
+  }
+
+  void _handlePay(String awb) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PayByAwbScreen(initialAwb: awb),
+      ),
+    );
   }
 
   void _handleDeliver(String awb) {
@@ -126,9 +156,11 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
             // Refresh shipments
             if (!mounted) return;
-            outerContext.read<ShipmentsBloc>().add(
-              FetchShipments(status: widget.initialStatus),
-            );
+            if (_selectedStatus != null) {
+              outerContext.read<ShipmentsBloc>().add(
+                FetchShipments(status: _selectedStatus),
+              );
+            }
           } catch (e) {
             // Close loading dialog if still open
             if (mounted) {
@@ -162,25 +194,14 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
           BlocListener<TrackOrderBloc, TrackOrderState>(
             listener: (context, state) {
               if (state is FetchStatusSuccess) {
-                final newStatusOptions = [
-                  'All',
-                  ...state.statuses.map((s) => s.code)
-                ];
-                setState(() {
-                  _statusOptions = newStatusOptions;
-                  // Set the initial status after statuses are loaded
-                  if (widget.initialStatus != null && 
-                      newStatusOptions.contains(widget.initialStatus)) {
-                    _selectedStatus = widget.initialStatus!;
-                  }
-                });
+                _applyStatuses(state.statuses);
               }
             },
             child: ShipmentsWidgets.buildSearchAndFilter(
               isDarkMode: isDarkMode,
               searchController: _searchController,
-              selectedStatus: _selectedStatus,
-              statusOptions: _statusOptions,
+              selectedStatus: _selectedStatus ?? '',
+              statuses: _statuses,
               onStatusChanged: _onStatusChanged,
               onSearch: _onSearch,
             ),
@@ -200,9 +221,11 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                     if (state is ChangeStatusSuccess) {
                       displaySnack(context, state.message, Colors.green);
                       // Refresh shipments after status change
-                      context.read<ShipmentsBloc>().add(
-                        FetchShipments(status: widget.initialStatus),
-                      );
+                      if (_selectedStatus != null) {
+                        context.read<ShipmentsBloc>().add(
+                          FetchShipments(status: _selectedStatus),
+                        );
+                      }
                     } else if (state is ChangeStatusFailure) {
                       displaySnack(context, state.errorMessage, Colors.red);
                     }
@@ -222,12 +245,14 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                   if (_filteredShipments.isEmpty) {
                     return ShipmentsWidgets.buildEmptyState(context);
                   }
-                  final showDeliverButton = widget.initialStatus == 'ARR' || _selectedStatus == 'ARR';
+                  final showDeliverButton = _selectedStatus == 'ARR';
                   return ShipmentsWidgets.buildShipmentsTable(
                     isDarkMode: isDarkMode,
                     shipments: _filteredShipments,
+                    statuses: _statuses,
                     showDeliverButton: showDeliverButton,
                     onDeliver: _handleDeliver,
+                    onPay: _handlePay,
                   );
                 }
 

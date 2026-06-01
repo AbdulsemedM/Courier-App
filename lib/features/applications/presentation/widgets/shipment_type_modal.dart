@@ -1,21 +1,17 @@
+import 'package:courier_app/core/utils/shipment_status_helper.dart';
+import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/theme_provider.dart';
 
-enum ShipmentType {
-  r4p,
-  arrived,
-  arriving,
-  delivered,
-  all,
-}
-
 class ShipmentTypeModal extends StatelessWidget {
-  final Function(ShipmentType) onTypeSelected;
+  final List<StatusModel> statuses;
+  final void Function(String statusCode) onStatusSelected;
 
   const ShipmentTypeModal({
     super.key,
-    required this.onTypeSelected,
+    required this.statuses,
+    required this.onStatusSelected,
   });
 
   @override
@@ -39,7 +35,6 @@ class ShipmentTypeModal extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle bar
           Container(
             margin: const EdgeInsets.only(top: 12, bottom: 8),
             width: 40,
@@ -49,11 +44,10 @@ class ShipmentTypeModal extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          // Title
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Text(
-              'Select Shipment Type',
+              'Select Shipment Status',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -62,51 +56,12 @@ class ShipmentTypeModal extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          // Options
-          _buildOption(
-            context: context,
-            isDarkMode: isDarkMode,
-            icon: Icons.inventory_2_outlined,
-            title: 'R4P Shipments',
-            subtitle: 'Ready for pickup',
-            color: Colors.orange,
-            type: ShipmentType.r4p,
-          ),
-          _buildOption(
-            context: context,
-            isDarkMode: isDarkMode,
-            icon: Icons.local_shipping_outlined,
-            title: 'Arrived Shipments',
-            subtitle: 'Shipments that have arrived',
-            color: Colors.green,
-            type: ShipmentType.arrived,
-          ),
-          _buildOption(
-            context: context,
-            isDarkMode: isDarkMode,
-            icon: Icons.directions_transit_outlined,
-            title: 'Arriving Shipments',
-            subtitle: 'Shipments in transit',
-            color: Colors.blue,
-            type: ShipmentType.arriving,
-          ),
-          _buildOption(
-            context: context,
-            isDarkMode: isDarkMode,
-            icon: Icons.check_circle_outline,
-            title: 'Delivered Shipments',
-            subtitle: 'Successfully delivered',
-            color: Colors.teal,
-            type: ShipmentType.delivered,
-          ),
-          _buildOption(
-            context: context,
-            isDarkMode: isDarkMode,
-            icon: Icons.assessment_outlined,
-            title: 'All Shipments',
-            subtitle: 'View all shipment reports',
-            color: Colors.purple,
-            type: ShipmentType.all,
+          ...statuses.map(
+            (status) => _buildOption(
+              context: context,
+              isDarkMode: isDarkMode,
+              status: status,
+            ),
           ),
           const SizedBox(height: 16),
         ],
@@ -117,21 +72,41 @@ class ShipmentTypeModal extends StatelessWidget {
   Widget _buildOption({
     required BuildContext context,
     required bool isDarkMode,
+    required StatusModel status,
+  }) {
+    final label = ShipmentStatusHelper.displayLabel(status);
+    final color = ShipmentStatusHelper.colorForCode(status.code);
+    final icon = ShipmentStatusHelper.iconForCode(status.code);
+
+    return _buildOptionTile(
+      context: context,
+      isDarkMode: isDarkMode,
+      icon: icon,
+      title: label,
+      subtitle: status.code,
+      color: color,
+      onTap: () {
+        Navigator.pop(context);
+        onStatusSelected(status.code);
+      },
+    );
+  }
+
+  Widget _buildOptionTile({
+    required BuildContext context,
+    required bool isDarkMode,
     required IconData icon,
     required String title,
     required String subtitle,
     required Color color,
-    required ShipmentType type,
+    required VoidCallback onTap,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-            onTypeSelected(type);
-          },
+          onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Container(
             padding: const EdgeInsets.all(16),
@@ -182,7 +157,8 @@ class ShipmentTypeModal extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                          color:
+                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
                         ),
                       ),
                     ],
@@ -201,4 +177,3 @@ class ShipmentTypeModal extends StatelessWidget {
     );
   }
 }
-

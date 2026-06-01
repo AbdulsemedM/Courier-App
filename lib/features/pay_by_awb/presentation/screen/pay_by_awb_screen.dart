@@ -7,7 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 
 class PayByAwbScreen extends StatefulWidget {
-  const PayByAwbScreen({super.key});
+  final String? initialAwb;
+
+  const PayByAwbScreen({super.key, this.initialAwb});
 
   @override
   State<PayByAwbScreen> createState() => _PayByAwbScreenState();
@@ -19,9 +21,79 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
   PaymentInvoiceModel? _lastFetchedDetails;
 
   @override
+  void initState() {
+    super.initState();
+    final awb = widget.initialAwb?.trim();
+    if (awb != null && awb.isNotEmpty) {
+      _awbController.text = awb;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setState(() => _hasSearched = true);
+        context.read<AddShipmentBloc>().add(
+              FetchShipmentDetailsEvent(trackingNumber: awb),
+            );
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _awbController.dispose();
     super.dispose();
+  }
+
+  ({String paymentMethod, String payerAccount})? _paymentInputs(
+    PaymentInvoiceModel details,
+  ) {
+    final method = details.paymentMethod?.trim().isNotEmpty == true
+        ? details.paymentMethod!.trim()
+        : details.paymentMode?.trim();
+    final account = details.senderMobile?.trim().isNotEmpty == true
+        ? details.senderMobile!.trim()
+        : details.receiverMobile?.trim();
+
+    if (method == null || method.isEmpty || account == null || account.isEmpty) {
+      return null;
+    }
+    return (paymentMethod: method, payerAccount: account);
+  }
+
+  void _showSnack(String message, {Color? backgroundColor}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: backgroundColor ?? Colors.red,
+      ),
+    );
+  }
+
+  Future<void> _initiatePayment(AuthService authService) async {
+    final details = _lastFetchedDetails;
+    if (details == null) {
+      _showSnack('Load shipment details before paying.');
+      return;
+    }
+
+    final inputs = _paymentInputs(details);
+    if (inputs == null) {
+      _showSnack(
+        'Payment method or payer phone number is missing for this shipment.',
+      );
+      return;
+    }
+
+    final userId = int.tryParse(await authService.getUserId() ?? '') ?? 0;
+    if (!mounted) return;
+
+    context.read<AddShipmentBloc>().add(
+          InitiatePaymentEvent(
+            awb: _awbController.text.trim(),
+            paymentMethod: inputs.paymentMethod,
+            payerAccount: inputs.payerAccount,
+            addedBy: userId,
+          ),
+        );
   }
 
   Widget _buildInfoRow(String label, String value, {bool highlight = false}) {
@@ -135,20 +207,9 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                         child: Row(
                           children: [
                             ElevatedButton.icon(
-                              onPressed: () async {
-                                context.read<AddShipmentBloc>().add(
-                                      InitiatePaymentEvent(
-                                        awb: _awbController.text,
-                                        paymentMethod:
-                                            _lastFetchedDetails!.paymentMethod!,
-                                        payerAccount: _lastFetchedDetails!.senderMobile!
-                                            , // Default payer account
-                                        addedBy: int.parse(
-                                            await authService.getUserId() ??
-                                                '0'),
-                                      ),
-                                    );
-                              },
+                              onPressed: state is InitiatePaymentLoading
+                                  ? null
+                                  : () => _initiatePayment(authService),
                               icon: const Icon(Icons.payment,
                                   color: Colors.deepPurple),
                               label: state is InitiatePaymentLoading

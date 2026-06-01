@@ -1,4 +1,6 @@
+import 'package:courier_app/core/utils/shipment_status_helper.dart';
 import 'package:courier_app/features/track_order/model/shipmet_status_model.dart';
+import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:courier_app/features/add_shipment/presentation/screens/print_shipment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -9,7 +11,7 @@ class ShipmentsWidgets {
     required bool isDarkMode,
     required TextEditingController searchController,
     required String selectedStatus,
-    required List<String> statusOptions,
+    required List<StatusModel> statuses,
     required Function(String) onStatusChanged,
     required VoidCallback onSearch,
   }) {
@@ -56,26 +58,36 @@ class ShipmentsWidgets {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: DropdownButton<String>(
-                  value: selectedStatus,
-                  dropdownColor:
-                      AppPalette.forMode(isDarkMode).surface,
-                  style: TextStyle(
-                    color: AppPalette.forMode(isDarkMode).textPrimary,
-                  ),
-                  underline: const SizedBox(),
-                  items: statusOptions.map((String status) {
-                    return DropdownMenuItem<String>(
-                      value: status,
-                      child: Text(status),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      onStatusChanged(newValue);
-                    }
-                  },
-                ),
+                child: statuses.isEmpty
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : DropdownButton<String>(
+                        value: statuses.any((s) => s.code == selectedStatus)
+                            ? selectedStatus
+                            : statuses.first.code,
+                        dropdownColor:
+                            AppPalette.forMode(isDarkMode).surface,
+                        style: TextStyle(
+                          color: AppPalette.forMode(isDarkMode).textPrimary,
+                        ),
+                        underline: const SizedBox(),
+                        items: statuses.map((status) {
+                          return DropdownMenuItem<String>(
+                            value: status.code,
+                            child: Text(
+                              ShipmentStatusHelper.displayLabel(status),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            onStatusChanged(newValue);
+                          }
+                        },
+                      ),
               ),
             ],
           ),
@@ -87,8 +99,10 @@ class ShipmentsWidgets {
   static Widget buildShipmentsTable({
     required bool isDarkMode,
     required List<ShipmentModel> shipments,
+    required List<StatusModel> statuses,
     bool showDeliverButton = false,
     Function(String)? onDeliver,
+    Function(String)? onPay,
   }) {
     return Container(
       margin: const EdgeInsets.all(16),
@@ -178,6 +192,12 @@ class ShipmentsWidgets {
               ),
             ],
             rows: shipments.map((shipment) {
+              final statusCode = shipment.shipmentStatus?.code ?? '';
+              final showPay = ShipmentStatusHelper.shouldShowPayAction(
+                shipmentStatusCode: statusCode,
+                paymentStatus: shipment.paymentStatus,
+              );
+
               return DataRow(
                 cells: [
                   DataCell(Text(
@@ -193,11 +213,14 @@ class ShipmentsWidgets {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(shipment.shipmentStatus?.code ?? ''),
+                        color: _getStatusColor(statusCode),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        shipment.shipmentStatus?.code ?? '',
+                        ShipmentStatusHelper.displayLabelForCode(
+                          statusCode,
+                          statuses,
+                        ),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -248,6 +271,20 @@ class ShipmentsWidgets {
                             },
                             tooltip: 'Print',
                           ),
+                          if (showPay && onPay != null)
+                            IconButton(
+                              icon: Icon(
+                                Icons.payment,
+                                color: isDarkMode ? Colors.amber[300] : Colors.amber[800],
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                if (shipment.awb != null && shipment.awb!.isNotEmpty) {
+                                  onPay(shipment.awb!);
+                                }
+                              },
+                              tooltip: 'Pay',
+                            ),
                           if (showDeliverButton && onDeliver != null)
                             IconButton(
                               icon: Icon(
@@ -282,7 +319,7 @@ class ShipmentsWidgets {
       case 'tra':
         return Colors.blue;
       case 'r4p':
-        return Colors.green;
+        return Colors.deepOrange;
       case 'mis':
         return Colors.red;
       case 'otw':
@@ -291,6 +328,8 @@ class ShipmentsWidgets {
         return Colors.indigo;
       case 'del':
         return Colors.amber;
+      case 'par':
+        return Colors.deepPurple;
       default:
         return Colors.grey;
     }

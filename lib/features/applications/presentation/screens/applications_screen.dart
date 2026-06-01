@@ -15,6 +15,8 @@ import 'package:courier_app/features/shelves_management/data/repository/shelves_
 import 'package:courier_app/features/shelves_management/data/data_provider/shelves_data_provider.dart';
 import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
 import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
+import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
+import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,6 +37,7 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
     super.initState();
     fetchPermissions();
     _loadRoles();
+    context.read<TrackOrderBloc>().add(FetchStatuses());
   }
 
   Future<void> _loadRoles() async {
@@ -114,35 +117,49 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
     }
   }
 
-  void _showShipmentTypeModal(BuildContext context) {
+  Future<void> _showShipmentTypeModal(BuildContext context) async {
+    final bloc = context.read<TrackOrderBloc>();
+    var state = bloc.state;
+
+    if (state is! FetchStatusSuccess) {
+      bloc.add(FetchStatuses());
+      state = await bloc.stream.firstWhere(
+        (s) => s is FetchStatusSuccess || s is FetchStatusFailure,
+      );
+    }
+
+    if (!context.mounted) return;
+
+    if (state is FetchStatusSuccess) {
+      _openShipmentTypeModal(context, state.statuses);
+    } else if (state is FetchStatusFailure) {
+      displaySnack(context, state.errorMessage, Colors.red);
+    }
+  }
+
+  void _openShipmentTypeModal(
+    BuildContext context,
+    List<StatusModel> statuses,
+  ) {
+    if (statuses.isEmpty) {
+      displaySnack(context, 'No shipment statuses available', Colors.red);
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ShipmentTypeModal(
-        onTypeSelected: (type) {
-          _handleShipmentTypeSelection(context, type);
+        statuses: statuses,
+        onStatusSelected: (statusCode) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ShipmentsScreen(initialStatus: statusCode),
+            ),
+          );
         },
-      ),
-    );
-  }
-
-  void _handleShipmentTypeSelection(BuildContext context, ShipmentType type) {
-    String? status;
-    if (type == ShipmentType.r4p) {
-      status = 'R4P';
-    } else if (type == ShipmentType.arrived) {
-      status = 'ARR';
-    } else if (type == ShipmentType.arriving) {
-      status = 'OTW';
-    } else if (type == ShipmentType.delivered) {
-      status = 'DEL';
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ShipmentsScreen(initialStatus: status),
       ),
     );
   }

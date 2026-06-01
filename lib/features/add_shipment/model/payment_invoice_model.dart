@@ -1,6 +1,24 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+String? _parsePaymentMethodField(
+  dynamic paymentMethod,
+  Map<String, dynamic> map,
+) {
+  if (paymentMethod is Map<String, dynamic>) {
+    return paymentMethod['method']?.toString() ??
+        paymentMethod['code']?.toString();
+  }
+  if (paymentMethod is String && paymentMethod.trim().isNotEmpty) {
+    return paymentMethod.trim();
+  }
+  final paymentMode = map['paymentMode'];
+  if (paymentMode is Map<String, dynamic>) {
+    return paymentMode['code']?.toString() ?? paymentMode['method']?.toString();
+  }
+  return null;
+}
+
 class PaymentInvoiceModel {
   final int? id;
   final String? awb;
@@ -221,10 +239,7 @@ class PaymentInvoiceModel {
         shipmentDescription: map['shipmentDescription'] != null
             ? map['shipmentDescription'] as String
             : null,
-        paymentMethod: (paymentMethod is Map<String, dynamic> &&
-                paymentMethod["method"] != null)
-            ? paymentMethod["method"] as String
-            : null,
+        paymentMethod: _parsePaymentMethodField(paymentMethod, map),
         paymentMode: (paymentMethod is Map<String, dynamic> &&
                 paymentMethod["mode"] != null)
             ? paymentMethod["mode"] as String

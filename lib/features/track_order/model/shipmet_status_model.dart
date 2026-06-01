@@ -1,3 +1,10 @@
+int? _jsonInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value.toString());
+}
+
 class ShipmentModel {
   final int? id;
   final String? awb;
@@ -34,6 +41,8 @@ class ShipmentModel {
   final User? deliveredBy;
   final String? deliveredAt;
   final bool? softDelete;
+  final String? paymentStatus;
+  final String? paymentStatusDescription;
 
   ShipmentModel({
     this.id,
@@ -71,6 +80,8 @@ class ShipmentModel {
     this.deliveredBy,
     this.deliveredAt,
     this.softDelete,
+    this.paymentStatus,
+    this.paymentStatusDescription,
   });
 
   factory ShipmentModel.fromJson(Map<String, dynamic> json) {
@@ -81,7 +92,7 @@ class ShipmentModel {
         return Branch.fromJson(json['senderBranch']);
       }
       // If it's an int, create a minimal Branch with just the ID
-      return Branch(id: json['senderBranch'] as int?);
+      return Branch(id: _jsonInt(json['senderBranch']));
     }
 
     // Handle receiverBranch - can be int (ID) or Map (object)
@@ -91,7 +102,7 @@ class ShipmentModel {
         return Branch.fromJson(json['receiverBranch']);
       }
       // If it's an int, create a minimal Branch with just the ID
-      return Branch(id: json['receiverBranch'] as int?);
+      return Branch(id: _jsonInt(json['receiverBranch']));
     }
 
     // Handle paymentMethod - check both paymentMethod and paymentMode
@@ -105,7 +116,7 @@ class ShipmentModel {
     }
 
     return ShipmentModel(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       awb: json['awb'],
       senderName: json['senderName'],
       senderMobile: json['senderMobile'],
@@ -113,10 +124,10 @@ class ShipmentModel {
       receiverName: json['receiverName'],
       receiverMobile: json['receiverMobile'],
       receiverBranch: parseReceiverBranch(),
-      qty: json['qty'],
+      qty: _jsonInt(json['qty']),
       unit: json['unit'],
-      numPcs: json['numPcs'],
-      numBoxes: json['numBoxes'],
+      numPcs: _jsonInt(json['numPcs']),
+      numBoxes: _jsonInt(json['numBoxes']),
       netFee: (json['netFee'] as num?)?.toDouble(),
       rate: (json['rate'] as num?)?.toDouble(),
       extraFee: (json['extraFee'] as num?)?.toDouble(),
@@ -150,6 +161,8 @@ class ShipmentModel {
       deliveredBy: User._parseUser(json['deliveredBy']),
       deliveredAt: json['deliveredAt'],
       softDelete: json['softDelete'],
+      paymentStatus: json['paymentStatus']?.toString(),
+      paymentStatusDescription: json['paymentStatusDescription']?.toString(),
     );
   }
 }
@@ -183,7 +196,7 @@ class Branch {
 
   factory Branch.fromJson(Map<String, dynamic> json) {
     return Branch(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       name: json['name'],
       code: json['code'],
       addedBy: User._parseUser(json['addedBy']),
@@ -219,7 +232,7 @@ class Currency {
 
   factory Currency.fromJson(Map<String, dynamic> json) {
     return Currency(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       code: json['code'],
       description: json['description'],
       addedBy: User._parseUser(json['addedBy']),
@@ -250,7 +263,7 @@ class Country {
 
   factory Country.fromJson(Map<String, dynamic> json) {
     return Country(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       name: json['name'],
       isoCode: json['isoCode'],
       countryCode: json['countryCode'],
@@ -303,15 +316,15 @@ class User {
       return Branch.fromJson(branchData);
     }
     // If it's an int, create a minimal Branch with just the ID
-    if (branchData is int) {
-      return Branch(id: branchData);
+    if (branchData is num) {
+      return Branch(id: branchData.toInt());
     }
     return null;
   }
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       firstName: json['firstName'],
       secondName: json['secondName'],
       lastName: json['lastName'],
@@ -320,7 +333,7 @@ class User {
       password: json['password'],
       isPasswordChanged: json['isPasswordChanged'],
       branch: _parseBranch(json['branch']),
-      status: json['status'],
+      status: _jsonInt(json['status']),
       serviceMode: json['serviceMode'] != null
           ? ServiceMode.fromJson(json['serviceMode'])
           : null,
@@ -338,8 +351,8 @@ class User {
       return User.fromJson(userData);
     }
     // If it's an int, create a minimal User with just the ID
-    if (userData is int) {
-      return User(id: userData);
+    if (userData is num) {
+      return User(id: userData.toInt());
     }
     return null;
   }
@@ -364,7 +377,7 @@ class ServiceMode {
 
   factory ServiceMode.fromJson(Map<String, dynamic> json) {
     return ServiceMode(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       code: json['code'],
       description: json['description'],
       addedBy: User._parseUser(json['addedBy']),
@@ -393,7 +406,7 @@ class Role {
 
   factory Role.fromJson(Map<String, dynamic> json) {
     return Role(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       role: json['role'],
       description: json['description'],
       addedBy: User._parseUser(json['addedBy']),
@@ -424,7 +437,7 @@ class PaymentMethod {
 
   factory PaymentMethod.fromJson(Map<String, dynamic> json) {
     return PaymentMethod(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       method: json['method'] ?? json['code'], // Handle both 'method' and 'code' fields
       description: json['description'],
       addedBy: User._parseUser(json['addedBy']),
@@ -454,7 +467,7 @@ class TransportMode {
 
   factory TransportMode.fromJson(Map<String, dynamic> json) {
     return TransportMode(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       mode: json['mode'],
       description: json['description'],
       addedBy: User._parseUser(json['addedBy']),
@@ -483,7 +496,7 @@ class DeliveryType {
 
   factory DeliveryType.fromJson(Map<String, dynamic> json) {
     return DeliveryType(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       type: json['type'],
       description: json['description'],
       addedBy: User._parseUser(json['addedBy']),
@@ -512,10 +525,10 @@ class ShipmentStatus {
 
   factory ShipmentStatus.fromJson(Map<String, dynamic> json) {
     return ShipmentStatus(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       code: json['code'],
       description: json['description'],
-      addedBy: json['addedBy'],
+      addedBy: _jsonInt(json['addedBy']),
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
     );
@@ -541,7 +554,7 @@ class ShipmentType {
 
   factory ShipmentType.fromJson(Map<String, dynamic> json) {
     return ShipmentType(
-      id: json['id'],
+      id: _jsonInt(json['id']),
       type: json['type'],
       description: json['description'],
       addedBy: User._parseUser(json['addedBy']),

@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:courier_app/core/utils/api_json_decoder.dart';
+import 'package:courier_app/core/utils/shipment_status_helper.dart';
 import 'package:courier_app/features/track_order/data/data_provider/track_order_data_provider.dart';
 import 'package:courier_app/features/track_order/model/shipmet_status_model.dart';
 import 'package:courier_app/features/track_order/model/statuses_model.dart';
@@ -15,7 +17,7 @@ class TrackOrderRepository {
       // print("here we gooooo");
       final fetchStatuses = await trackOrderDataProvider.fetchOrders();
 
-      final data = jsonDecode(fetchStatuses);
+      final data = decodeApiMap(fetchStatuses);
       if (data['status'] != 200) {
         // print('Error Message: ${data['message']}');
 
@@ -25,7 +27,9 @@ class TrackOrderRepository {
 
       if (data['data'] is List) {
         final orders = (data['data'] as List)
-            .map((order) => ShipmentModel.fromJson(order))
+            .map((order) => ShipmentModel.fromJson(
+                  Map<String, dynamic>.from(order as Map),
+                ))
             .toList();
         return orders;
       } else {
@@ -44,7 +48,7 @@ class TrackOrderRepository {
       // print("here we gooooo");
       final fetchStatuses = await trackOrderDataProvider.fetchStatuses();
 
-      final data = jsonDecode(fetchStatuses);
+      final data = decodeApiMap(fetchStatuses);
       if (data['status'] != 200) {
         // print('Error Message: ${data['message']}');
 
@@ -54,9 +58,11 @@ class TrackOrderRepository {
 
       if (data['data'] is List) {
         final statuses = (data['data'] as List)
-            .map((status) => StatusModel.fromJson(status))
+            .map((status) => StatusModel.fromJson(
+                  Map<String, dynamic>.from(status as Map),
+                ))
             .toList();
-        return statuses;
+        return ShipmentStatusHelper.withAppStatuses(statuses);
       } else {
         throw "Invalid response format: Expected a list";
       }
