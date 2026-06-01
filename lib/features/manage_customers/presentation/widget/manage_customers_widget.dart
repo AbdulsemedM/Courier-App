@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../model/customer_model.dart';
 
 class SearchBarWidget extends StatelessWidget {
@@ -14,7 +15,7 @@ class SearchBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -25,10 +26,10 @@ class SearchBarWidget extends StatelessWidget {
           hintText: 'Search customers...',
           prefixIcon: Icon(
             Icons.search,
-            color: isDarkMode ? Colors.grey : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
           filled: true,
-          fillColor: isDarkMode ? Colors.white10 : Colors.grey[100],
+          fillColor: context.palette.surfaceMuted,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -43,7 +44,7 @@ class SearchBarWidget extends StatelessWidget {
           ),
         ),
         style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black,
+          color: context.palette.textPrimary,
         ),
       ),
     );
@@ -64,7 +65,7 @@ class CustomersTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -76,7 +77,7 @@ class CustomersTable extends StatelessWidget {
               label: Text(
                 'Full Name',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -85,7 +86,7 @@ class CustomersTable extends StatelessWidget {
               label: Text(
                 'Email',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -94,7 +95,7 @@ class CustomersTable extends StatelessWidget {
               label: Text(
                 'Phone',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -103,7 +104,7 @@ class CustomersTable extends StatelessWidget {
               label: Text(
                 'Company',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -112,7 +113,7 @@ class CustomersTable extends StatelessWidget {
               label: Text(
                 'Branch',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -121,7 +122,7 @@ class CustomersTable extends StatelessWidget {
               label: Text(
                 'Created At',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -131,7 +132,7 @@ class CustomersTable extends StatelessWidget {
                 label: Text(
                   'Actions',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -143,38 +144,38 @@ class CustomersTable extends StatelessWidget {
                 DataCell(Text(
                   customer.fullname,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   customer.email,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   customer.phone,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   customer.company,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   customer.branchName,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   DateFormat('MMM-dd-yyyy')
                       .format(DateTime.parse(customer.createdAt)),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 if (onEdit != null || onDelete != null)

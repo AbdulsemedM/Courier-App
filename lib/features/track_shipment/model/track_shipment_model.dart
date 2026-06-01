@@ -8,6 +8,8 @@ class TrackShipmentModel {
   final String receiverName;
   final String receiverMobile;
   final String name;
+  final String? senderBranchName;
+  final String? receiverBranchName;
   final String netFee;
   final String shipmentDescription;
   final String method;
@@ -38,6 +40,8 @@ class TrackShipmentModel {
     required this.receiverName,
     required this.receiverMobile,
     required this.name,
+    this.senderBranchName,
+    this.receiverBranchName,
     required this.netFee,
     required this.shipmentDescription,
     required this.method,
@@ -70,6 +74,8 @@ class TrackShipmentModel {
     String? receiverName,
     String? receiverMobile,
     String? name,
+    String? senderBranchName,
+    String? receiverBranchName,
     String? netFee,
     String? shipmentDescription,
     String? method,
@@ -101,6 +107,8 @@ class TrackShipmentModel {
       receiverName: receiverName ?? this.receiverName,
       receiverMobile: receiverMobile ?? this.receiverMobile,
       name: name ?? this.name,
+      senderBranchName: senderBranchName ?? this.senderBranchName,
+      receiverBranchName: receiverBranchName ?? this.receiverBranchName,
       netFee: netFee ?? this.netFee,
       shipmentDescription: shipmentDescription ?? this.shipmentDescription,
       method: method ?? this.method,
@@ -136,6 +144,8 @@ class TrackShipmentModel {
       'receiverName': receiverName,
       'receiverMobile': receiverMobile,
       'name': name,
+      'senderBranchName': senderBranchName,
+      'receiverBranchName': receiverBranchName,
       'netFee': netFee,
       'shipmentDescription': shipmentDescription,
       'method': method,
@@ -183,13 +193,15 @@ class TrackShipmentModel {
     // Handle senderBranch - can be int (ID) or Map
     final senderBranch = shipment['senderBranch'];
     int? senderBranchId;
+    String? senderBranchName;
     if (senderBranch is int) {
       senderBranchId = senderBranch;
     } else if (senderBranch is Map<String, dynamic>) {
       senderBranchId = senderBranch['id'] as int?;
+      senderBranchName = senderBranch['name'] as String?;
     }
 
-    // Handle receiverBranch - can be int (ID) or Map
+    // Handle receiverBranch (destination) - can be int (ID) or Map
     final receiverBranch = shipment['receiverBranch'];
     int? receiverBranchId;
     String? receiverBranchName;
@@ -199,6 +211,19 @@ class TrackShipmentModel {
       receiverBranchId = receiverBranch['id'] as int?;
       receiverBranchName = receiverBranch['name'] as String?;
     }
+
+    // Fallback keys some APIs use for destination
+    receiverBranchName ??= shipment['destinationBranchName'] as String? ??
+        shipment['destination'] as String? ??
+        (shipment['destinationBranch'] is Map<String, dynamic>
+            ? (shipment['destinationBranch'] as Map<String, dynamic>)['name']
+                as String?
+            : null);
+    senderBranchName ??= shipment['originBranchName'] as String? ??
+        (shipment['originBranch'] is Map<String, dynamic>
+            ? (shipment['originBranch'] as Map<String, dynamic>)['name']
+                as String?
+            : null);
 
     // Extract delivery type
     final deliveryTypeObj = shipment['deliveryType'];
@@ -262,6 +287,8 @@ class TrackShipmentModel {
       receiverName: shipment['receiverName'] as String? ?? '',
       receiverMobile: shipment['receiverMobile'] as String? ?? '',
       name: receiverBranchName ?? '',
+      senderBranchName: senderBranchName,
+      receiverBranchName: receiverBranchName,
       netFee: (shipment['netFee'] ?? '').toString(),
       shipmentDescription: shipment['shipmentDescription'] as String? ?? '',
       method: (shipment['paymentMethod'] is Map<String, dynamic>)
@@ -323,6 +350,8 @@ class TrackShipmentModel {
         other.receiverName == receiverName &&
         other.receiverMobile == receiverMobile &&
         other.name == name &&
+        other.senderBranchName == senderBranchName &&
+        other.receiverBranchName == receiverBranchName &&
         other.netFee == netFee &&
         other.shipmentDescription == shipmentDescription &&
         other.method == method &&
@@ -356,6 +385,8 @@ class TrackShipmentModel {
         receiverName.hashCode ^
         receiverMobile.hashCode ^
         name.hashCode ^
+        senderBranchName.hashCode ^
+        receiverBranchName.hashCode ^
         netFee.hashCode ^
         shipmentDescription.hashCode ^
         method.hashCode ^

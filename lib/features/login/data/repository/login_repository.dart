@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/configuration/phone_number_manager.dart';
 import 'package:courier_app/core/services/remembered_credentials_vault.dart';
+import 'package:courier_app/core/utils/role_display_helper.dart';
 import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -43,6 +44,17 @@ class LoginRepository {
       if (permissions.roleName != null) {
         await authService.storeRoleName(permissions.roleName!);
       }
+
+      final user = decodedToken['user'];
+      final tokenRoles = user is Map<String, dynamic>
+          ? RoleDisplayHelper.parseRolesFromToken(user)
+          : <String>[];
+      if (tokenRoles.isNotEmpty) {
+        await authService.storeRoleNames(tokenRoles);
+      } else if (permissions.roleName != null) {
+        await authService.storeRoleNames([permissions.roleName!]);
+      }
+
       await PermissionManager().setPermission(
           permissions.permissions?.map((e) => e.name ?? '').toList() ?? []);
       final vault = RememberedCredentialsVault();

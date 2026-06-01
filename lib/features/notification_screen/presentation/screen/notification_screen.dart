@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../widget/notification_widget.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -13,22 +12,19 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: isDarkMode
-            ? const Color(0xFF0A1931).withOpacity(0.95)
-            : Colors.white.withOpacity(0.8),
+        backgroundColor: context.palette.appBarBackground,
         title: Text(
           'Notifications',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
         ),
         actions: [
@@ -55,21 +51,22 @@ class _NotificationScreenState extends State<NotificationScreen> {
         children: [
           NotificationWidgets.buildDateHeader(
             'Today',
-            isDarkMode: isDarkMode,
+            context: context,
           ),
           NotificationWidgets.buildNotificationItem(
+            context: context,
             icon: Icons.local_shipping,
             color: Colors.green,
             title: 'Package Delivered',
             description: 'Your package #1234 has been delivered successfully',
             time: '2 hours ago',
             isUnread: true,
-            isDarkMode: isDarkMode,
             onTap: () {
               // Handle notification tap
             },
           ),
           NotificationWidgets.buildNotificationItem(
+            context: context,
             icon: Icons.warning_rounded,
             color: Colors.orange,
             title: 'Delivery Delayed',
@@ -77,63 +74,62 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 'Package #5678 delivery is delayed due to heavy traffic',
             time: '4 hours ago',
             isUnread: true,
-            isDarkMode: isDarkMode,
             onTap: () {
               // Handle notification tap
             },
           ),
           NotificationWidgets.buildDateHeader(
             'Yesterday',
-            isDarkMode: isDarkMode,
+            context: context,
           ),
           NotificationWidgets.buildNotificationItem(
+            context: context,
             icon: Icons.location_on,
             color: Colors.blue,
             title: 'Out for Delivery',
             description: 'Package #9012 is out for delivery to your location',
             time: '1 day ago',
             isUnread: false,
-            isDarkMode: isDarkMode,
             onTap: () {
               // Handle notification tap
             },
           ),
           NotificationWidgets.buildNotificationItem(
+            context: context,
             icon: Icons.receipt_long,
             color: Colors.purple,
             title: 'New Invoice',
             description: 'Invoice for package #3456 has been generated',
             time: '1 day ago',
             isUnread: false,
-            isDarkMode: isDarkMode,
             onTap: () {
               // Handle notification tap
             },
           ),
           NotificationWidgets.buildDateHeader(
             'Older',
-            isDarkMode: isDarkMode,
+            context: context,
           ),
           NotificationWidgets.buildNotificationItem(
+            context: context,
             icon: Icons.discount_rounded,
             color: Colors.pink,
             title: 'Special Offer',
             description: 'Get 20% off on your next international shipment',
             time: '3 days ago',
             isUnread: false,
-            isDarkMode: isDarkMode,
             onTap: () {
               // Handle notification tap
             },
           ),
           NotificationWidgets.buildNotificationItem(
+            context: context,
             icon: Icons.rate_review,
             color: Colors.teal,
             title: 'Rate Your Experience',
             description: 'How was your experience with delivery #7890?',
             time: '5 days ago',
             isUnread: false,
-            isDarkMode: isDarkMode,
             onTap: () {
               // Handle notification tap
             },

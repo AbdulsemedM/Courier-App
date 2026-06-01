@@ -5,6 +5,7 @@ import 'package:courier_app/features/tellers/bloc/tellers_bloc.dart';
 import 'package:courier_app/features/tellers/model/teller_model.dart';
 import 'package:courier_app/features/tellers/presentation/widget/add_teller_modal.dart';
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class AccountingCreateScreen extends StatefulWidget {
   const AccountingCreateScreen({super.key});
@@ -27,7 +28,7 @@ class _AccountingCreateScreenState extends State<AccountingCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       body: Container(
@@ -40,10 +41,7 @@ class _AccountingCreateScreenState extends State<AccountingCreateScreen> {
                     const Color.fromARGB(255, 75, 23, 160),
                     const Color(0xFF5b3895),
                   ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: SafeArea(
@@ -57,7 +55,7 @@ class _AccountingCreateScreenState extends State<AccountingCreateScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -67,7 +65,7 @@ class _AccountingCreateScreenState extends State<AccountingCreateScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                     const Spacer(),
@@ -76,7 +74,7 @@ class _AccountingCreateScreenState extends State<AccountingCreateScreen> {
                       icon: const Icon(Icons.add),
                       label: const Text('Add'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5a00),
+                        backgroundColor: context.palette.accent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         shape: RoundedRectangleBorder(
@@ -104,18 +102,16 @@ class _AccountingCreateScreenState extends State<AccountingCreateScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           filled: true,
-                          fillColor: isDarkMode
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.white.withOpacity(0.9),
+                          fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
                           ),
                         ),
                         dropdownColor:
-                            isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+                            context.palette.surface,
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black,
+                          color: context.palette.textPrimary,
                         ),
                         items: [
                           const DropdownMenuItem<String>(
@@ -167,7 +163,7 @@ class _AccountingCreateScreenState extends State<AccountingCreateScreen> {
                           child: Text(
                             'No tellers found',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: context.palette.textPrimary,
                             ),
                           ),
                         );
@@ -188,7 +184,7 @@ class _AccountingCreateScreenState extends State<AccountingCreateScreen> {
                             Text(
                               'Error: ${state.message}',
                               style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
+                                color: context.palette.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 16),

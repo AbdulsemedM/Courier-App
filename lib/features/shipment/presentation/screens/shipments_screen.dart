@@ -6,8 +6,7 @@ import 'package:courier_app/features/shipment/data/data_provider/deliver_shipmen
 import 'package:courier_app/features/shipment/data/repository/deliver_shipment_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../../track_order/bloc/track_order_bloc.dart';
 import '../widgets/shipments_widget.dart';
 import '../widgets/deliver_shipment_modal.dart';
@@ -150,17 +149,12 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode
-          ? const Color(0xFF5b3895)
-          : const Color(0xFF5b3895),
+      backgroundColor: context.palette.appBarBackground,
       appBar: AppBar(
-        backgroundColor: isDarkMode
-            ? const Color(0xFF5b3895)
-            : const Color(0xFF5b3895),
+        backgroundColor: context.palette.appBarBackground,
         title: const Text('Shipments'),
       ),
       body: Column(
@@ -221,12 +215,12 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                 },
               builder: (context, state) {
                 if (state is FetchShipmentsLoading) {
-                  return ShipmentsWidgets.buildShimmerEffect(isDarkMode);
+                  return ShipmentsWidgets.buildShimmerEffect(context);
                 }
 
                 if (state is FetchShipmentsSuccess) {
                   if (_filteredShipments.isEmpty) {
-                    return ShipmentsWidgets.buildEmptyState(isDarkMode);
+                    return ShipmentsWidgets.buildEmptyState(context);
                   }
                   final showDeliverButton = widget.initialStatus == 'ARR' || _selectedStatus == 'ARR';
                   return ShipmentsWidgets.buildShipmentsTable(
@@ -242,13 +236,13 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                     child: Text(
                       state.errorMessage,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   );
                 }
 
-                return ShipmentsWidgets.buildEmptyState(isDarkMode);
+                return ShipmentsWidgets.buildEmptyState(context);
               },
               ),
             ),

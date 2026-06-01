@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class DeliverShipmentModal extends StatefulWidget {
   final String awb;
@@ -137,13 +136,12 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF5b3895) : Colors.white,
+        color: context.palette.appBarBackground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SingleChildScrollView(
@@ -157,7 +155,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[600] : Colors.grey[400],
+                color: context.palette.textSecondary,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -167,7 +165,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black87,
+                color: context.palette.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -175,7 +173,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
               'AWB: ${widget.awb}',
               style: TextStyle(
                 fontSize: 16,
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                color: context.palette.textSecondary,
               ),
             ),
             const SizedBox(height: 24),
@@ -185,7 +183,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: isDarkMode ? Colors.white : Colors.black87,
+                color: context.palette.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -194,10 +192,10 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
               child: Container(
                 height: 150,
                 decoration: BoxDecoration(
-                  color: isDarkMode ? const Color(0xFF1E293B) : Colors.grey[100],
+                  color: context.palette.surfaceMuted,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                    color: context.palette.border,
                   ),
                 ),
                 child: _customerIdFile != null
@@ -233,13 +231,13 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
                             Icon(
                               Icons.add_photo_alternate,
                               size: 48,
-                              color: isDarkMode ? Colors.grey[400]! : Colors.grey[600]!,
+                              color: context.palette.textSecondary,
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Tap to upload',
                               style: TextStyle(
-                                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                                color: context.palette.textSecondary,
                               ),
                             ),
                           ],
@@ -259,7 +257,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
               title: Text(
                 'Deliver to self',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: context.palette.textPrimary,
                 ),
               ),
               activeColor: Colors.green,
@@ -271,15 +269,15 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
               TextField(
                 controller: _deliveredToNameController,
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: context.palette.textPrimary,
                 ),
                 decoration: InputDecoration(
                   labelText: 'Delivered to Name *',
                   labelStyle: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
                   filled: true,
-                  fillColor: isDarkMode ? const Color(0xFF1E293B) : Colors.grey[100],
+                  fillColor: context.palette.surfaceMuted,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -295,15 +293,15 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
                 controller: _deliveredToPhoneController,
                 keyboardType: TextInputType.phone,
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: context.palette.textPrimary,
                 ),
                 decoration: InputDecoration(
                   labelText: 'Delivered to Phone *',
                   labelStyle: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
                   filled: true,
-                  fillColor: isDarkMode ? const Color(0xFF1E293B) : Colors.grey[100],
+                  fillColor: context.palette.surfaceMuted,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,

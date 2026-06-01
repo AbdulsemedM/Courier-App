@@ -3,8 +3,7 @@ import 'package:courier_app/features/add_shipment/model/service_modes_model.dart
 import 'package:courier_app/features/add_shipment/model/shipment_type_model.dart';
 import 'package:courier_app/features/add_shipment/model/transport_mode_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class SecondPage extends StatefulWidget {
   final Map<String, dynamic> formData;
@@ -36,13 +35,18 @@ class _SecondPageState extends State<SecondPage> {
   @override
   void initState() {
     super.initState();
-    // selectedUnit = widget.formData['unit'] as String?;
+    final existingUnit = widget.formData['unit'] as String?;
+    if (existingUnit == null || existingUnit.isEmpty) {
+      selectedUnit = 'Kg';
+      widget.formData['unit'] = 'Kg';
+    } else {
+      selectedUnit = existingUnit;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -208,8 +212,8 @@ class _SecondPageState extends State<SecondPage> {
                   onPressed: widget.onPrevious,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                    foregroundColor: isDarkMode ? Colors.white : Colors.black87,
+                        context.palette.border,
+                    foregroundColor: context.palette.textPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -241,8 +245,8 @@ class _SecondPageState extends State<SecondPage> {
                       : widget.onNext,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDarkMode
-                        ? const Color(0xFFFF5A00)
-                        : const Color(0xFFFF5A00),
+                        ? context.palette.accent
+                        : context.palette.accent,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -279,7 +283,7 @@ class _SecondPageState extends State<SecondPage> {
         Text(
           label,
           style: TextStyle(
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -288,22 +292,22 @@ class _SecondPageState extends State<SecondPage> {
           onChanged: onChanged,
           keyboardType: keyboardType,
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
           decoration: InputDecoration(
             filled: true,
             fillColor:
-                isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.white,
+                context.palette.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -337,7 +341,7 @@ class _SecondPageState extends State<SecondPage> {
         Text(
           label,
           style: TextStyle(
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -346,23 +350,23 @@ class _SecondPageState extends State<SecondPage> {
           items: items,
           onChanged: onChanged,
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
-          dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+          dropdownColor: context.palette.surface,
           decoration: InputDecoration(
             filled: true,
             fillColor:
-                isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.white,
+                context.palette.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: context.palette.border,
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -397,17 +401,17 @@ class _SecondPageState extends State<SecondPage> {
         Text(
           label,
           style: TextStyle(
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             color:
-                isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.white,
+                context.palette.surface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+              color: context.palette.border,
             ),
           ),
           child: DropdownButtonHideUnderline(
@@ -416,15 +420,15 @@ class _SecondPageState extends State<SecondPage> {
               child: DropdownButton<String>(
                 value: value,
                 isExpanded: true,
-                dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                dropdownColor: context.palette.surface,
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: context.palette.textPrimary,
                   fontSize: 16,
                 ),
                 hint: Text(
                   'Select Unit',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
                 ),
                 items: units.map((String unit) {
@@ -457,40 +461,50 @@ class _SecondPageState extends State<SecondPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.grey[300] : Colors.black87,
+            color: context.palette.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
-        Wrap(
-          spacing: 16,
-          runSpacing: 12,
-          children: options.where((option) => option['id'] != null).map((option) {
-            final id = option['id'] as int;
-            final labelText = option['label'] as String;
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final maxLabelWidth = constraints.maxWidth - 48;
+            return Wrap(
+              spacing: 16,
+              runSpacing: 12,
+              children:
+                  options.where((option) => option['id'] != null).map((option) {
+                final id = option['id'] as int;
+                final labelText = option['label'] as String;
 
-            return InkWell(
-              onTap: () => onChanged(id),
-              borderRadius: BorderRadius.circular(8),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Radio<int>(
-                    value: id,
-                    groupValue: selectedId,
-                    onChanged: (value) => onChanged(value),
-                    activeColor: Colors.blue,
+                return InkWell(
+                  onTap: () => onChanged(id),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Radio<int>(
+                        value: id,
+                        groupValue: selectedId,
+                        onChanged: (value) => onChanged(value),
+                        activeColor: Colors.blue,
+                      ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: maxLabelWidth),
+                        child: Text(
+                          labelText,
+                          softWrap: true,
+                          style: TextStyle(
+                            color: context.palette.textPrimary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    labelText,
-                    style: TextStyle(
-                      color: isDarkMode ? Colors.grey[300] : Colors.black87,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
+                );
+              }).toList(),
             );
-          }).toList(),
+          },
         ),
       ],
     );

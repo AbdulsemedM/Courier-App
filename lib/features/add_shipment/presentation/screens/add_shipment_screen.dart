@@ -12,10 +12,10 @@ import 'package:courier_app/features/add_shipment/model/transport_mode_model.dar
 import 'package:courier_app/features/add_shipment/presentation/screens/payment_waiting_screen.dart';
 import 'package:courier_app/features/add_shipment/presentation/screens/print_shipment_screen.dart';
 // import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import 'first_page.dart';
 import 'second_page.dart';
 import 'third_page.dart';
@@ -179,7 +179,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      color: isDarkMode ? const Color(0xFF5b3895) : Colors.white,
+      color: context.palette.appBarBackground,
       child: Column(
         children: [
           // Row with circles and connecting lines
@@ -199,7 +199,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                         color: isActive
                             ? Colors.blue
                             : (isCompleted
-                                ? const Color(0xFFFF5A00)
+                                ? context.palette.accent
                                 : Colors.grey[300]),
                         shape: BoxShape.circle,
                       ),
@@ -222,7 +222,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                           margin: const EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
                             color: isCompleted || (index < _currentPage)
-                                ? const Color(0xFFFF5A00)
+                                ? context.palette.accent
                                 : Colors.grey[300],
                           ),
                         ),
@@ -245,12 +245,10 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: isActive
-                        ? (isDarkMode ? Colors.white : Colors.black87)
+                        ? (context.palette.textPrimary)
                         : (isCompleted
-                            ? const Color(0xFFFF5A00)
-                            : (isDarkMode
-                                ? Colors.grey[400]
-                                : Colors.grey[600])),
+                            ? context.palette.accent
+                            : (context.palette.textSecondary)),
                     fontSize: 12,
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                   ),
@@ -266,11 +264,10 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
   }
 
   Widget _buildLoadingWidget() {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? const Color(0xFF0A1931) : Colors.grey[100],
+      backgroundColor: context.palette.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -278,7 +275,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: isDarkMode ? const Color(0xFF1A1F37) : Colors.white,
+                color: context.palette.surface,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -305,7 +302,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                   Text(
                     'Loading Shipment Data...',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: context.palette.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -321,8 +318,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return MultiBlocListener(
       listeners: [
@@ -544,9 +540,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
 
           if (hasAllData) {
             return Scaffold(
-              backgroundColor: isDarkMode
-                  ? const Color(0xFF5b3895)
-                  : const Color(0xFF5b3895),
+              backgroundColor: context.palette.appBarBackground,
               appBar: AppBar(
                 elevation: 0,
                 backgroundColor: isDarkMode
@@ -555,7 +549,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                 title: Text(
                   'Add Shipment',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -563,7 +557,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                 leading: IconButton(
                   icon: Icon(
                     Icons.arrow_back,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                   ),
                   onPressed: () {
                     if (_currentPage == 0) {

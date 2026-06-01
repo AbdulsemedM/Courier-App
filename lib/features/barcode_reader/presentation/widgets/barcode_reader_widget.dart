@@ -2,9 +2,8 @@ import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
-// import 'package:provider/provider.dart';
-// import '../../../../core/theme/theme_provider.dart';
-
+import 'package:courier_app/core/theme/app_palette.dart';
+// // 
 class BarcodeReaderWidgets {
   static Widget buildScanner({
     required bool isDarkMode,
@@ -39,7 +38,7 @@ class BarcodeReaderWidgets {
         Text(
           'Align barcode within the frame',
           style: TextStyle(
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: AppPalette.forMode(isDarkMode).textSecondary,
             fontSize: 16,
           ),
         ),
@@ -63,7 +62,7 @@ class BarcodeReaderWidgets {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: AppPalette.forMode(isDarkMode).textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -71,14 +70,14 @@ class BarcodeReaderWidgets {
             'Separate multiple entries with commas',
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: AppPalette.forMode(isDarkMode).textSecondary,
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: controller,
             style: TextStyle(
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: AppPalette.forMode(isDarkMode).textPrimary,
             ),
             textCapitalization: TextCapitalization.characters,
             onChanged: (value) {
@@ -94,22 +93,20 @@ class BarcodeReaderWidgets {
             decoration: InputDecoration(
               hintText: 'e.g. ETAA11111,ETAA22222,ETAA33333',
               hintStyle: TextStyle(
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                color: AppPalette.forMode(isDarkMode).textSecondary,
               ),
               filled: true,
-              fillColor: isDarkMode
-                  ? Colors.grey[800]!.withOpacity(0.5)
-                  : Colors.grey[100],
+              fillColor: AppPalette.forMode(isDarkMode).surfaceMuted,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                  color: AppPalette.forMode(isDarkMode).border,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                  color: AppPalette.forMode(isDarkMode).border,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -148,8 +145,8 @@ class BarcodeReaderWidgets {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: isDarkMode
-                  ? const Color(0xFFFF5A00)
-                  : const Color(0xFFFF5A00),
+                  ? AppPalette.forMode(isDarkMode).accent
+                  : AppPalette.forMode(isDarkMode).accent,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(
                 horizontal: 32,
@@ -180,7 +177,7 @@ class BarcodeReaderWidgets {
     return FloatingActionButton.extended(
       onPressed: onToggle,
       backgroundColor:
-          isDarkMode ? const Color(0xFFFF5A00) : const Color(0xFFFF5A00),
+          isDarkMode ? AppPalette.forMode(isDarkMode).accent : AppPalette.forMode(isDarkMode).accent,
       icon: Icon(
         isScanning ? Icons.edit : Icons.barcode_reader,
         color: Colors.white,
@@ -240,7 +237,7 @@ class BarcodeReaderWidgets {
           Text(
             'Select Status',
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: AppPalette.forMode(isDarkMode).textSecondary,
               fontSize: 14,
             ),
           ),
@@ -248,12 +245,10 @@ class BarcodeReaderWidgets {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: isDarkMode
-                  ? Colors.grey[800]!.withOpacity(0.5)
-                  : Colors.white,
+              color: AppPalette.forMode(isDarkMode).surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: AppPalette.forMode(isDarkMode).border,
               ),
             ),
             child: DropdownButtonHideUnderline(
@@ -262,22 +257,22 @@ class BarcodeReaderWidgets {
                 hint: Text(
                   'Select status',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                   ),
                 ),
                 isExpanded: true,
                 icon: Icon(
                   Icons.arrow_drop_down,
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  color: AppPalette.forMode(isDarkMode).textSecondary,
                 ),
-                dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                dropdownColor: AppPalette.forMode(isDarkMode).surface,
                 items: statuses
                     .map((status) => DropdownMenuItem<String>(
                           value: status.code,
                           child: Text(
                             '${status.code} - ${status.description}',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black87,
+                              color: AppPalette.forMode(isDarkMode).textPrimary,
                             ),
                           ),
                         ))

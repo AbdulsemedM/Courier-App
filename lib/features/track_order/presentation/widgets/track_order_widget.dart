@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../model/shipmet_status_model.dart';
 
 class TrackOrderWidgets {
-  static Widget buildShimmerEffect(bool isDarkMode) {
+  static Widget buildShimmerEffect(BuildContext context) {
+    final isDarkMode = context.isDarkMode;
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: 6,
-      itemBuilder: (context, index) {
+      itemBuilder: (ctx, index) {
         return Shimmer.fromColors(
-          baseColor: isDarkMode ? Colors.grey[850]! : Colors.grey[300]!,
-          highlightColor: isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+          baseColor: isDarkMode ? Colors.grey[850]! : context.palette.border,
+          highlightColor: isDarkMode ? Colors.grey[700]! : context.palette.surfaceMuted,
           child: Container(
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[850] : Colors.white,
+              color: context.palette.surface,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -69,6 +71,7 @@ class TrackOrderWidgets {
   }
 
   static Widget buildShipmentCard({
+    required BuildContext context,
     required bool isDarkMode,
     required ShipmentModel shipment,
     required bool isSelected,
@@ -79,8 +82,8 @@ class TrackOrderWidgets {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: isSelected
-            ? (isDarkMode ? const Color(0xFF1A365D) : Colors.blue[50])
-            : (isDarkMode ? const Color(0xFF152642) : Colors.white),
+            ? context.palette.accentMuted
+            : context.palette.surface,
         borderRadius: BorderRadius.circular(12),
         border: isSelected
             ? Border.all(
@@ -115,7 +118,7 @@ class TrackOrderWidgets {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                     Row(
@@ -143,14 +146,14 @@ class TrackOrderWidgets {
                 Text(
                   'From: ${shipment.senderBranch?.name}',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'To: ${shipment.receiverBranch?.name}',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -160,7 +163,7 @@ class TrackOrderWidgets {
                     Text(
                       'Qty: ${shipment.qty} ${shipment.unit}',
                       style: TextStyle(
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        color: context.palette.textSecondary,
                       ),
                     ),
                     Text(
@@ -210,7 +213,7 @@ class TrackOrderWidgets {
     );
   }
 
-  static Widget buildEmptyState(bool isDarkMode) {
+  static Widget buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -218,14 +221,14 @@ class TrackOrderWidgets {
           Icon(
             Icons.local_shipping_outlined,
             size: 64,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
           const SizedBox(height: 16),
           Text(
             'No shipments found',
             style: TextStyle(
               fontSize: 18,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: context.palette.textSecondary,
             ),
           ),
         ],
@@ -324,7 +327,7 @@ class ShipmentCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -335,7 +338,7 @@ class ShipmentCard extends StatelessWidget {
         ],
       ),
       child: Material(
-        color: const Color(0xFF5b3895),
+        color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
@@ -352,7 +355,7 @@ class ShipmentCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                     TrackOrderWidgets.buildStatusChip(
@@ -365,14 +368,14 @@ class ShipmentCard extends StatelessWidget {
                 Text(
                   'From: ${shipment.senderBranch?.name}',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'To: ${shipment.receiverBranch?.name}',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -382,7 +385,7 @@ class ShipmentCard extends StatelessWidget {
                     Text(
                       'Qty: ${shipment.qty} ${shipment.unit}',
                       style: TextStyle(
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        color: context.palette.textSecondary,
                       ),
                     ),
                     Text(

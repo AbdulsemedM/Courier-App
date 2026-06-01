@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../model/shipment_invoice_model.dart';
 
 class ShipmentInvoiceWidgets {
@@ -17,20 +18,20 @@ class ShipmentInvoiceWidgets {
             child: TextField(
               controller: controller,
               style: TextStyle(
-                color: isDarkMode ? Colors.white : Colors.black87,
+                color: AppPalette.forMode(isDarkMode).textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Enter AWB Number',
                 hintStyle: TextStyle(
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  color: AppPalette.forMode(isDarkMode).textSecondary,
                 ),
                 prefixIcon: Icon(
                   Icons.search,
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  color: AppPalette.forMode(isDarkMode).textSecondary,
                 ),
                 filled: true,
                 fillColor:
-                    isDarkMode ? const Color(0xFF1E293B) : Colors.grey[100],
+                    AppPalette.forMode(isDarkMode).surfaceMuted,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -44,7 +45,7 @@ class ShipmentInvoiceWidgets {
           ElevatedButton(
             onPressed: onSearch,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5a00),
+              backgroundColor: AppPalette.forMode(isDarkMode).accent,
               padding: const EdgeInsets.all(16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -60,12 +61,13 @@ class ShipmentInvoiceWidgets {
     );
   }
 
-  static Widget buildShimmerEffect(bool isDarkMode) {
+  static Widget buildShimmerEffect(BuildContext context) {
+    final isDarkMode = context.isDarkMode;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Shimmer.fromColors(
-        baseColor: isDarkMode ? Colors.grey[850]! : Colors.grey[300]!,
-        highlightColor: isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+        baseColor: isDarkMode ? Colors.grey[850]! : AppPalette.forMode(isDarkMode).border,
+        highlightColor: isDarkMode ? Colors.grey[700]! : AppPalette.forMode(isDarkMode).surfaceMuted,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -134,7 +136,7 @@ class ShipmentInvoiceWidgets {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
+        color: AppPalette.forMode(isDarkMode).appBarBackground,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -169,7 +171,7 @@ class ShipmentInvoiceWidgets {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.black87,
+                          color: AppPalette.forMode(isDarkMode).textPrimary,
                         ),
                       ),
                     ),
@@ -179,7 +181,7 @@ class ShipmentInvoiceWidgets {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        color: AppPalette.forMode(isDarkMode).textSecondary,
                       ),
                     ),
                   ],
@@ -293,7 +295,7 @@ class ShipmentInvoiceWidgets {
             : const Color.fromARGB(255, 73, 4, 185),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+          color: AppPalette.forMode(isDarkMode).border,
         ),
       ),
       child: Column(
@@ -313,21 +315,21 @@ class ShipmentInvoiceWidgets {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: AppPalette.forMode(isDarkMode).textPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             phone,
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: AppPalette.forMode(isDarkMode).textSecondary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             branch,
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: AppPalette.forMode(isDarkMode).textSecondary,
             ),
           ),
         ],
@@ -349,14 +351,14 @@ class ShipmentInvoiceWidgets {
           Text(
             label,
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: AppPalette.forMode(isDarkMode).textSecondary,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
             ),
           ),
           Text(
             value,
             style: TextStyle(
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: AppPalette.forMode(isDarkMode).textPrimary,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -377,7 +379,7 @@ class ShipmentInvoiceWidgets {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: AppPalette.forMode(isDarkMode).textSecondary,
           ),
         ),
         const SizedBox(height: 2),
@@ -386,14 +388,15 @@ class ShipmentInvoiceWidgets {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: AppPalette.forMode(isDarkMode).textPrimary,
           ),
         ),
       ],
     );
   }
 
-  static Widget buildEmptyState(bool isDarkMode) {
+  static Widget buildEmptyState(BuildContext context) {
+    final palette = context.palette;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -401,14 +404,14 @@ class ShipmentInvoiceWidgets {
           Icon(
             Icons.receipt_outlined,
             size: 64,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: palette.textSecondary,
           ),
           const SizedBox(height: 16),
           Text(
             'Enter AWB number to view invoice',
             style: TextStyle(
               fontSize: 18,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: palette.textSecondary,
             ),
           ),
         ],

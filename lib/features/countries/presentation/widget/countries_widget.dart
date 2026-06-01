@@ -1,6 +1,7 @@
 import 'package:courier_app/features/branches/model/country_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class SearchBarWidget extends StatelessWidget {
   final TextEditingController controller;
@@ -14,7 +15,7 @@ class SearchBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -25,12 +26,12 @@ class SearchBarWidget extends StatelessWidget {
           hintText: 'Search countries...',
           prefixIcon: Icon(
             Icons.search,
-            color: isDarkMode ? Colors.grey : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
           filled: true,
-          fillColor: isDarkMode ? Colors.white10 : Colors.grey[100],
+          fillColor: context.palette.surfaceMuted,
           hintStyle: TextStyle(
-            color: isDarkMode ? Colors.grey : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -46,7 +47,7 @@ class SearchBarWidget extends StatelessWidget {
           ),
         ),
         style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black,
+          color: context.palette.textPrimary,
         ),
       ),
     );
@@ -67,21 +68,21 @@ class CountriesTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SingleChildScrollView(
         child: DataTable(
           headingRowColor: MaterialStateProperty.all(
-            isDarkMode ? Colors.grey[800] : Colors.grey[200],
+            context.palette.border,
           ),
           columns: [
             DataColumn(
               label: Text(
                 'Country Name',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -90,7 +91,7 @@ class CountriesTable extends StatelessWidget {
               label: Text(
                 'ISO Code',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -99,7 +100,7 @@ class CountriesTable extends StatelessWidget {
               label: Text(
                 'Country Code',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -108,7 +109,7 @@ class CountriesTable extends StatelessWidget {
               label: Text(
                 'Created At',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -118,7 +119,7 @@ class CountriesTable extends StatelessWidget {
                 label: Text(
                   'Actions',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -130,19 +131,19 @@ class CountriesTable extends StatelessWidget {
                 DataCell(Text(
                   country.name ?? '',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   country.isoCode ?? '',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   country.countryCode ?? '',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
@@ -150,7 +151,7 @@ class CountriesTable extends StatelessWidget {
                     ? DateFormat('MMM-dd-yyyy').format(DateTime.parse(country.createdAt!))
                     : '',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 if (onEdit != null || onDelete != null)

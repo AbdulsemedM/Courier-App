@@ -13,6 +13,7 @@ import 'package:courier_app/features/shipment_types/presentation/screen/shipment
 import 'package:courier_app/features/tellers/presentation/screen/teller_screen.dart';
 import 'package:courier_app/features/transport_modes/presentation/screen/transport_modes_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../widgets/options_widget.dart';
 
 class OptionsScreen extends StatefulWidget {
@@ -42,28 +43,13 @@ class _OptionsScreenState extends State<OptionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor:
-          isDarkMode ? const Color(0xFF5b3895) : const Color(0xFF5b3895),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
-                : [
-                    const Color(0xFF5b3895),
-                    const Color(0xFF5b3895),
-                  ],
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: context.isDarkMode
+          ? const Color(0xFF5B3895)
+          : context.palette.background,
+      body: SafeArea(
           child: Column(
             children: [
               // Custom App Bar
@@ -74,7 +60,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -84,7 +70,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ],
@@ -200,7 +186,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.black87,
+                          color: context.palette.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -265,7 +251,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 
@@ -305,21 +290,24 @@ class _OptionsScreenState extends State<OptionsScreen> {
     } else if (option == 'User management') {
       showModalBottomSheet(
         context: context,
-        backgroundColor: const Color.fromARGB(255, 75, 23, 160),
+        backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
         isScrollControlled: true,
         builder: (context) {
-          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+          final isDarkMode = context.isDarkMode;
           return Container(
             height: MediaQuery.of(context).size.height * 0.5,
             decoration: BoxDecoration(
               color: isDarkMode
                   ? const Color.fromARGB(255, 75, 23, 160)
-                  : const Color.fromARGB(255, 75, 23, 160),
+                  : context.palette.surface,
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(24)),
+              border: isDarkMode
+                  ? null
+                  : Border.all(color: context.palette.border),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: context.palette.cardShadow,
                   blurRadius: 10,
                   spreadRadius: 2,
                 ),
@@ -333,9 +321,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? const Color(0xFF5b3895)
-                        : const Color.fromARGB(255, 75, 23, 160),
+                    color: context.palette.border,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -346,7 +332,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -354,7 +340,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   'Select a category to manage',
                   style: TextStyle(
                     fontSize: 16,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -450,22 +436,25 @@ class _OptionsScreenState extends State<OptionsScreen> {
     } else if (option == 'Account management') {
       showModalBottomSheet(
         context: context,
-        backgroundColor: const Color.fromARGB(255, 75, 23, 160),
+        backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
         isScrollControlled: true,
         builder: (context) {
-          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+          final isDarkMode = context.isDarkMode;
           return SingleChildScrollView(
               child: Container(
             height: MediaQuery.of(context).size.height * 0.8,
             decoration: BoxDecoration(
               color: isDarkMode
                   ? const Color.fromARGB(255, 75, 23, 160)
-                  : const Color.fromARGB(255, 75, 23, 160),
+                  : context.palette.surface,
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(24)),
+              border: isDarkMode
+                  ? null
+                  : Border.all(color: context.palette.border),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: context.palette.cardShadow,
                   blurRadius: 10,
                   spreadRadius: 2,
                 ),
@@ -479,9 +468,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? const Color.fromARGB(255, 75, 23, 160)
-                        : const Color.fromARGB(255, 75, 23, 160),
+                    color: context.palette.border,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -492,7 +479,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -500,7 +487,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   'Select a category to manage',
                   style: TextStyle(
                     fontSize: 16,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    color: context.palette.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -598,7 +585,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
     required Gradient gradient,
     required VoidCallback onTap,
   }) {
-    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // final isDarkMode = context.isDarkMode;
 
     return GestureDetector(
       onTap: onTap,
@@ -664,14 +651,14 @@ class _OptionsScreenState extends State<OptionsScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.black12 : Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDarkMode ? Colors.white10 : Colors.grey.shade200,
+          color: context.palette.border,
           width: 1,
         ),
         boxShadow: [
@@ -705,18 +692,18 @@ class _OptionsScreenState extends State<OptionsScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
         ),
         subtitle: Text(
           subtitle,
           style: TextStyle(
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
-          color: isDarkMode ? Colors.grey[600] : Colors.grey[400],
+          color: context.palette.textSecondary,
           size: 16,
         ),
       ),

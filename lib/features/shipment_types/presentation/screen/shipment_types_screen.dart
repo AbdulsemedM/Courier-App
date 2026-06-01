@@ -3,6 +3,7 @@ import 'package:courier_app/features/shipment_types/presentation/widget/add_ship
 import 'package:courier_app/features/shipment_types/presentation/widget/shipment_types_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../bloc/shipment_types_bloc.dart';
 
 class ShipmentTypesScreen extends StatefulWidget {
@@ -42,10 +43,11 @@ class _ShipmentTypesScreenState extends State<ShipmentTypesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF5b3895),
+      backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 75, 23, 160),
-        title: const Text('Shipment Types'),
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
+        title: Text('Shipment Types', style: TextStyle(color: context.palette.textPrimary)),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),

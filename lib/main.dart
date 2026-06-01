@@ -16,6 +16,9 @@ import 'package:courier_app/features/currency/data/repository/currency_repositor
 import 'package:courier_app/features/exchange_rate/bloc/exchange_rate_bloc.dart';
 import 'package:courier_app/features/exchange_rate/data/data_provider/exchange_rate_data_provider.dart';
 import 'package:courier_app/features/exchange_rate/data/repository/exchange_rate_repository.dart';
+import 'package:courier_app/features/manifest/bloc/manifest_bloc.dart';
+import 'package:courier_app/features/manifest/data/data_provider/manifest_data_provider.dart';
+import 'package:courier_app/features/manifest/data/repository/manifest_repository.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
 import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
 import 'package:courier_app/features/login/data/repository/login_repository.dart';
@@ -130,6 +133,10 @@ void main() async {
         BlocProvider(
             create: (context) => ShipmentsBloc(ShipmentRepository(
                 shipmentDataProvider: ShipmentDataProvider()))),
+        BlocProvider(
+            create: (context) => ManifestBloc(
+                manifestRepository: ManifestRepository(
+                    manifestDataProvider: ManifestDataProvider()))),
         BlocProvider(
             create: (context) =>
                 LoginBloc(LoginRepository(LoginDataProvider()))),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../model/shipmet_status_model.dart';
 import '../widgets/track_order_widget.dart';
-import 'package:provider/provider.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class ShipmentListScreen extends StatefulWidget {
   const ShipmentListScreen({super.key});
@@ -37,8 +36,7 @@ class _ShipmentListScreenState extends State<ShipmentListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -50,16 +48,16 @@ class _ShipmentListScreenState extends State<ShipmentListScreen> {
         title: Text(
           'Shipments',
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
       body: _isLoading
-          ? TrackOrderWidgets.buildShimmerEffect(isDarkMode)
+          ? TrackOrderWidgets.buildShimmerEffect(context)
           : shipments.isEmpty
-              ? TrackOrderWidgets.buildEmptyState(isDarkMode)
+              ? TrackOrderWidgets.buildEmptyState(context)
               : TrackOrderWidgets.buildShipmentList(
                   isDarkMode,
                   shipments,

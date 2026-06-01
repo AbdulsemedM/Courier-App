@@ -5,6 +5,7 @@ import 'package:courier_app/features/roles/presentation/widget/roles_widget.dart
 import 'package:courier_app/features/roles/presentation/widget/permissions_modal.dart';
 import 'package:courier_app/features/roles/model/permission_model.dart';
 import 'package:courier_app/features/roles/model/roles_model.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class RolesScreen extends StatefulWidget {
   const RolesScreen({Key? key}) : super(key: key);
@@ -31,7 +32,7 @@ class _RolesScreenState extends State<RolesScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => AddRoleModal(
-        isDarkMode: Theme.of(context).brightness == Brightness.dark,
+        isDarkMode: context.isDarkMode,
         onSubmit: (role) {
           context.read<RolesBloc>().add(AddRolesEvent(roles: role));
         },
@@ -41,32 +42,28 @@ class _RolesScreenState extends State<RolesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode 
-          ? const Color(0xFF0A1931) 
-          : const Color(0xFFF5F6FA),
+      backgroundColor: context.palette.background,
       appBar: AppBar(
-        backgroundColor: isDarkMode 
-            ? const Color(0xFF152642) 
-            : Colors.white,
+        backgroundColor: context.palette.appBarBackground,
         elevation: 0,
         title: Text(
           'Roles Management',
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
         iconTheme: IconThemeData(
-          color: isDarkMode ? Colors.white : Colors.black87,
+          color: context.palette.textPrimary,
         ),
         actions: [
           IconButton(
             icon: Icon(
               Icons.add_circle_outline,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: context.palette.textPrimary,
             ),
             onPressed: _showAddRoleModal,
             tooltip: 'Add Role',
@@ -118,10 +115,10 @@ class _RolesScreenState extends State<RolesScreen> {
             // Show roles if we have them (either from current state or cached)
             if (_cachedRoles != null) {
               return _cachedRoles!.isEmpty
-                  ? RolesWidget.buildEmptyState(isDarkMode)
+                  ? RolesWidget.buildEmptyState(context)
                   : RolesWidget.buildRolesGrid(
+                      context,
                       _cachedRoles!,
-                      isDarkMode,
                       onRoleTap: (role) {
                         setState(() {
                           _selectedRoleId = role.id;

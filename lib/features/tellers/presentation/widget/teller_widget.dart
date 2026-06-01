@@ -1,6 +1,7 @@
 import 'package:courier_app/features/tellers/model/teller_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class SearchBarWidget extends StatelessWidget {
   final TextEditingController controller;
@@ -14,7 +15,7 @@ class SearchBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -25,10 +26,10 @@ class SearchBarWidget extends StatelessWidget {
           hintText: 'Search tellers...',
           prefixIcon: Icon(
             Icons.search,
-            color: isDarkMode ? Colors.grey : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
           filled: true,
-          fillColor: isDarkMode ? Colors.white10 : Colors.grey[100],
+          fillColor: context.palette.surfaceMuted,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -43,7 +44,7 @@ class SearchBarWidget extends StatelessWidget {
           ),
         ),
         style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black,
+          color: context.palette.textPrimary,
         ),
       ),
     );
@@ -64,7 +65,7 @@ class TellersTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -76,7 +77,7 @@ class TellersTable extends StatelessWidget {
               label: Text(
                 'Teller Name',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -85,7 +86,7 @@ class TellersTable extends StatelessWidget {
               label: Text(
                 'Branch Name',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -94,7 +95,7 @@ class TellersTable extends StatelessWidget {
               label: Text(
                 'Branch Code',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -103,7 +104,7 @@ class TellersTable extends StatelessWidget {
               label: Text(
                 'Status',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -112,7 +113,7 @@ class TellersTable extends StatelessWidget {
               label: Text(
                 'Added By',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -121,7 +122,7 @@ class TellersTable extends StatelessWidget {
               label: Text(
                 'Created At',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -130,7 +131,7 @@ class TellersTable extends StatelessWidget {
               label: Text(
                 'Actions',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -142,19 +143,19 @@ class TellersTable extends StatelessWidget {
                 DataCell(Text(
                   teller.tellerName,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   teller.branchName,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   teller.branchCode,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(
@@ -179,14 +180,14 @@ class TellersTable extends StatelessWidget {
                 DataCell(Text(
                   teller.addedBy,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   DateFormat('MMM-dd-yyyy')
                       .format(DateTime.parse(teller.createdAt)),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 if (onEdit != null || onDelete != null)

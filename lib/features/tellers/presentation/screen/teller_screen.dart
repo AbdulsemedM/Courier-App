@@ -1,6 +1,7 @@
 import 'package:courier_app/features/tellers/presentation/widget/teller_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../bloc/tellers_bloc.dart';
 import '../../model/teller_model.dart';
 import '../widget/add_teller_modal.dart';
@@ -24,26 +25,11 @@ class _TellerScreenState extends State<TellerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
+      body: SafeArea(
           child: Column(
             children: [
               // Custom App Bar
@@ -54,7 +40,7 @@ class _TellerScreenState extends State<TellerScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -64,7 +50,7 @@ class _TellerScreenState extends State<TellerScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                     const Spacer(),
@@ -73,7 +59,7 @@ class _TellerScreenState extends State<TellerScreen> {
                       icon: const Icon(Icons.add),
                       label: const Text('Add Teller'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5a00),
+                        backgroundColor: context.palette.accent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         shape: RoundedRectangleBorder(
@@ -109,7 +95,7 @@ class _TellerScreenState extends State<TellerScreen> {
                           child: Text(
                             'No tellers found',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: context.palette.textPrimary,
                             ),
                           ),
                         );
@@ -130,7 +116,7 @@ class _TellerScreenState extends State<TellerScreen> {
                             Text(
                               'Error: ${state.message}',
                               style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
+                                color: context.palette.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -152,7 +138,6 @@ class _TellerScreenState extends State<TellerScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 

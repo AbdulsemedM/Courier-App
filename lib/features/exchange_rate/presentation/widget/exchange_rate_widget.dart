@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../model/exchange_rate_model.dart';
 
 class SearchBarWidget extends StatelessWidget {
@@ -14,7 +15,7 @@ class SearchBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -25,10 +26,10 @@ class SearchBarWidget extends StatelessWidget {
           hintText: 'Search exchange rates...',
           prefixIcon: Icon(
             Icons.search,
-            color: isDarkMode ? Colors.grey : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
           filled: true,
-          fillColor: isDarkMode ? Colors.white10 : Colors.grey[100],
+          fillColor: context.palette.surfaceMuted,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -43,7 +44,7 @@ class SearchBarWidget extends StatelessWidget {
           ),
         ),
         style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black,
+          color: context.palette.textPrimary,
         ),
       ),
     );
@@ -64,7 +65,7 @@ class ExchangeRateTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -76,7 +77,7 @@ class ExchangeRateTable extends StatelessWidget {
               label: Text(
                 'From Currency',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -85,7 +86,7 @@ class ExchangeRateTable extends StatelessWidget {
               label: Text(
                 'To Currency',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -94,7 +95,7 @@ class ExchangeRateTable extends StatelessWidget {
               label: Text(
                 'Factor',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -103,7 +104,7 @@ class ExchangeRateTable extends StatelessWidget {
               label: Text(
                 'Created At',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -113,7 +114,7 @@ class ExchangeRateTable extends StatelessWidget {
             //     label: Text(
             //       'Actions',
             //       style: TextStyle(
-            //         color: isDarkMode ? Colors.white : Colors.black,
+            //         color: context.palette.textPrimary,
             //         fontWeight: FontWeight.bold,
             //       ),
             //     ),
@@ -125,26 +126,26 @@ class ExchangeRateTable extends StatelessWidget {
                 DataCell(Text(
                   rate.fromCurrency.code,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   rate.toCurrency.code,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   rate.factor.toString(),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(Text(
                   DateFormat('MMM-dd-yyyy')
                       .format(DateTime.parse(rate.createdAt)),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 // if (onEdit != null || onDelete != null)

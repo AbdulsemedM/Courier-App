@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../bloc/countries_bloc.dart';
 
 class AddCountryModal extends StatefulWidget {
@@ -17,7 +18,7 @@ class _AddCountryModalState extends State<AddCountryModal> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -32,7 +33,7 @@ class _AddCountryModalState extends State<AddCountryModal> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
+                color: context.palette.textPrimary,
               ),
             ),
             const SizedBox(height: 24),

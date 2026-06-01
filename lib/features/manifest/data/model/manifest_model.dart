@@ -1,0 +1,181 @@
+class ManifestBranch {
+  final int id;
+  final String name;
+  final String code;
+
+  const ManifestBranch({
+    required this.id,
+    required this.name,
+    required this.code,
+  });
+
+  factory ManifestBranch.fromJson(Map<String, dynamic> json) {
+    return ManifestBranch(
+      id: json['id'] as int? ?? 0,
+      name: json['name'] as String? ?? '',
+      code: json['code'] as String? ?? '',
+    );
+  }
+}
+
+class ManifestUser {
+  final int id;
+  final String fullName;
+  final String email;
+
+  const ManifestUser({
+    required this.id,
+    required this.fullName,
+    required this.email,
+  });
+
+  factory ManifestUser.fromJson(Map<String, dynamic> json) {
+    final firstName = json['firstName'] as String? ?? '';
+    final secondName = json['secondName'] as String? ?? '';
+    final lastName = json['lastName'] as String? ?? '';
+    final fullName = json['fullName'] as String? ??
+        [firstName, secondName, lastName].where((s) => s.isNotEmpty).join(' ');
+
+    return ManifestUser(
+      id: json['id'] as int? ?? 0,
+      fullName: fullName,
+      email: json['email'] as String? ?? '',
+    );
+  }
+}
+
+class ManifestStatus {
+  final int id;
+  final String code;
+  final String description;
+  final String name;
+
+  const ManifestStatus({
+    required this.id,
+    required this.code,
+    required this.description,
+    required this.name,
+  });
+
+  factory ManifestStatus.fromJson(Map<String, dynamic> json) {
+    return ManifestStatus(
+      id: json['id'] as int? ?? 0,
+      code: json['code'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      name: json['name'] as String? ?? json['description'] as String? ?? '',
+    );
+  }
+}
+
+class ManifestModel {
+  final int id;
+  final String manifestId;
+  final ManifestBranch branch;
+  final int senderBranch;
+  final ManifestBranch receiverBranch;
+  final ManifestUser createdBy;
+  final ManifestStatus fromStatus;
+  final ManifestStatus toStatus;
+  final String manifestDate;
+  final String fileType;
+  final String? downloadUrl;
+  final String? barcodeUrl;
+  final int totalShipments;
+  final double totalWeight;
+  final double totalValue;
+  final String createdAt;
+  final String updatedAt;
+
+  const ManifestModel({
+    required this.id,
+    required this.manifestId,
+    required this.branch,
+    required this.senderBranch,
+    required this.receiverBranch,
+    required this.createdBy,
+    required this.fromStatus,
+    required this.toStatus,
+    required this.manifestDate,
+    required this.fileType,
+    this.downloadUrl,
+    this.barcodeUrl,
+    required this.totalShipments,
+    required this.totalWeight,
+    required this.totalValue,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory ManifestModel.fromJson(Map<String, dynamic> json) {
+    return ManifestModel(
+      id: json['id'] as int? ?? 0,
+      manifestId: json['manifestId'] as String? ?? '',
+      branch: json['branch'] is Map<String, dynamic>
+          ? ManifestBranch.fromJson(json['branch'] as Map<String, dynamic>)
+          : const ManifestBranch(id: 0, name: '', code: ''),
+      senderBranch: json['senderBranch'] as int? ?? 0,
+      receiverBranch: json['receiverBranch'] is Map<String, dynamic>
+          ? ManifestBranch.fromJson(
+              json['receiverBranch'] as Map<String, dynamic>)
+          : const ManifestBranch(id: 0, name: '', code: ''),
+      createdBy: json['createdBy'] is Map<String, dynamic>
+          ? ManifestUser.fromJson(json['createdBy'] as Map<String, dynamic>)
+          : const ManifestUser(id: 0, fullName: '', email: ''),
+      fromStatus: json['fromStatus'] is Map<String, dynamic>
+          ? ManifestStatus.fromJson(json['fromStatus'] as Map<String, dynamic>)
+          : const ManifestStatus(id: 0, code: '', description: '', name: ''),
+      toStatus: json['toStatus'] is Map<String, dynamic>
+          ? ManifestStatus.fromJson(json['toStatus'] as Map<String, dynamic>)
+          : const ManifestStatus(id: 0, code: '', description: '', name: ''),
+      manifestDate: json['manifestDate'] as String? ?? '',
+      fileType: json['fileType'] as String? ?? '',
+      downloadUrl: json['downloadUrl'] as String?,
+      barcodeUrl: json['barcodeUrl'] as String?,
+      totalShipments: json['totalShipments'] as int? ?? 0,
+      totalWeight: (json['totalWeight'] as num?)?.toDouble() ?? 0,
+      totalValue: (json['totalValue'] as num?)?.toDouble() ?? 0,
+      createdAt: json['createdAt'] as String? ?? '',
+      updatedAt: json['updatedAt'] as String? ?? '',
+    );
+  }
+
+  String get routeLabel =>
+      '${branch.name.trim()} → ${receiverBranch.name.trim()}';
+
+  String get creatorLabel => createdBy.fullName;
+
+  String get displayDateTime => manifestDate.isNotEmpty ? manifestDate : createdAt;
+}
+
+class ManifestListResponse {
+  final int status;
+  final String message;
+  final List<ManifestModel> data;
+  final int count;
+
+  const ManifestListResponse({
+    required this.status,
+    required this.message,
+    required this.data,
+    required this.count,
+  });
+
+  factory ManifestListResponse.fromJson(Map<String, dynamic> json) {
+    final rawData = json['data'];
+    List<ManifestModel> manifests = [];
+
+    if (rawData is List) {
+      manifests = rawData
+          .whereType<Map<String, dynamic>>()
+          .map(ManifestModel.fromJson)
+          .toList();
+    }
+
+    return ManifestListResponse(
+      status: json['status'] as int? ?? 200,
+      message: json['message'] as String? ?? '',
+      data: manifests,
+      count: json['count'] as int? ?? manifests.length,
+    );
+  }
+}

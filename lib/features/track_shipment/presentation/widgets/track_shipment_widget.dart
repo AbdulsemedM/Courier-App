@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../model/track_shipment_model.dart';
 import 'package:intl/intl.dart';
-import '../../../add_shipment/model/branch_model.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
+import '../../../branches/model/branches_model.dart';
 
 class TrackShipmentWidgets {
-  static Widget buildShimmerEffect(bool isDarkMode) {
+  static Widget buildShimmerEffect(BuildContext context) {
+    final isDarkMode = context.isDarkMode;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Shimmer.fromColors(
-        baseColor: isDarkMode ? Colors.grey[850]! : Colors.grey[300]!,
-        highlightColor: isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+        baseColor: isDarkMode ? Colors.grey[850]! : AppPalette.forMode(isDarkMode).border,
+        highlightColor: isDarkMode ? Colors.grey[700]! : AppPalette.forMode(isDarkMode).surfaceMuted,
         child: Column(
           children: [
             // Header shimmer
@@ -97,7 +99,7 @@ class TrackShipmentWidgets {
   static Widget buildTrackingDetails({
     required bool isDarkMode,
     required List<TrackShipmentModel> shipments,
-    List<BranchModel>? branches,
+    List<BranchesModel>? branches,
   }) {
     final mainShipment = shipments.first;
 
@@ -123,17 +125,29 @@ class TrackShipmentWidgets {
     );
   }
 
-  static String? _getBranchName(int? branchId, List<BranchModel>? branches) {
+  static String? _getBranchName(int? branchId, List<BranchesModel>? branches) {
     if (branchId == null || branches == null) return null;
     try {
-      final branch = branches.firstWhere(
-        (b) => b.id == branchId,
-        orElse: () => BranchModel(),
-      );
-      return branch.name;
+      final branch = branches.firstWhere((b) => b.id == branchId);
+      final name = branch.name.trim();
+      if (name.isNotEmpty) return name;
+      return null;
     } catch (e) {
       return null;
     }
+  }
+
+  static String _displayBranch({
+    String? parsedName,
+    int? branchId,
+    List<BranchesModel>? branches,
+  }) {
+    final fromList = _getBranchName(branchId, branches);
+    if (fromList != null && fromList.isNotEmpty) return fromList;
+    if (parsedName != null && parsedName.trim().isNotEmpty) {
+      return parsedName.trim();
+    }
+    return '—';
   }
 
   static Widget _buildHeaderCard(bool isDarkMode, TrackShipmentModel shipment) {
@@ -249,18 +263,24 @@ class TrackShipmentWidgets {
   }
 
   static Widget _buildShipmentInfoCard(bool isDarkMode,
-      TrackShipmentModel shipment, List<BranchModel>? branches) {
-    final senderBranchName =
-        _getBranchName(shipment.senderBranchId, branches) ?? shipment.name;
-    final receiverBranchName =
-        _getBranchName(shipment.receiverBranchId, branches);
+      TrackShipmentModel shipment, List<BranchesModel>? branches) {
+    final originBranch = _displayBranch(
+      parsedName: shipment.senderBranchName,
+      branchId: shipment.senderBranchId,
+      branches: branches,
+    );
+    final destinationBranch = _displayBranch(
+      parsedName: shipment.receiverBranchName ?? shipment.name,
+      branchId: shipment.receiverBranchId,
+      branches: branches,
+    );
 
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+      color: AppPalette.forMode(isDarkMode).surface,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -283,12 +303,18 @@ class TrackShipmentWidgets {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+            _buildRouteBanner(
+              isDarkMode: isDarkMode,
+              origin: originBranch,
+              destination: destinationBranch,
+            ),
+            const SizedBox(height: 20),
             // Sender Section
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[900] : Colors.blue[50],
+                color: isDarkMode ? Colors.grey[900] : AppPalette.forMode(isDarkMode).accentMuted,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -314,7 +340,7 @@ class TrackShipmentWidgets {
                   const SizedBox(height: 8),
                   _buildInfoRow('Mobile', shipment.senderMobile, isDarkMode),
                   const SizedBox(height: 8),
-                  _buildInfoRow('Branch', senderBranchName, isDarkMode),
+                  _buildInfoRow('Origin', originBranch, isDarkMode),
                 ],
               ),
             ),
@@ -348,8 +374,7 @@ class TrackShipmentWidgets {
                   const SizedBox(height: 8),
                   _buildInfoRow('Mobile', shipment.receiverMobile, isDarkMode),
                   const SizedBox(height: 8),
-                  if (receiverBranchName != null)
-                    _buildInfoRow('Branch', receiverBranchName, isDarkMode),
+                  _buildInfoRow('Destination', destinationBranch, isDarkMode),
                 ],
               ),
             ),
@@ -424,7 +449,7 @@ class TrackShipmentWidgets {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+      color: AppPalette.forMode(isDarkMode).surface,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -551,7 +576,7 @@ class TrackShipmentWidgets {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+      color: AppPalette.forMode(isDarkMode).surface,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -630,7 +655,7 @@ class TrackShipmentWidgets {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+      color: AppPalette.forMode(isDarkMode).surface,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -752,7 +777,7 @@ class TrackShipmentWidgets {
                   Text(
                     description.trim(),
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                      color: AppPalette.forMode(isDarkMode).textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -833,6 +858,103 @@ class TrackShipmentWidgets {
         .trim();
   }
 
+  static Widget _buildRouteBanner({
+    required bool isDarkMode,
+    required String origin,
+    required String destination,
+  }) {
+    final palette = AppPalette.forMode(isDarkMode);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDarkMode
+              ? [
+                  Colors.deepPurple.withValues(alpha: 0.35),
+                  Colors.indigo.withValues(alpha: 0.25),
+                ]
+              : [
+                  Colors.deepPurple.shade50,
+                  Colors.indigo.shade50,
+                ],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDarkMode
+              ? Colors.deepPurple.withValues(alpha: 0.4)
+              : Colors.deepPurple.shade100,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'From',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: palette.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  origin,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: palette.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Icon(
+              Icons.arrow_forward_rounded,
+              color: palette.accent,
+              size: 22,
+            ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'To',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: palette.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  destination,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: palette.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   static Widget _buildInfoRow(String label, String value, bool isDarkMode) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -851,7 +973,7 @@ class TrackShipmentWidgets {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: AppPalette.forMode(isDarkMode).textPrimary,
             ),
             textAlign: TextAlign.end,
           ),

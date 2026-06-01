@@ -4,6 +4,7 @@ import 'package:courier_app/features/teller_by_branch/data/model/teller_by_branc
 import 'package:courier_app/features/teller_by_branch/presentation/widgets/teller_by_branch_table.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class TellerByBranchScreen extends StatefulWidget {
   const TellerByBranchScreen({super.key});
@@ -47,7 +48,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       body: Container(
@@ -60,10 +61,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                     const Color.fromARGB(255, 75, 23, 160),
                     const Color(0xFF5b3895),
                   ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: SafeArea(
@@ -77,7 +75,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -87,7 +85,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ],
@@ -110,18 +108,16 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: isDarkMode
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.white.withOpacity(0.9),
+                        fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,
                         ),
                       ),
                       dropdownColor:
-                          isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+                          context.palette.surface,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       items: const [
                         DropdownMenuItem<String>(
@@ -158,12 +154,10 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                             'Search by teller name, account number, branch...',
                         prefixIcon: Icon(
                           Icons.search,
-                          color: isDarkMode ? Colors.grey : Colors.grey[600],
+                          color: context.palette.textSecondary,
                         ),
                         filled: true,
-                        fillColor: isDarkMode
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.white.withOpacity(0.9),
+                        fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -179,7 +173,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                         ),
                       ),
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ],
@@ -228,7 +222,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                             child: Text(
                               'No tellers found',
                               style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
+                                color: context.palette.textPrimary,
                               ),
                             ),
                           );
@@ -264,9 +258,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                                   IconButton(
                                     icon: Icon(
                                       Icons.chevron_left,
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
+                                      color: context.palette.textPrimary,
                                     ),
                                     onPressed: _currentPage > 0
                                         ? () {
@@ -280,9 +272,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                                   Text(
                                     'Page ${_currentPage + 1} of ${totalPages == 0 ? 1 : totalPages}',
                                     style: TextStyle(
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
+                                      color: context.palette.textPrimary,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -290,9 +280,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                                   IconButton(
                                     icon: Icon(
                                       Icons.chevron_right,
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
+                                      color: context.palette.textPrimary,
                                     ),
                                     onPressed: _currentPage < totalPages - 1
                                         ? () {
@@ -306,9 +294,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                                   Text(
                                     'Total: ${filteredTellers.length}',
                                     style: TextStyle(
-                                      color: isDarkMode
-                                          ? Colors.white70
-                                          : Colors.black87,
+                                      color: context.palette.textSecondary,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -328,7 +314,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                                 'Error: ${state.message}',
                                 style: TextStyle(
                                   color:
-                                      isDarkMode ? Colors.white : Colors.black,
+                                      context.palette.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 16),
@@ -346,7 +332,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                           'Select a branch to view tellers',
                           style: TextStyle(
                             color:
-                                isDarkMode ? Colors.white70 : Colors.grey[700],
+                                context.palette.textSecondary,
                           ),
                           textAlign: TextAlign.center,
                         ),

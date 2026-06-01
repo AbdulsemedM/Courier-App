@@ -1,11 +1,11 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/configuration/phone_number_manager.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/features/analytics/presentation/screens/analytics_screen.dart';
 import 'package:courier_app/features/applications/presentation/screens/applications_screen.dart';
 import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
 import 'package:courier_app/features/login/presentation/screen/login_screen.dart';
-// import 'package:courier_app/features/notification_screen/presentation/screen/notification_screen.dart';
 import 'package:courier_app/features/settings_screen/presentation/screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,16 +48,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _handleLogout() async {
     try {
-      // Clear all authentication data
       await _authService.deleteToken();
       await _authService.deleteUserId();
       await _authService.deleteBranch();
       await _authService.deleteRoleName();
-      
-      // Clear permissions
+      await _authService.deleteRoleNames();
       await PermissionManager().setPermission([]);
-      
-      // Navigate to login screen
+
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -65,7 +62,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
       }
     } catch (e) {
-      // Handle any errors during logout
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -78,35 +74,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<bool> _onWillPop() async {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    final isDarkMode = themeProvider.isDarkMode;
-    
+    final palette = context.palette;
+
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: isDarkMode ? const Color(0xFF1A1F37) : Colors.white,
+          backgroundColor: palette.surface,
           title: Text(
             'Logout',
             style: TextStyle(
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: palette.textPrimary,
               fontWeight: FontWeight.bold,
             ),
           ),
           content: Text(
             'Are you sure you want to logout?',
-            style: TextStyle(
-              color: isDarkMode ? Colors.white70 : Colors.black87,
-            ),
+            style: TextStyle(color: palette.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
                 'Cancel',
-                style: TextStyle(
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                ),
+                style: TextStyle(color: palette.textSecondary),
               ),
             ),
             ElevatedButton(
@@ -124,16 +115,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     if (shouldLogout == true) {
       await _handleLogout();
-      return false; // Prevent default back button behavior
     }
-    return false; // Prevent default back button behavior
+    return false;
+  }
+
+  BottomNavyBarItem _navItem({
+    required IconData icon,
+    required String title,
+    required AppPalette palette,
+  }) {
+    return BottomNavyBarItem(
+      icon: Icon(icon),
+      title: Text(title),
+      activeColor: palette.navActive,
+      inactiveColor: palette.navInactive,
+      textAlign: TextAlign.center,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-    // final customColors = Theme.of(context).extension<CustomColors>()!;
+    final palette = context.palette;
 
     return PopScope(
       canPop: false,
@@ -143,154 +145,97 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
       },
       child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDarkMode
-                ? [
-                    const Color(0xFF0A1931), // Dark blue
-                    const Color(0xFF152642), // Slightly lighter blue
-                  ]
-                : [
-                    const Color(0xFFF5F6FA),
-                    const Color(0xFFFFFFFF),
-                  ],
-          ),
-        ),
+        color: palette.background,
         child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SizedBox.expand(
-                child: PageView(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() => _currentIndex = index);
-                  },
-                  children: _isAdmin
-                      ? const <Widget>[
-                          HomeScreen(),
-                          ApplicationsScreen(),
-                          AnalyticsScreen(),
-                          SettingsScreen(),
-                        ]
-                      : const <Widget>[
-                          HomeScreen(),
-                          ApplicationsScreen(),
-                          SettingsScreen(),
-                        ],
+          backgroundColor: Colors.transparent,
+          body: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SizedBox.expand(
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() => _currentIndex = index);
+                    },
+                    children: _isAdmin
+                        ? const <Widget>[
+                            HomeScreen(),
+                            ApplicationsScreen(),
+                            AnalyticsScreen(),
+                            SettingsScreen(),
+                          ]
+                        : const <Widget>[
+                            HomeScreen(),
+                            ApplicationsScreen(),
+                            SettingsScreen(),
+                          ],
+                  ),
                 ),
-              ),
-        bottomNavigationBar: _isLoading
-            ? null
-            : Container(
-                decoration: BoxDecoration(
-                  color: isDarkMode ? const Color(0xFF5b3895) : Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDarkMode
-                          ? Colors.black.withOpacity(0.3)
-                          : Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, -5),
+          bottomNavigationBar: _isLoading
+              ? null
+              : Container(
+                  decoration: BoxDecoration(
+                    color: palette.navBarBackground,
+                    border: Border(
+                      top: BorderSide(color: palette.border),
                     ),
-                  ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: palette.cardShadow,
+                        blurRadius: 10,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: BottomNavyBar(
+                    selectedIndex: _currentIndex,
+                    showElevation: false,
+                    backgroundColor: palette.navBarBackground,
+                    onItemSelected: (index) {
+                      setState(() => _currentIndex = index);
+                      _pageController!.jumpToPage(index);
+                    },
+                    items: _isAdmin
+                        ? [
+                            _navItem(
+                              icon: Icons.home,
+                              title: 'Home',
+                              palette: palette,
+                            ),
+                            _navItem(
+                              icon: Icons.app_shortcut_rounded,
+                              title: 'Application',
+                              palette: palette,
+                            ),
+                            _navItem(
+                              icon: Icons.analytics,
+                              title: 'Analytics',
+                              palette: palette,
+                            ),
+                            _navItem(
+                              icon: Icons.settings,
+                              title: 'Settings',
+                              palette: palette,
+                            ),
+                          ]
+                        : [
+                            _navItem(
+                              icon: Icons.home,
+                              title: 'Home',
+                              palette: palette,
+                            ),
+                            _navItem(
+                              icon: Icons.app_shortcut_rounded,
+                              title: 'Application',
+                              palette: palette,
+                            ),
+                            _navItem(
+                              icon: Icons.settings,
+                              title: 'Settings',
+                              palette: palette,
+                            ),
+                          ],
+                  ),
                 ),
-                child: BottomNavyBar(
-                  selectedIndex: _currentIndex,
-                  showElevation: false,
-                  backgroundColor: isDarkMode
-                      ? const Color(0xFF5b3895)
-                      : const Color(0xFF5b3895),
-                  onItemSelected: (index) {
-                    setState(() => _currentIndex = index);
-                    _pageController!.jumpToPage(index);
-                  },
-                  items: _isAdmin
-                      ? <BottomNavyBarItem>[
-                          BottomNavyBarItem(
-                            icon: const Icon(Icons.home),
-                            title: const Text('Home'),
-                            activeColor: isDarkMode
-                                ? const Color(0xFFFF5A00)
-                                : const Color(0xFFFF5A00),
-                            inactiveColor: isDarkMode
-                                ? Colors.grey.shade500
-                                : Colors.grey.shade600,
-                            textAlign: TextAlign.center,
-                          ),
-                          BottomNavyBarItem(
-                            icon: const Icon(Icons.app_shortcut_rounded),
-                            title: const Text('Application'),
-                            activeColor: isDarkMode
-                                ? const Color(0xFFFF5A00)
-                                : const Color(0xFFFF5A00),
-                            inactiveColor: isDarkMode
-                                ? Colors.grey.shade500
-                                : Colors.grey.shade600,
-                            textAlign: TextAlign.center,
-                          ),
-                          BottomNavyBarItem(
-                            icon: const Icon(Icons.analytics),
-                            title: const Text('Analytics'),
-                            activeColor: isDarkMode
-                                ? const Color(0xFFFF5A00)
-                                : const Color(0xFFFF5A00),
-                            inactiveColor: isDarkMode
-                                ? Colors.grey.shade500
-                                : Colors.grey.shade600,
-                            textAlign: TextAlign.center,
-                          ),
-                          BottomNavyBarItem(
-                            icon: const Icon(Icons.settings),
-                            title: const Text('Settings'),
-                            activeColor: isDarkMode
-                                ? const Color(0xFFFF5A00)
-                                : const Color(0xFFFF5A00),
-                            inactiveColor: isDarkMode
-                                ? Colors.grey.shade500
-                                : Colors.grey.shade600,
-                            textAlign: TextAlign.center,
-                          ),
-                        ]
-                      : <BottomNavyBarItem>[
-                          BottomNavyBarItem(
-                            icon: const Icon(Icons.home),
-                            title: const Text('Home'),
-                            activeColor: isDarkMode
-                                ? const Color(0xFFFF5A00)
-                                : const Color(0xFFFF5A00),
-                            inactiveColor: isDarkMode
-                                ? Colors.grey.shade500
-                                : Colors.grey.shade600,
-                            textAlign: TextAlign.center,
-                          ),
-                          BottomNavyBarItem(
-                            icon: const Icon(Icons.app_shortcut_rounded),
-                            title: const Text('Application'),
-                            activeColor: isDarkMode
-                                ? const Color(0xFFFF5A00)
-                                : const Color(0xFFFF5A00),
-                            inactiveColor: isDarkMode
-                                ? Colors.grey.shade500
-                                : Colors.grey.shade600,
-                            textAlign: TextAlign.center,
-                          ),
-                          BottomNavyBarItem(
-                            icon: const Icon(Icons.settings),
-                            title: const Text('Settings'),
-                            activeColor: isDarkMode
-                                ? const Color(0xFFFF5A00)
-                                : const Color(0xFFFF5A00),
-                            inactiveColor: isDarkMode
-                                ? Colors.grey.shade500
-                                : Colors.grey.shade600,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                ),
-              ),
         ),
       ),
     );

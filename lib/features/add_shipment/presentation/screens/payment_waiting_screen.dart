@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 import '../../bloc/add_shipment_bloc.dart';
 import '../../model/payment_invoice_model.dart';
 import '../../model/branch_model.dart';
 import 'print_shipment_screen.dart';
-import '../../../../core/theme/theme_provider.dart';
 
 class PaymentWaitingScreen extends StatefulWidget {
   final String trackingNumber;
@@ -95,11 +94,10 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? const Color(0xFF0A1931) : Colors.grey[50],
+      backgroundColor: context.palette.background,
       appBar: AppBar(
         title: const Text(
           'Payment Status',
@@ -270,7 +268,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          color: context.palette.surface,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -318,7 +316,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          color: context.palette.surface,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -346,7 +344,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[900] : Colors.blue[50],
+                    color: context.isDarkMode ? Colors.grey[900] : context.palette.accentMuted,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -453,7 +451,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          color: context.palette.surface,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -518,7 +516,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+          color: context.palette.surface,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -649,7 +647,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: context.palette.textPrimary,
             ),
             textAlign: TextAlign.end,
           ),

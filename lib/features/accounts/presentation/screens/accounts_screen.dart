@@ -4,6 +4,7 @@ import 'package:courier_app/features/accounts/presentation/widgets/accounts_tabl
 import 'package:courier_app/features/accounts/presentation/widgets/accounts_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class AccountsScreen extends StatefulWidget {
   const AccountsScreen({super.key});
@@ -31,7 +32,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       body: Container(
@@ -44,10 +45,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     const Color.fromARGB(255, 75, 23, 160),
                     const Color(0xFF5b3895),
                   ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: SafeArea(
@@ -61,7 +59,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -71,7 +69,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ],
@@ -91,18 +89,16 @@ class _AccountsScreenState extends State<AccountsScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: isDarkMode
-                        ? Colors.white.withOpacity(0.1)
-                        : Colors.white.withOpacity(0.9),
+                    fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 12,
                     ),
                   ),
                   dropdownColor:
-                      isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+                      context.palette.surface,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                   items: [
                     const DropdownMenuItem<String>(
@@ -165,7 +161,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                           child: Text(
                             'No accounts found',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: context.palette.textPrimary,
                             ),
                           ),
                         );
@@ -199,9 +195,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                 IconButton(
                                   icon: Icon(
                                     Icons.chevron_left,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
+                                    color: context.palette.textPrimary,
                                   ),
                                   onPressed: _currentPage > 0
                                       ? () {
@@ -215,9 +209,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                 Text(
                                   'Page ${_currentPage + 1} of ${totalPages == 0 ? 1 : totalPages}',
                                   style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
+                                    color: context.palette.textPrimary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -225,9 +217,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                 IconButton(
                                   icon: Icon(
                                     Icons.chevron_right,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
+                                    color: context.palette.textPrimary,
                                   ),
                                   onPressed: _currentPage < totalPages - 1
                                       ? () {
@@ -241,9 +231,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                 Text(
                                   'Total: ${filteredAccounts.length}',
                                   style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white70
-                                        : Colors.black87,
+                                    color: context.palette.textSecondary,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -262,7 +250,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                             Text(
                               'Error: ${state.message}',
                               style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
+                                color: context.palette.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 16),

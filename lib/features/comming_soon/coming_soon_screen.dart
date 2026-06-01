@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class ComingSoonScreen extends StatefulWidget {
   const ComingSoonScreen({super.key});
@@ -34,7 +35,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       body: Container(
@@ -47,10 +48,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
                     const Color.fromARGB(255, 75, 23, 160),
                     const Color(0xFF5b3895),
                   ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: SingleChildScrollView(
@@ -74,7 +72,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
                 shaderCallback: (bounds) => LinearGradient(
                   colors: isDarkMode
                       ? [Colors.white, Colors.blue.shade200]
-                      : [Colors.blue.shade700, Colors.blue.shade900],
+                      : [context.palette.textPrimary, context.palette.textSecondary],
                 ).createShader(bounds),
                 child: const Text(
                   'Coming Soon!',
@@ -93,7 +91,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
-                  color: isDarkMode ? Colors.white70 : Colors.black87,
+                  color: context.palette.textSecondary,
                   height: 1.5,
                 ),
               ),
@@ -125,7 +123,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
                     Icon(
                       Icons.engineering_outlined,
                       size: 48,
-                      color: isDarkMode ? Colors.white70 : Colors.blue.shade700,
+                      color: isDarkMode ? context.palette.textSecondary : Colors.blue.shade700,
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -133,7 +131,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -142,7 +140,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                        color: context.palette.textSecondary,
                         height: 1.5,
                       ),
                     ),
@@ -155,8 +153,8 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isDarkMode
-                      ? const Color(0xFFFF5A00)
-                      : const Color(0xFFFF5A00),
+                      ? context.palette.accent
+                      : context.palette.accent,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
                     vertical: 16,

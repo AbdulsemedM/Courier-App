@@ -7,6 +7,7 @@ import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class TellerLiabilityByBranchScreen extends StatefulWidget {
   const TellerLiabilityByBranchScreen({super.key});
@@ -98,7 +99,7 @@ class _TellerLiabilityByBranchScreenState
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       body: Container(
@@ -111,10 +112,7 @@ class _TellerLiabilityByBranchScreenState
                     const Color.fromARGB(255, 75, 23, 160),
                     const Color(0xFF5b3895),
                   ]
-                : [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: SafeArea(
@@ -128,7 +126,7 @@ class _TellerLiabilityByBranchScreenState
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -138,7 +136,7 @@ class _TellerLiabilityByBranchScreenState
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: context.palette.textPrimary,
                       ),
                     ),
                   ],
@@ -168,18 +166,16 @@ class _TellerLiabilityByBranchScreenState
                               borderRadius: BorderRadius.circular(12),
                             ),
                             filled: true,
-                            fillColor: isDarkMode
-                                ? Colors.white.withOpacity(0.1)
-                                : Colors.white.withOpacity(0.9),
+                            fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
                             ),
                           ),
                           dropdownColor:
-                              isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+                              context.palette.surface,
                           style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.black,
+                            color: context.palette.textPrimary,
                           ),
                           items: branches.map((branch) {
                             return DropdownMenuItem<int>(
@@ -213,18 +209,16 @@ class _TellerLiabilityByBranchScreenState
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: isDarkMode
-                                  ? Colors.white.withOpacity(0.1)
-                                  : Colors.white.withOpacity(0.9),
+                              fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 12,
                               ),
                             ),
                             dropdownColor:
-                                isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+                                context.palette.surface,
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: context.palette.textPrimary,
                             ),
                             items: const [
                               DropdownMenuItem<String>(
@@ -270,16 +264,14 @@ class _TellerLiabilityByBranchScreenState
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: isDarkMode
-                                  ? Colors.white.withOpacity(0.1)
-                                  : Colors.white.withOpacity(0.9),
+                              fillColor: isDarkMode ? Colors.white.withOpacity(0.1) : context.palette.surface,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 12,
                               ),
                             ),
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
+                              color: context.palette.textPrimary,
                             ),
                           ),
                         ),
@@ -330,7 +322,7 @@ class _TellerLiabilityByBranchScreenState
                                 Text(
                                   'Error: ${state.message}',
                                   style: TextStyle(
-                                    color: isDarkMode ? Colors.white : Colors.black,
+                                    color: context.palette.textPrimary,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -353,7 +345,7 @@ class _TellerLiabilityByBranchScreenState
                                     ? 'Please select a branch'
                                     : 'No teller liabilities found for this branch',
                                 style: TextStyle(
-                                  color: isDarkMode ? Colors.white : Colors.black,
+                                  color: context.palette.textPrimary,
                                 ),
                               ),
                             );
@@ -403,7 +395,7 @@ class _TellerLiabilityByBranchScreenState
                                 ? 'Please select a branch to view liabilities'
                                 : 'No data available',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white70 : Colors.black54,
+                              color: context.palette.textSecondary,
                             ),
                           ),
                         );
@@ -425,7 +417,7 @@ class _TellerLiabilityByBranchScreenState
     String value,
     IconData icon,
   ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -443,7 +435,7 @@ class _TellerLiabilityByBranchScreenState
         children: [
           Icon(
             icon,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: context.palette.textPrimary,
             size: 24,
           ),
           const SizedBox(height: 8),
@@ -451,7 +443,7 @@ class _TellerLiabilityByBranchScreenState
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.white70 : Colors.black54,
+              color: context.palette.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
@@ -460,7 +452,7 @@ class _TellerLiabilityByBranchScreenState
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black,
+              color: context.palette.textPrimary,
             ),
           ),
         ],

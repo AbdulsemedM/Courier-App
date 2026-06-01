@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class NotificationWidgets {
-  static Widget buildDateHeader(String date, {bool? isDarkMode}) {
+  static Widget buildDateHeader(String date, {required BuildContext context}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Text(
@@ -9,13 +10,14 @@ class NotificationWidgets {
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: isDarkMode ?? false ? Colors.white : Colors.grey.shade800,
+          color: context.palette.textPrimary,
         ),
       ),
     );
   }
 
   static Widget buildNotificationItem({
+    required BuildContext context,
     required IconData icon,
     required Color color,
     required String title,
@@ -23,16 +25,18 @@ class NotificationWidgets {
     required String time,
     required bool isUnread,
     required VoidCallback onTap,
-    bool? isDarkMode,
   }) {
+    final isDarkMode = context.isDarkMode;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDarkMode ?? false ? const Color(0xFF152642) : Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: context.palette.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ?? false ? 0.2 : 0.05),
+            color: context.palette.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -51,7 +55,7 @@ class NotificationWidgets {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(isDarkMode ?? false ? 0.2 : 0.1),
+                    color: color.withOpacity(isDarkMode ? 0.2 : 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -71,9 +75,7 @@ class NotificationWidgets {
                           fontSize: 16,
                           fontWeight:
                               isUnread ? FontWeight.bold : FontWeight.w600,
-                          color: isDarkMode ?? false
-                              ? Colors.white
-                              : Colors.black87,
+                          color: context.palette.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -81,9 +83,7 @@ class NotificationWidgets {
                         description,
                         style: TextStyle(
                           fontSize: 14,
-                          color: isDarkMode ?? false
-                              ? Colors.grey.shade400
-                              : Colors.grey.shade600,
+                          color: context.palette.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -91,9 +91,7 @@ class NotificationWidgets {
                         time,
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDarkMode ?? false
-                              ? Colors.grey.shade500
-                              : Colors.grey.shade500,
+                          color: context.palette.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -105,9 +103,7 @@ class NotificationWidgets {
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: isDarkMode ?? false
-                          ? Colors.blue.shade200
-                          : Colors.blue.shade700,
+                      color: context.palette.accent,
                       shape: BoxShape.circle,
                     ),
                   ),

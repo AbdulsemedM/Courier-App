@@ -1,6 +1,7 @@
 import 'package:courier_app/features/services_mode/models/services_mode_models.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class SearchBarWidget extends StatelessWidget {
   final TextEditingController controller;
@@ -14,7 +15,7 @@ class SearchBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -25,12 +26,12 @@ class SearchBarWidget extends StatelessWidget {
           hintText: 'Search services mode...',
           prefixIcon: Icon(
             Icons.search,
-            color: isDarkMode ? Colors.grey : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
           filled: true,
-          fillColor: isDarkMode ? Colors.white10 : Colors.grey[100],
+          fillColor: context.palette.surfaceMuted,
           hintStyle: TextStyle(
-            color: isDarkMode ? Colors.grey : Colors.grey[600],
+            color: context.palette.textSecondary,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -46,7 +47,7 @@ class SearchBarWidget extends StatelessWidget {
           ),
         ),
         style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black,
+          color: context.palette.textPrimary,
         ),
       ),
     );
@@ -67,7 +68,7 @@ class ServicesModeTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -79,7 +80,7 @@ class ServicesModeTable extends StatelessWidget {
               label: Text(
                 'Type',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -88,7 +89,7 @@ class ServicesModeTable extends StatelessWidget {
               label: Text(
                 'Description',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -97,7 +98,7 @@ class ServicesModeTable extends StatelessWidget {
               label: Text(
                 'Created At',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: context.palette.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -107,7 +108,7 @@ class ServicesModeTable extends StatelessWidget {
                 label: Text(
                   'Actions',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -119,7 +120,7 @@ class ServicesModeTable extends StatelessWidget {
                 DataCell(Text(
                   service.code,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 DataCell(
@@ -130,7 +131,7 @@ class ServicesModeTable extends StatelessWidget {
                       child: Text(
                         service.description,
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black,
+                          color: context.palette.textPrimary,
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -142,7 +143,7 @@ class ServicesModeTable extends StatelessWidget {
                   DateFormat('MMM-dd-yyyy').format(
                       DateTime.parse(service.createdAt)),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: context.palette.textPrimary,
                   ),
                 )),
                 if (onEdit != null || onDelete != null)

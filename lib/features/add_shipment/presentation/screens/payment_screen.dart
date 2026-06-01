@@ -5,9 +5,8 @@ import 'package:courier_app/features/add_shipment/presentation/screens/print_shi
 // import 'package:courier_app/features/add_shipment/data/repository/add_shipment_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class PaymentScreen extends StatefulWidget {
   final Map<String, dynamic> formData;
@@ -72,8 +71,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     // Calculate total amount
     final rate = (widget.formData['rate'] as num?)?.toDouble() ?? 0.0;
@@ -99,7 +97,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         builder: (context, state) {
           return Scaffold(
             backgroundColor:
-                isDarkMode ? const Color(0xFF0A1931) : Colors.grey[50],
+                context.palette.background,
             appBar: AppBar(
               title: const Text(
                 'Payment Summary',

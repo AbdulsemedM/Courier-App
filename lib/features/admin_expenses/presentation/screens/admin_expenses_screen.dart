@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:courier_app/core/theme/theme_provider.dart';
 import 'package:courier_app/features/admin_expenses/bloc/admin_expenses_bloc.dart';
 import 'package:courier_app/features/branch_report/data/model/branch_shipment_model.dart';
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:courier_app/configuration/auth_service.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class AdminExpensesScreen extends StatefulWidget {
   const AdminExpensesScreen({super.key});
@@ -51,14 +50,14 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
       firstDate: DateTime(2015),
       lastDate: _toDate,
       builder: (context, child) {
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        final isDarkMode = context.isDarkMode;
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: const Color(0xFFFF5A00),
+              primary: context.palette.accent,
               onPrimary: Colors.white,
-              surface: isDarkMode ? Colors.grey[850]! : Colors.white,
-              onSurface: isDarkMode ? Colors.white : Colors.black,
+              surface: context.palette.surface,
+              onSurface: context.palette.textPrimary,
             ),
           ),
           child: child!,
@@ -83,14 +82,14 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
       firstDate: _fromDate,
       lastDate: DateTime.now(),
       builder: (context, child) {
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        final isDarkMode = context.isDarkMode;
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: const Color(0xFFFF5A00),
+              primary: context.palette.accent,
               onPrimary: Colors.white,
-              surface: isDarkMode ? Colors.grey[850]! : Colors.white,
-              onSurface: isDarkMode ? Colors.white : Colors.black,
+              surface: context.palette.surface,
+              onSurface: context.palette.textPrimary,
             ),
           ),
           child: child!,
@@ -124,21 +123,18 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.isDarkMode;
 
     return Scaffold(
       backgroundColor:
-          isDarkMode ? const Color(0xFF1A1C2E) : const Color(0xFFF5F6FA),
+          context.palette.background,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: isDarkMode
-            ? const Color.fromARGB(255, 91, 19, 207)
-            : const Color(0xFF5b3895),
+        backgroundColor: context.palette.appBarBackground,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: context.palette.textPrimary,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -147,7 +143,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: context.palette.textPrimary,
           ),
         ),
       ),
@@ -161,10 +157,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                     const Color(0xFF1A1C2E),
                     const Color(0xFF2D3250),
                   ]
-                : [
-                    const Color(0xFFF5F6FA),
-                    const Color(0xFFFFFFFF),
-                  ],
+                : [context.palette.background, context.palette.background],
           ),
         ),
         child: Column(
@@ -173,9 +166,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode
-                    ? Colors.grey[850]!.withOpacity(0.5)
-                    : Colors.white,
+                color: context.palette.surface,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -204,18 +195,16 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           filled: true,
-                          fillColor: isDarkMode
-                              ? Colors.grey[800]
-                              : Colors.grey[100],
+                          fillColor: context.palette.surfaceMuted,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
                           ),
                         ),
                         dropdownColor:
-                            isDarkMode ? const Color(0xFF1A1C2E) : Colors.white,
+                            context.palette.surface,
                         style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black87,
+                          color: context.palette.textPrimary,
                         ),
                         items: branches.map((branch) {
                           return DropdownMenuItem<int>(
@@ -242,14 +231,10 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: isDarkMode
-                                  ? Colors.grey[800]
-                                  : Colors.grey[100],
+                              color: context.palette.surfaceMuted,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: isDarkMode
-                                    ? Colors.grey[700]!
-                                    : Colors.grey[300]!,
+                                color: context.palette.border,
                               ),
                             ),
                             child: Row(
@@ -262,9 +247,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                                       'From Date',
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: isDarkMode
-                                            ? Colors.white70
-                                            : Colors.black54,
+                                        color: context.palette.textSecondary,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -273,18 +256,14 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black87,
+                                        color: context.palette.textPrimary,
                                       ),
                                     ),
                                   ],
                                 ),
                                 Icon(
                                   Icons.calendar_today,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.black54,
+                                  color: context.palette.textSecondary,
                                 ),
                               ],
                             ),
@@ -298,14 +277,10 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: isDarkMode
-                                  ? Colors.grey[800]
-                                  : Colors.grey[100],
+                              color: context.palette.surfaceMuted,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: isDarkMode
-                                    ? Colors.grey[700]!
-                                    : Colors.grey[300]!,
+                                color: context.palette.border,
                               ),
                             ),
                             child: Row(
@@ -318,9 +293,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                                       'To Date',
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: isDarkMode
-                                            ? Colors.white70
-                                            : Colors.black54,
+                                        color: context.palette.textSecondary,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -329,18 +302,14 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black87,
+                                        color: context.palette.textPrimary,
                                       ),
                                     ),
                                   ],
                                 ),
                                 Icon(
                                   Icons.calendar_today,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.black54,
+                                  color: context.palette.textSecondary,
                                 ),
                               ],
                             ),
@@ -359,7 +328,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                   if (state is AdminExpensesLoading) {
                     return Center(
                       child: CircularProgressIndicator(
-                        color: const Color(0xFFFF5A00),
+                        color: context.palette.accent,
                       ),
                     );
                   }
@@ -377,7 +346,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                           Text(
                             'Error: ${state.message}',
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black87,
+                              color: context.palette.textPrimary,
                               fontSize: 16,
                             ),
                             textAlign: TextAlign.center,
@@ -386,7 +355,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                           ElevatedButton(
                             onPressed: _fetchExpenses,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF5A00),
+                              backgroundColor: context.palette.accent,
                             ),
                             child: const Text('Retry'),
                           ),
@@ -411,9 +380,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                             Text(
                               'No expenses found',
                               style: TextStyle(
-                                color: isDarkMode
-                                    ? Colors.white70
-                                    : Colors.black54,
+                                color: context.palette.textSecondary,
                                 fontSize: 16,
                               ),
                             ),
@@ -444,7 +411,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                           ? 'Please select a branch to view expenses'
                           : 'No data available',
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                        color: context.palette.textSecondary,
                       ),
                     ),
                   );
@@ -507,7 +474,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -524,7 +491,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.white70 : Colors.black54,
+              color: context.palette.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -533,7 +500,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
+              color: context.palette.textPrimary,
             ),
           ),
         ],
@@ -551,7 +518,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -567,7 +534,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
           child: DataTable(
             headingRowColor: MaterialStateProperty.resolveWith<Color>(
               (Set<MaterialState> states) =>
-                  isDarkMode ? const Color(0xFF0F172A) : Colors.blue[50]!,
+                  context.palette.surfaceMuted,
             ),
             dataRowColor: MaterialStateProperty.resolveWith<Color>(
               (Set<MaterialState> states) {
@@ -576,7 +543,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                       ? Colors.blue.withOpacity(0.1)
                       : Colors.blue[100]!;
                 }
-                return isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+                return context.palette.surface;
               },
             ),
             columns: [
@@ -584,7 +551,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                 label: Text(
                   'AWB',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -593,7 +560,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                 label: Text(
                   'Sender',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -602,7 +569,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                 label: Text(
                   'Receiver',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -611,7 +578,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                 label: Text(
                   'Qty',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -620,7 +587,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                 label: Text(
                   'Net Fee',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -629,7 +596,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                 label: Text(
                   'Total Amount',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -638,7 +605,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                 label: Text(
                   'Status',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -647,7 +614,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                 label: Text(
                   'Created At',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: context.palette.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -662,44 +629,44 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                   DataCell(Text(
                     shipment.awb ?? 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
                     shipment.senderName ?? 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
                     shipment.receiverName ?? 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
                     '${shipment.qty ?? 0} ${shipment.unit ?? 'kg'}',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
                     currencyFormat.format(shipment.netFee ?? 0),
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
                     currencyFormat.format(shipment.totalAmount ?? 0),
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                       fontWeight: FontWeight.bold,
                     ),
                   )),
                   DataCell(Text(
                     shipment.shipmentStatus?.code ?? 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                     ),
                   )),
                   DataCell(Text(
@@ -707,7 +674,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                         ? DateFormat('MMM dd, yyyy').format(createdAt)
                         : 'N/A',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                      color: context.palette.textSecondary,
                       fontSize: 12,
                     ),
                   )),

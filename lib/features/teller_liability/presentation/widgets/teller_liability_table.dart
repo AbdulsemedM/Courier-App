@@ -1,6 +1,7 @@
 import 'package:courier_app/features/teller_liability/data/model/teller_liability_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:courier_app/core/theme/app_palette.dart';
 
 class TellerLiabilityTable extends StatelessWidget {
   final List<TellerLiability> liabilities;
@@ -12,7 +13,7 @@ class TellerLiabilityTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.isDarkMode;
     final currencyFormat = NumberFormat.currency(symbol: '', decimalDigits: 2);
     final dateFormat = DateFormat('MMM dd, yyyy HH:mm');
 
@@ -31,7 +32,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'ID',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -40,7 +41,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'Created At',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -49,7 +50,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'Teller Name',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -58,7 +59,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'Branch ID',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -67,7 +68,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'Status',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -76,7 +77,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'Expected Amount',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -85,7 +86,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'Actual Amount',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -94,7 +95,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'Shortfall',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -103,7 +104,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'Reason',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -112,7 +113,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'Transaction Ref',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -121,7 +122,7 @@ class TellerLiabilityTable extends StatelessWidget {
               label: Text(
                 'Recorded By',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: AppPalette.forMode(isDarkMode).textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -132,14 +133,14 @@ class TellerLiabilityTable extends StatelessWidget {
             final statusColor = _getStatusColor(liability.status, isDarkMode);
             final shortfallColor = liability.shortfallAmount > 0
                 ? Colors.red
-                : (isDarkMode ? Colors.white70 : Colors.black87);
+                : (AppPalette.forMode(isDarkMode).textSecondary);
 
             return DataRow(
               cells: [
                 DataCell(Text(
                   liability.id.toString(),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                   ),
                 )),
                 DataCell(Text(
@@ -147,21 +148,21 @@ class TellerLiabilityTable extends StatelessWidget {
                       ? dateFormat.format(createdAt)
                       : liability.createdAt,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   liability.tellerName,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   liability.branch.toString(),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
@@ -192,7 +193,7 @@ class TellerLiabilityTable extends StatelessWidget {
                 DataCell(Text(
                   currencyFormat.format(liability.expectedAmount),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -200,7 +201,7 @@ class TellerLiabilityTable extends StatelessWidget {
                 DataCell(Text(
                   currencyFormat.format(liability.actualAmount),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -219,7 +220,7 @@ class TellerLiabilityTable extends StatelessWidget {
                     child: Text(
                       liability.reason,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white70 : Colors.black87,
+                        color: AppPalette.forMode(isDarkMode).textSecondary,
                         fontSize: 12,
                       ),
                       maxLines: 2,
@@ -230,14 +231,14 @@ class TellerLiabilityTable extends StatelessWidget {
                 DataCell(Text(
                   liability.transactionReference,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
                 DataCell(Text(
                   liability.recordedBy.toString(),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                    color: AppPalette.forMode(isDarkMode).textSecondary,
                     fontSize: 12,
                   ),
                 )),
@@ -260,7 +261,7 @@ class TellerLiabilityTable extends StatelessWidget {
       case 'RESOLVED':
         return Colors.blue;
       default:
-        return isDarkMode ? Colors.white70 : Colors.grey;
+        return AppPalette.forMode(isDarkMode).textSecondary;
     }
   }
 }
