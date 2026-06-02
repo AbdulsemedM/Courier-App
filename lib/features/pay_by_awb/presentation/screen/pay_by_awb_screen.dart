@@ -2,6 +2,7 @@ import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
 import 'package:courier_app/features/add_shipment/presentation/screens/print_shipment_screen.dart';
 import 'package:courier_app/features/add_shipment/model/payment_invoice_model.dart';
+import 'package:courier_app/features/pay_by_awb/presentation/widgets/process_payment_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
@@ -42,22 +43,6 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
     super.dispose();
   }
 
-  ({String paymentMethod, String payerAccount})? _paymentInputs(
-    PaymentInvoiceModel details,
-  ) {
-    final method = details.paymentMethod?.trim().isNotEmpty == true
-        ? details.paymentMethod!.trim()
-        : details.paymentMode?.trim();
-    final account = details.senderMobile?.trim().isNotEmpty == true
-        ? details.senderMobile!.trim()
-        : details.receiverMobile?.trim();
-
-    if (method == null || method.isEmpty || account == null || account.isEmpty) {
-      return null;
-    }
-    return (paymentMethod: method, payerAccount: account);
-  }
-
   void _showSnack(String message, {Color? backgroundColor}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -68,29 +53,25 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
     );
   }
 
-  Future<void> _initiatePayment(AuthService authService) async {
-    final details = _lastFetchedDetails;
-    if (details == null) {
+  Future<void> _onPayNowPressed(AuthService authService) async {
+    final awb = _awbController.text.trim();
+    if (awb.isEmpty || _lastFetchedDetails == null) {
       _showSnack('Load shipment details before paying.');
       return;
     }
 
-    final inputs = _paymentInputs(details);
-    if (inputs == null) {
-      _showSnack(
-        'Payment method or payer phone number is missing for this shipment.',
-      );
-      return;
-    }
+    final bloc = context.read<AddShipmentBloc>();
+    final result = await showProcessPaymentDialog(context: context, awb: awb);
+    if (result == null || !mounted) return;
 
     final userId = int.tryParse(await authService.getUserId() ?? '') ?? 0;
     if (!mounted) return;
 
-    context.read<AddShipmentBloc>().add(
+    bloc.add(
           InitiatePaymentEvent(
-            awb: _awbController.text.trim(),
-            paymentMethod: inputs.paymentMethod,
-            payerAccount: inputs.payerAccount,
+            awb: awb,
+            paymentMethod: result.paymentMethod,
+            payerAccount: result.payerAccount,
             addedBy: userId,
           ),
         );
@@ -209,7 +190,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                             ElevatedButton.icon(
                               onPressed: state is InitiatePaymentLoading
                                   ? null
-                                  : () => _initiatePayment(authService),
+                                  : () => _onPayNowPressed(authService),
                               icon: const Icon(Icons.payment,
                                   color: Colors.deepPurple),
                               label: state is InitiatePaymentLoading

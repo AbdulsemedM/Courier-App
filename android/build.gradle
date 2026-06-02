@@ -48,18 +48,28 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+subprojects { subProject ->
+    subProject.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            // Some third-party plugins emit deprecation warnings that can fail builds
+            // when warnings are treated as errors in their own Gradle config.
+            allWarningsAsErrors = false
+        }
+    }
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
 
 buildscript {
-    ext.kotlin_version = '1.8.22'  // or newer
+    ext.kotlin_version = '2.2.0'  // or newer
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'  // or newer
+        classpath 'com.android.tools.build:gradle:8.9.1'  // or newer
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }

@@ -3,6 +3,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../model/track_shipment_model.dart';
 import 'package:intl/intl.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
+import 'package:courier_app/core/utils/shipment_status_helper.dart';
 import '../../../branches/model/branches_model.dart';
 
 class TrackShipmentWidgets {
@@ -100,8 +101,14 @@ class TrackShipmentWidgets {
     required bool isDarkMode,
     required List<TrackShipmentModel> shipments,
     List<BranchesModel>? branches,
+    Function(String awb)? onDeliver,
   }) {
     final mainShipment = shipments.first;
+    final canDeliver = ShipmentStatusHelper.shouldShowDeliverAction(
+      shipmentStatusCode: mainShipment.statusCode,
+      shipmentStatusLabel: mainShipment.statusDescription,
+      paymentStatus: mainShipment.paymentStatus,
+    );
 
     return SingleChildScrollView(
       child: Padding(
@@ -109,6 +116,14 @@ class TrackShipmentWidgets {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (canDeliver && onDeliver != null) ...[
+              _buildDeliverCta(
+                isDarkMode: isDarkMode,
+                shipment: mainShipment,
+                onDeliver: onDeliver,
+              ),
+              const SizedBox(height: 16),
+            ],
             _buildHeaderCard(isDarkMode, mainShipment),
             const SizedBox(height: 16),
             _buildShipmentInfoCard(isDarkMode, mainShipment, branches),
@@ -706,6 +721,55 @@ class TrackShipmentWidgets {
     );
   }
 
+  static Widget _buildDeliverCta({
+    required bool isDarkMode,
+    required TrackShipmentModel shipment,
+    required Function(String awb) onDeliver,
+  }) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDarkMode
+              ? [Colors.green.shade700, Colors.green.shade500]
+              : [Colors.green.shade600, Colors.green.shade400],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        onPressed: () => onDeliver(shipment.awb),
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          shadowColor: Colors.transparent,
+          minimumSize: const Size.fromHeight(56),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        icon: const Icon(Icons.local_shipping, size: 22),
+        label: const Text(
+          'Deliver Shipment',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.2,
+          ),
+        ),
+      ),
+    );
+  }
+
   static Widget _buildTimelineItem({
     required bool isDarkMode,
     required String description,
@@ -783,14 +847,16 @@ class TrackShipmentWidgets {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Icon(
                         Icons.access_time,
                         size: 14,
                         color: Colors.grey[600],
                       ),
-                      const SizedBox(width: 4),
                       Text(
                         formattedTime,
                         style: TextStyle(
@@ -799,19 +865,18 @@ class TrackShipmentWidgets {
                         ),
                       ),
                       if (user.isNotEmpty) ...[
-                        const SizedBox(width: 12),
                         Icon(
                           Icons.person,
                           size: 14,
                           color: Colors.grey[600]!,
                         ),
-                        const SizedBox(width: 4),
                         Text(
                           'user: $user',
                           style: TextStyle(
                             color: Colors.grey[600]!,
                             fontSize: 12,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ],

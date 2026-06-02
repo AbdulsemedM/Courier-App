@@ -93,6 +93,7 @@ import 'package:courier_app/providers/provider_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'core/update/force_update_gate.dart';
 import 'core/theme/theme_provider.dart';
 import 'package:courier_app/configuration/payment_service.dart';
 
@@ -222,7 +223,9 @@ class MyApp extends StatelessWidget {
           title: 'Courier App',
           debugShowCheckedModeBanner: false,
           theme: themeProvider.currentTheme,
-          home: const LoginScreen(),
+          home: const ForceUpdateGate(
+            child: LoginScreen(),
+          ),
         );
       },
     );

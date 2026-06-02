@@ -1,8 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:courier_app/app/utils/dialog_utils.dart';
 import 'package:courier_app/core/services/scanner_service.dart';
 import 'package:courier_app/features/track_order/presentation/widgets/track_order_widget.dart';
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
+import 'package:courier_app/features/shipment/data/data_provider/deliver_shipment_data_provider.dart';
+import 'package:courier_app/features/shipment/data/repository/deliver_shipment_repository.dart';
+import 'package:courier_app/features/shipment/presentation/widgets/deliver_shipment_modal.dart';
 import 'package:courier_app/features/track_shipment/bloc/track_shipment_bloc.dart';
 import 'package:courier_app/features/track_shipment/presentation/widgets/track_shipment_widget.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +15,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 
 class TrackShipmentScreen extends StatefulWidget {
@@ -197,6 +201,68 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     context.read<TrackShipmentBloc>().add(TrackShipment(awb));
   }
 
+  void _refreshTrackingForAwb(String awb) {
+    if (!mounted) return;
+    context.read<TrackShipmentBloc>().add(TrackShipment(awb));
+  }
+
+  void _handleDeliver(String awb) {
+    final outerContext = context;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (modalContext) => DeliverShipmentModal(
+        awb: awb,
+        onDeliver: ({
+          required String awb,
+          required bool isSelf,
+          File? customerIdFile,
+          String? deliveredToName,
+          String? deliveredToPhone,
+        }) async {
+          try {
+            Navigator.pop(modalContext);
+
+            if (!mounted) return;
+            showDialog(
+              context: outerContext,
+              barrierDismissible: false,
+              builder: (_) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+
+            final repository = DeliverShipmentRepository(
+              deliverShipmentDataProvider: DeliverShipmentDataProvider(),
+            );
+
+            final message = await repository.deliverShipment(
+              awb: awb,
+              isSelf: isSelf,
+              customerIdFile: customerIdFile,
+              deliveredToName: deliveredToName,
+              deliveredToPhone: deliveredToPhone,
+            );
+
+            if (!mounted) return;
+            Navigator.pop(outerContext);
+            displaySnack(outerContext, message, Colors.green);
+            _refreshTrackingForAwb(awb);
+          } catch (error) {
+            if (mounted) {
+              try {
+                Navigator.pop(outerContext);
+              } catch (_) {}
+              displaySnack(outerContext, error.toString(), Colors.red);
+            }
+          }
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.isDarkMode;
@@ -360,6 +426,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                           isDarkMode: isDarkMode,
                           shipments: state.trackShipmentModel,
                           branches: branches,
+                          onDeliver: _handleDeliver,
                         );
                       },
                     );

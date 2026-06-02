@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class ShipmentStatusHelper {
   static const pendingStatusCode = 'PAR';
   static const readyForPickupStatusCode = 'R4P';
+  static const arrivedStatusCode = 'ARR';
 
   static StatusModel pendingStatus() {
     return StatusModel(
@@ -95,6 +96,43 @@ class ShipmentStatusHelper {
     }
 
     return needsPayment(paymentStatus);
+  }
+
+  static bool isPaymentFulfilled(String? paymentStatus) {
+    if (paymentStatus == null || paymentStatus.trim().isEmpty) {
+      return false;
+    }
+
+    final normalized = paymentStatus.trim().toUpperCase();
+    return normalized == 'SUCCESS' || normalized == 'PAID';
+  }
+
+  static bool isDeliverableStatusCode(String? statusCode) {
+    if (statusCode == null || statusCode.trim().isEmpty) {
+      return false;
+    }
+
+    final normalized = statusCode.trim().toUpperCase();
+    return normalized == arrivedStatusCode || normalized == readyForPickupStatusCode;
+  }
+
+  static bool isDeliverableStatusLabel(String? statusLabel) {
+    if (statusLabel == null || statusLabel.trim().isEmpty) {
+      return false;
+    }
+
+    final normalized = statusLabel.trim().toUpperCase();
+    return normalized == 'ARRIVED' || normalized == 'READY FOR PICKUP';
+  }
+
+  static bool shouldShowDeliverAction({
+    required String? shipmentStatusCode,
+    required String? shipmentStatusLabel,
+    required String? paymentStatus,
+  }) {
+    final isDeliverable = isDeliverableStatusCode(shipmentStatusCode) ||
+        isDeliverableStatusLabel(shipmentStatusLabel);
+    return isDeliverable && isPaymentFulfilled(paymentStatus);
   }
 
   static String displayLabel(StatusModel status) {
