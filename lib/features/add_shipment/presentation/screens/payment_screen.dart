@@ -1,6 +1,8 @@
 // import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
+import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart';
 import 'package:courier_app/features/add_shipment/presentation/screens/print_shipment_screen.dart';
+import 'package:courier_app/features/pay_by_awb/presentation/widgets/process_payment_dialog.dart';
 // import 'package:courier_app/features/add_shipment/bloc/add_shipment_event.dart';
 // import 'package:courier_app/features/add_shipment/data/repository/add_shipment_repository.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,33 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
+  Future<void> _onPayNowPressed() async {
+    final bloc = context.read<AddShipmentBloc>();
+    final result = await showProcessPaymentDialog(
+      context: context,
+      awb: widget.trackingNumber,
+    );
+    if (result == null || !mounted) return;
+
+    final formAddedBy = widget.formData['addedBy'];
+    final addedBy = formAddedBy is int
+        ? formAddedBy
+        : int.tryParse(formAddedBy?.toString() ?? '') ??
+            int.tryParse(await AuthService().getUserId() ?? '') ??
+            0;
+
+    if (!mounted) return;
+
+    bloc.add(
+          InitiatePaymentEvent(
+            awb: widget.trackingNumber,
+            paymentMethod: result.paymentMethod,
+            payerAccount: result.payerAccount,
+            addedBy: addedBy,
+          ),
+        );
+  }
+
   Widget _buildInfoRow(String label, String value, {bool highlight = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -111,20 +140,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   child: Row(
                     children: [
                       ElevatedButton.icon(
-                        onPressed: () {
-                          final payerAccount =
-                              widget.formData['payerAccount']?.toString() ??
-                                  widget.formData['senderMobile']?.toString();
-                          context.read<AddShipmentBloc>().add(
-                                InitiatePaymentEvent(
-                                  awb: widget.trackingNumber,
-                                  paymentMethod: widget.paymentInfo,
-                                  payerAccount: payerAccount!,
-                                  addedBy:
-                                      widget.formData['addedBy'] as int? ?? 1,
-                                ),
-                              );
-                        },
+                        onPressed: state is InitiatePaymentLoading
+                            ? null
+                            : _onPayNowPressed,
                         icon:
                             const Icon(Icons.payment, color: Colors.deepPurple),
                         label: state is InitiatePaymentLoading

@@ -178,8 +178,7 @@ class AddShipmentDataProvider {
   Future<String> initiatePayment(String awb, String paymentMethod,
       String payerAccount, int addedBy) async {
     try {
-      final apiProvider =
-          ProviderSetup.getApiProvider(ApiConstants.paymentBaseUrl);
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
       final response =
           await apiProvider.postRequest("/api/v1/payment/initiate", {
         "awb": awb,
