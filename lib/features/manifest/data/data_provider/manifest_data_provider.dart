@@ -41,4 +41,35 @@ class ManifestDataProvider {
       throw e.toString();
     }
   }
+
+  Future<String> addAwbsToManifest({
+    required int manifestId,
+    required List<String> awbs,
+  }) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider.patchRequest(
+        '/api/v1/manifest/$manifestId/awb',
+        {'awbs': awbs},
+      );
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<String> removeAwbFromManifest({
+    required int manifestId,
+    required String awb,
+  }) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider.deleteRequest(
+        '/api/v1/manifest/$manifestId/awb/$awb',
+      );
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }

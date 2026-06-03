@@ -31,3 +31,37 @@ class CreateManifest extends ManifestEvent {
   @override
   List<Object> get props => [awbs, fileType, userId];
 }
+
+class AddAwbsToManifest extends ManifestEvent {
+  final int manifestId;
+  final List<String> awbs;
+  final int branchId;
+  final String date;
+
+  const AddAwbsToManifest({
+    required this.manifestId,
+    required this.awbs,
+    required this.branchId,
+    required this.date,
+  });
+
+  @override
+  List<Object> get props => [manifestId, awbs, branchId, date];
+}
+
+class RemoveAwbFromManifest extends ManifestEvent {
+  final int manifestId;
+  final String awb;
+  final int branchId;
+  final String date;
+
+  const RemoveAwbFromManifest({
+    required this.manifestId,
+    required this.awb,
+    required this.branchId,
+    required this.date,
+  });
+
+  @override
+  List<Object> get props => [manifestId, awb, branchId, date];
+}

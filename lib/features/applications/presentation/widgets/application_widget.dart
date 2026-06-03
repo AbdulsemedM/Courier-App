@@ -7,6 +7,7 @@ import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_s
 import 'package:courier_app/features/shelves_management/presentation/screen/shelves_screen.dart';
 import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
 import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
+import 'package:courier_app/features/home_delivery/presentation/screens/home_deliveries_screen.dart';
 import 'package:courier_app/features/manifest/presentation/screens/manifest_screen.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:flutter/material.dart';
@@ -454,6 +455,15 @@ final List<MenuOption> defaultMenuOptions = [
     gradientStart: const Color(0xFFEEF2FF),
     gradientEnd: const Color(0xFFE0E7FF),
     screen: const ManifestScreen(),
+  ),
+  MenuOption(
+    title: 'Home Deliveries',
+    subtitle: 'Assign & track deliveries',
+    icon: Icons.delivery_dining_rounded,
+    color: const Color(0xFFBE185D),
+    gradientStart: const Color(0xFFFDF2F8),
+    gradientEnd: const Color(0xFFFCE7F3),
+    screen: const HomeDeliveriesScreen(),
   ),
   MenuOption(
     title: 'Add Extra Fee',

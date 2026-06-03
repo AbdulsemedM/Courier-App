@@ -16,9 +16,14 @@ import 'package:courier_app/features/currency/data/repository/currency_repositor
 import 'package:courier_app/features/exchange_rate/bloc/exchange_rate_bloc.dart';
 import 'package:courier_app/features/exchange_rate/data/data_provider/exchange_rate_data_provider.dart';
 import 'package:courier_app/features/exchange_rate/data/repository/exchange_rate_repository.dart';
+import 'package:courier_app/features/home_delivery/bloc/home_delivery_bloc.dart';
+import 'package:courier_app/features/home_delivery/data/data_provider/home_delivery_data_provider.dart';
+import 'package:courier_app/features/home_delivery/data/repository/home_delivery_repository.dart';
 import 'package:courier_app/features/manifest/bloc/manifest_bloc.dart';
 import 'package:courier_app/features/manifest/data/data_provider/manifest_data_provider.dart';
 import 'package:courier_app/features/manifest/data/repository/manifest_repository.dart';
+import 'package:courier_app/features/messenger/data/data_provider/messenger_data_provider.dart';
+import 'package:courier_app/features/messenger/data/repository/messenger_repository.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
 import 'package:courier_app/features/login/data/data_provider/login_data_provider.dart';
 import 'package:courier_app/features/login/data/repository/login_repository.dart';
@@ -138,6 +143,15 @@ void main() async {
             create: (context) => ManifestBloc(
                 manifestRepository: ManifestRepository(
                     manifestDataProvider: ManifestDataProvider()))),
+        BlocProvider(
+            create: (context) => HomeDeliveryBloc(
+                  homeDeliveryRepository: HomeDeliveryRepository(
+                    homeDeliveryDataProvider: HomeDeliveryDataProvider(),
+                  ),
+                  messengerRepository: MessengerRepository(
+                    messengerDataProvider: MessengerDataProvider(),
+                  ),
+                )),
         BlocProvider(
             create: (context) =>
                 LoginBloc(LoginRepository(LoginDataProvider()))),

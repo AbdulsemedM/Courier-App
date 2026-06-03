@@ -13,6 +13,7 @@ import 'package:courier_app/features/shelves_management/presentation/screen/shel
 import 'package:courier_app/features/shelves_management/bloc/shelves_management_bloc.dart';
 import 'package:courier_app/features/shelves_management/data/repository/shelves_repository.dart';
 import 'package:courier_app/features/shelves_management/data/data_provider/shelves_data_provider.dart';
+import 'package:courier_app/features/home_delivery/presentation/screens/home_deliveries_screen.dart';
 import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
 import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
@@ -205,6 +206,10 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
           } else if (screen is ShipmentsScreen) {
             permission = 'manage_shipments';
             errorMessage = 'You do not have permission to view shipments';
+          } else if (screen is HomeDeliveriesScreen) {
+            permission = 'manage_shipments';
+            errorMessage =
+                'You do not have permission to view home deliveries';
           // } else if (screen is RolesScreen) {
           //   permission = 'manage_permissions';
           //   errorMessage = 'You do not have permission to manage roles';

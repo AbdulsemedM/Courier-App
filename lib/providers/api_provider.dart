@@ -87,6 +87,55 @@ class ApiProvider {
     }
   }
 
+  Future<http.Response> patchRequest(
+      String endpoint, Map<dynamic, dynamic> body) async {
+    final url = Uri.parse('${ApiConstants.baseUrl}$endpoint');
+    final headers = await _headersFor(endpoint);
+
+    try {
+      final response = await http
+          .patch(
+        url,
+        headers: headers,
+        body: jsonEncode(body),
+      )
+          .timeout(
+        timeout,
+        onTimeout: () {
+          throw TimeoutException('Request timed out');
+        },
+      );
+      loggingInterceptor.logRequest(url.toString(), 'PATCH', headers, body);
+      loggingInterceptor.logResponse(response);
+      errorInterceptor.checkError(response);
+      return response;
+    } catch (error) {
+      loggingInterceptor.logError(error);
+      rethrow;
+    }
+  }
+
+  Future<http.Response> deleteRequest(String endpoint) async {
+    final url = Uri.parse('${ApiConstants.baseUrl}$endpoint');
+    final headers = await _headersFor(endpoint);
+
+    try {
+      final response = await http.delete(url, headers: headers).timeout(
+        timeout,
+        onTimeout: () {
+          throw TimeoutException('Request timed out');
+        },
+      );
+      loggingInterceptor.logRequest(url.toString(), 'DELETE', headers, null);
+      loggingInterceptor.logResponse(response);
+      errorInterceptor.checkError(response);
+      return response;
+    } catch (error) {
+      loggingInterceptor.logError(error);
+      rethrow;
+    }
+  }
+
   Future<http.Response> putRequest(
       String endpoint, Map<dynamic, dynamic> body) async {
     final url = Uri.parse('${ApiConstants.baseUrl}$endpoint');

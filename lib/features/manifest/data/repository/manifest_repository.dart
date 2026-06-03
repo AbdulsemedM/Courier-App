@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:courier_app/core/utils/api_json_decoder.dart';
 import 'package:courier_app/features/manifest/data/data_provider/manifest_data_provider.dart';
 import 'package:courier_app/features/manifest/data/model/manifest_model.dart';
 
@@ -48,6 +49,44 @@ class ManifestRepository {
         throw 'No manifest returned from server';
       }
       return list.first;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<String> addAwbsToManifest({
+    required int manifestId,
+    required List<String> awbs,
+  }) async {
+    try {
+      final response = await manifestDataProvider.addAwbsToManifest(
+        manifestId: manifestId,
+        awbs: awbs,
+      );
+      final data = decodeApiMap(response);
+      if (data['status'] != 200) {
+        throw data['message'] ?? 'Failed to add AWBs to manifest';
+      }
+      return data['message']?.toString() ?? 'AWBs added to manifest successfully';
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<String> removeAwbFromManifest({
+    required int manifestId,
+    required String awb,
+  }) async {
+    try {
+      final response = await manifestDataProvider.removeAwbFromManifest(
+        manifestId: manifestId,
+        awb: awb,
+      );
+      final data = decodeApiMap(response);
+      if (data['status'] != 200) {
+        throw data['message'] ?? 'Failed to remove AWB from manifest';
+      }
+      return data['message']?.toString() ?? 'AWB removed from manifest successfully';
     } catch (e) {
       throw e.toString();
     }

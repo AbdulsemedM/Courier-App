@@ -55,11 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  bool _hasAccountingAccessRole(String? roleName) {
-    if (roleName == null) return false;
-    final role = roleName.toLowerCase().trim();
-    return role == 'admin' || role == 'teller' || role == 'branch manager';
-  }
+  bool _hasAccountingAccessRole(String? roleName) =>
+      RoleDisplayHelper.hasAccountingAccess(roleName);
 
   @override
   Widget build(BuildContext context) {

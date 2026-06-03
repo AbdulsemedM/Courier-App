@@ -1,3 +1,4 @@
+import 'package:courier_app/app/utils/dialog_utils.dart';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/features/manifest/bloc/manifest_bloc.dart';
@@ -97,7 +98,8 @@ class _ManifestScreenState extends State<ManifestScreen> {
           m.branch.name.toLowerCase().contains(query) ||
           m.receiverBranch.name.toLowerCase().contains(query) ||
           m.creatorLabel.toLowerCase().contains(query) ||
-          m.createdBy.email.toLowerCase().contains(query);
+          m.createdBy.email.toLowerCase().contains(query) ||
+          m.awbList.any((awb) => awb.toLowerCase().contains(query));
     }).toList();
   }
 
@@ -106,6 +108,113 @@ class _ManifestScreenState extends State<ManifestScreen> {
     if (start >= manifests.length) return [];
     final end = (start + _itemsPerPage).clamp(0, manifests.length);
     return manifests.sublist(start, end);
+  }
+
+  void _openManageAwbs(ManifestModel manifest) {
+    if (_branchId == null) return;
+    final addController = TextEditingController();
+    final date = DateFormat('yyyy-MM-dd').format(_selectedDate);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        final palette = sheetContext.palette;
+        return Container(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 20,
+          ),
+          decoration: BoxDecoration(
+            color: palette.surface,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Manifest #${manifest.id} AWBs',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: palette.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (manifest.awbList.isEmpty)
+                Text(
+                  'No AWBs on this manifest yet',
+                  style: TextStyle(color: palette.textSecondary),
+                )
+              else
+                ...manifest.awbList.map(
+                  (awb) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(awb, style: TextStyle(color: palette.textPrimary)),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      onPressed: () {
+                        context.read<ManifestBloc>().add(
+                              RemoveAwbFromManifest(
+                                manifestId: manifest.id,
+                                awb: awb,
+                                branchId: _branchId!,
+                                date: date,
+                              ),
+                            );
+                        Navigator.pop(sheetContext);
+                      },
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: addController,
+                decoration: InputDecoration(
+                  labelText: 'Add AWBs (comma-separated)',
+                  filled: true,
+                  fillColor: palette.surfaceMuted,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  final awbs = addController.text
+                      .split(',')
+                      .map((s) => s.trim())
+                      .where((s) => s.isNotEmpty)
+                      .toList();
+                  if (awbs.isEmpty) return;
+                  context.read<ManifestBloc>().add(
+                        AddAwbsToManifest(
+                          manifestId: manifest.id,
+                          awbs: awbs,
+                          branchId: _branchId!,
+                          date: date,
+                        ),
+                      );
+                  Navigator.pop(sheetContext);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: palette.accent,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Add AWBs'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _openCreateScreen() async {
@@ -126,7 +235,17 @@ class _ManifestScreenState extends State<ManifestScreen> {
     final palette = context.palette;
     final dateLabel = DateFormat('MM/dd/yyyy').format(_selectedDate);
 
-    return Scaffold(
+    return BlocListener<ManifestBloc, ManifestState>(
+      listenWhen: (prev, curr) =>
+          curr is ManifestAwbActionSuccess || curr is ManifestAwbActionFailure,
+      listener: (context, state) {
+        if (state is ManifestAwbActionSuccess) {
+          displaySnack(context, state.message, Colors.green);
+        } else if (state is ManifestAwbActionFailure) {
+          displaySnack(context, state.message, Colors.red);
+        }
+      },
+      child: Scaffold(
       backgroundColor: palette.background,
       appBar: AppBar(
         elevation: 0,
@@ -314,7 +433,10 @@ class _ManifestScreenState extends State<ManifestScreen> {
                         return Column(
                           children: [
                             Expanded(
-                              child: ManifestTable(manifests: pageItems),
+                              child: ManifestTable(
+                                manifests: pageItems,
+                                onManageAwbs: _openManageAwbs,
+                              ),
                             ),
                             _buildPagination(
                               palette: palette,
@@ -336,6 +458,7 @@ class _ManifestScreenState extends State<ManifestScreen> {
                 ),
               ],
             ),
+    ),
     );
   }
 

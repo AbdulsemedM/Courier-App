@@ -48,3 +48,23 @@ final class CreateManifestFailure extends ManifestState {
   @override
   List<Object> get props => [message];
 }
+
+final class ManifestAwbActionLoading extends ManifestState {}
+
+final class ManifestAwbActionSuccess extends ManifestState {
+  final String message;
+
+  const ManifestAwbActionSuccess({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
+final class ManifestAwbActionFailure extends ManifestState {
+  final String message;
+
+  const ManifestAwbActionFailure({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}

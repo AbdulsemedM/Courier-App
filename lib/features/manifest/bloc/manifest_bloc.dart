@@ -15,6 +15,8 @@ class ManifestBloc extends Bloc<ManifestEvent, ManifestState> {
   ManifestBloc({required this.manifestRepository}) : super(ManifestInitial()) {
     on<FetchManifests>(_onFetchManifests);
     on<CreateManifest>(_onCreateManifest);
+    on<AddAwbsToManifest>(_onAddAwbsToManifest);
+    on<RemoveAwbFromManifest>(_onRemoveAwbFromManifest);
   }
 
   Future<void> _onFetchManifests(
@@ -53,6 +55,40 @@ class ManifestBloc extends Bloc<ManifestEvent, ManifestState> {
       }
     } catch (e) {
       emit(CreateManifestFailure(message: e.toString()));
+    }
+  }
+
+  Future<void> _onAddAwbsToManifest(
+    AddAwbsToManifest event,
+    Emitter<ManifestState> emit,
+  ) async {
+    emit(ManifestAwbActionLoading());
+    try {
+      final message = await manifestRepository.addAwbsToManifest(
+        manifestId: event.manifestId,
+        awbs: event.awbs,
+      );
+      emit(ManifestAwbActionSuccess(message: message));
+      add(FetchManifests(branchId: event.branchId, date: event.date));
+    } catch (e) {
+      emit(ManifestAwbActionFailure(message: e.toString()));
+    }
+  }
+
+  Future<void> _onRemoveAwbFromManifest(
+    RemoveAwbFromManifest event,
+    Emitter<ManifestState> emit,
+  ) async {
+    emit(ManifestAwbActionLoading());
+    try {
+      final message = await manifestRepository.removeAwbFromManifest(
+        manifestId: event.manifestId,
+        awb: event.awb,
+      );
+      emit(ManifestAwbActionSuccess(message: message));
+      add(FetchManifests(branchId: event.branchId, date: event.date));
+    } catch (e) {
+      emit(ManifestAwbActionFailure(message: e.toString()));
     }
   }
 }

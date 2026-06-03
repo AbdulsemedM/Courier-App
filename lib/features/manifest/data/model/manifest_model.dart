@@ -85,6 +85,7 @@ class ManifestModel {
   final double totalValue;
   final String createdAt;
   final String updatedAt;
+  final List<String> awbList;
 
   const ManifestModel({
     required this.id,
@@ -104,9 +105,39 @@ class ManifestModel {
     required this.totalValue,
     required this.createdAt,
     required this.updatedAt,
+    this.awbList = const [],
   });
 
   factory ManifestModel.fromJson(Map<String, dynamic> json) {
+    if (json.containsKey('awbList') || json.containsKey('date')) {
+      final awbList = (json['awbList'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [];
+      final id = json['id'] as int? ?? 0;
+      final branchId = json['branchId'] as int? ?? 0;
+      return ManifestModel(
+        id: id,
+        manifestId: id.toString(),
+        branch: ManifestBranch(id: branchId, name: '', code: ''),
+        senderBranch: branchId,
+        receiverBranch: const ManifestBranch(id: 0, name: '', code: ''),
+        createdBy: const ManifestUser(id: 0, fullName: '', email: ''),
+        fromStatus:
+            const ManifestStatus(id: 0, code: '', description: '', name: ''),
+        toStatus:
+            const ManifestStatus(id: 0, code: '', description: '', name: ''),
+        manifestDate: json['date'] as String? ?? '',
+        fileType: '',
+        totalShipments: json['totalShipments'] as int? ?? awbList.length,
+        totalWeight: 0,
+        totalValue: 0,
+        createdAt: json['date'] as String? ?? '',
+        updatedAt: '',
+        awbList: awbList,
+      );
+    }
+
     return ManifestModel(
       id: json['id'] as int? ?? 0,
       manifestId: json['manifestId'] as String? ?? '',
@@ -136,6 +167,7 @@ class ManifestModel {
       totalValue: (json['totalValue'] as num?)?.toDouble() ?? 0,
       createdAt: json['createdAt'] as String? ?? '',
       updatedAt: json['updatedAt'] as String? ?? '',
+      awbList: const [],
     );
   }
 

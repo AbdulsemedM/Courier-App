@@ -1,5 +1,6 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:courier_app/configuration/auth_service.dart';
+import 'package:courier_app/core/utils/role_display_helper.dart';
 import 'package:courier_app/configuration/phone_number_manager.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/features/analytics/presentation/screens/analytics_screen.dart';
@@ -34,7 +35,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _checkAdminRole() async {
     final roleName = await _authService.getRoleName();
     setState(() {
-      _isAdmin = roleName?.toLowerCase() == 'admin';
+      _isAdmin = RoleDisplayHelper.isAdminRole(roleName);
       _pageController = PageController();
       _isLoading = false;
     });

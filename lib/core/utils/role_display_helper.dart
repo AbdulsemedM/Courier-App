@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:courier_app/configuration/auth_service.dart';
 
 class RoleDisplayInfo {
@@ -19,6 +17,24 @@ class RoleDisplayHelper {
     'teller': 2,
   };
 
+  /// Maps API role strings (e.g. `TALLER `, `BRANCH MANAGER`) to canonical names.
+  static String normalizeRole(String raw) {
+    final normalized = raw.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+    if (normalized.isEmpty) return normalized;
+    // Backend lists this role as "TALLER" (typo for teller).
+    if (normalized == 'taller') return 'teller';
+    return normalized;
+  }
+
+  static bool isAdminRole(String? raw) =>
+      raw != null && normalizeRole(raw) == 'admin';
+
+  static bool hasAccountingAccess(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return false;
+    final role = normalizeRole(raw);
+    return role == 'admin' || role == 'teller' || role == 'branch manager';
+  }
+
   static String resolvePrimaryRole(List<String> roles) {
     if (roles.isEmpty) return 'user';
 
@@ -26,7 +42,7 @@ class RoleDisplayHelper {
     var bestPriority = 999;
 
     for (final raw in roles) {
-      final normalized = raw.trim().toLowerCase();
+      final normalized = normalizeRole(raw);
       if (normalized.isEmpty) continue;
 
       final priority = _rolePriority[normalized] ?? 100;
@@ -40,7 +56,7 @@ class RoleDisplayHelper {
   }
 
   static String formatRoleLabel(String role) {
-    final normalized = role.trim().toLowerCase();
+    final normalized = normalizeRole(role);
     if (normalized.isEmpty) return 'User';
 
     return normalized

@@ -1,4 +1,3 @@
-import 'package:courier_app/app/utils/dialog_utils.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/features/manifest/data/model/manifest_model.dart';
 import 'package:courier_app/features/track_order/presentation/widgets/track_order_widget.dart';
@@ -7,8 +6,13 @@ import 'package:intl/intl.dart';
 
 class ManifestTable extends StatelessWidget {
   final List<ManifestModel> manifests;
+  final void Function(ManifestModel manifest)? onManageAwbs;
 
-  const ManifestTable({super.key, required this.manifests});
+  const ManifestTable({
+    super.key,
+    required this.manifests,
+    this.onManageAwbs,
+  });
 
   String _formatDateTime(String raw) {
     try {
@@ -120,6 +124,19 @@ class ManifestTable extends StatelessWidget {
                         '${manifest.totalShipments} shipments',
                         style: TextStyle(color: palette.textPrimary),
                       ),
+                      if (manifest.awbList.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          manifest.awbList.take(3).join(', ') +
+                              (manifest.awbList.length > 3
+                                  ? ' +${manifest.awbList.length - 3} more'
+                                  : ''),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: palette.textSecondary,
+                          ),
+                        ),
+                      ],
                       Text(
                         'Weight: ${manifest.totalWeight.toStringAsFixed(0)} kg',
                         style: TextStyle(
@@ -158,15 +175,11 @@ class ManifestTable extends StatelessWidget {
                 ),
                 DataCell(
                   IconButton(
-                    icon: Icon(Icons.edit_outlined, color: palette.accent),
-                    tooltip: 'Edit manifest',
-                    onPressed: () {
-                      displaySnack(
-                        context,
-                        'Edit manifest — coming soon',
-                        Colors.orange,
-                      );
-                    },
+                    icon: Icon(Icons.list_alt, color: palette.accent),
+                    tooltip: 'Manage AWBs',
+                    onPressed: onManageAwbs != null
+                        ? () => onManageAwbs!(manifest)
+                        : null,
                   ),
                 ),
               ],
