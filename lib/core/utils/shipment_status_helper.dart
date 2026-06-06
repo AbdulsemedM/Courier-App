@@ -135,6 +135,16 @@ class ShipmentStatusHelper {
     return isDeliverable && isPaymentFulfilled(paymentStatus);
   }
 
+  static bool shouldShowPayBeforeDeliverAction({
+    required String? shipmentStatusCode,
+    required String? shipmentStatusLabel,
+    required String? paymentStatus,
+  }) {
+    final isDeliverable = isDeliverableStatusCode(shipmentStatusCode) ||
+        isDeliverableStatusLabel(shipmentStatusLabel);
+    return isDeliverable && needsPayment(paymentStatus);
+  }
+
   static String displayLabel(StatusModel status) {
     final name = status.name?.trim();
     if (name != null && name.isNotEmpty) return name;

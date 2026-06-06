@@ -102,9 +102,17 @@ class TrackShipmentWidgets {
     required List<TrackShipmentModel> shipments,
     List<BranchesModel>? branches,
     Function(String awb)? onDeliver,
+    Function(String awb)? onPay,
+    Function(String awb)? onRefreshPaymentStatus,
+    bool isPaymentActionLoading = false,
   }) {
     final mainShipment = shipments.first;
     final canDeliver = ShipmentStatusHelper.shouldShowDeliverAction(
+      shipmentStatusCode: mainShipment.statusCode,
+      shipmentStatusLabel: mainShipment.statusDescription,
+      paymentStatus: mainShipment.paymentStatus,
+    );
+    final canPay = ShipmentStatusHelper.shouldShowPayBeforeDeliverAction(
       shipmentStatusCode: mainShipment.statusCode,
       shipmentStatusLabel: mainShipment.statusDescription,
       paymentStatus: mainShipment.paymentStatus,
@@ -122,6 +130,23 @@ class TrackShipmentWidgets {
                 shipment: mainShipment,
                 onDeliver: onDeliver,
               ),
+              const SizedBox(height: 16),
+            ],
+            if (canPay && onPay != null) ...[
+              _buildPayCta(
+                isDarkMode: isDarkMode,
+                shipment: mainShipment,
+                onPay: onPay,
+                isLoading: isPaymentActionLoading,
+              ),
+              const SizedBox(height: 12),
+              if (onRefreshPaymentStatus != null)
+                _buildRefreshStatusCta(
+                  isDarkMode: isDarkMode,
+                  shipment: mainShipment,
+                  onRefreshPaymentStatus: onRefreshPaymentStatus,
+                  isLoading: isPaymentActionLoading,
+                ),
               const SizedBox(height: 16),
             ],
             _buildHeaderCard(isDarkMode, mainShipment),
@@ -764,6 +789,109 @@ class TrackShipmentWidgets {
             fontSize: 17,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.2,
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Widget _buildPayCta({
+    required bool isDarkMode,
+    required TrackShipmentModel shipment,
+    required Function(String awb) onPay,
+    required bool isLoading,
+  }) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDarkMode
+              ? [Colors.orange.shade800, Colors.orange.shade600]
+              : [Colors.orange.shade700, Colors.orange.shade500],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withOpacity(0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        onPressed: isLoading ? null : () => onPay(shipment.awb),
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          shadowColor: Colors.transparent,
+          disabledForegroundColor: Colors.white70,
+          minimumSize: const Size.fromHeight(56),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        icon: isLoading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : const Icon(Icons.payment, size: 22),
+        label: const Text(
+          'Pay Shipment',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.2,
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Widget _buildRefreshStatusCta({
+    required bool isDarkMode,
+    required TrackShipmentModel shipment,
+    required Function(String awb) onRefreshPaymentStatus,
+    required bool isLoading,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: isLoading ? null : () => onRefreshPaymentStatus(shipment.awb),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: isDarkMode ? Colors.orange.shade300 : Colors.orange.shade800,
+          side: BorderSide(
+            color: isDarkMode ? Colors.orange.shade400 : Colors.orange.shade700,
+          ),
+          minimumSize: const Size.fromHeight(48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        icon: isLoading
+            ? SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isDarkMode ? Colors.orange.shade300 : Colors.orange.shade800,
+                  ),
+                ),
+              )
+            : const Icon(Icons.refresh, size: 20),
+        label: const Text(
+          'Refresh Status',
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),

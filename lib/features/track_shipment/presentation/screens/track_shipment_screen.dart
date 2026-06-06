@@ -2,7 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:courier_app/app/utils/dialog_utils.dart';
+import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/core/services/scanner_service.dart';
+import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart'
+    hide FetchBranches;
+import 'package:courier_app/features/pay_by_awb/presentation/widgets/process_payment_dialog.dart';
 import 'package:courier_app/features/track_order/presentation/widgets/track_order_widget.dart';
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:courier_app/features/shipment/data/data_provider/deliver_shipment_data_provider.dart';
@@ -206,6 +210,29 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     context.read<TrackShipmentBloc>().add(TrackShipment(awb));
   }
 
+  String get _currentAwb => _searchController.text.trim();
+
+  Future<void> _handlePay(String awb) async {
+    final result = await showProcessPaymentDialog(context: context, awb: awb);
+    if (result == null || !mounted) return;
+
+    final userId = int.tryParse(await AuthService().getUserId() ?? '') ?? 0;
+    if (!mounted) return;
+
+    context.read<AddShipmentBloc>().add(
+          InitiatePaymentEvent(
+            awb: awb,
+            paymentMethod: result.paymentMethod,
+            payerAccount: result.payerAccount,
+            addedBy: userId,
+          ),
+        );
+  }
+
+  void _handleRefreshPaymentStatus(String awb) {
+    context.read<AddShipmentBloc>().add(CheckPaymentStatusEvent(awb: awb));
+  }
+
   void _handleDeliver(String awb) {
     final outerContext = context;
 
@@ -267,7 +294,28 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = context.isDarkMode;
 
-    return Scaffold(
+    return BlocListener<AddShipmentBloc, AddShipmentState>(
+      listenWhen: (previous, current) =>
+          current is InitiatePaymentSuccess ||
+          current is InitiatePaymentFailure ||
+          current is CheckPaymentStatusSuccess ||
+          current is CheckPaymentStatusFailure,
+      listener: (context, state) {
+        if (state is InitiatePaymentSuccess) {
+          displaySnack(context, state.message, Colors.green);
+        } else if (state is InitiatePaymentFailure) {
+          displaySnack(context, state.errorMessage, Colors.red);
+        } else if (state is CheckPaymentStatusSuccess) {
+          final awb = _currentAwb;
+          if (awb.isNotEmpty) {
+            _refreshTrackingForAwb(awb);
+          }
+          displaySnack(context, state.message, Colors.green);
+        } else if (state is CheckPaymentStatusFailure) {
+          displaySnack(context, state.errorMessage, Colors.red);
+        }
+      },
+      child: Scaffold(
       backgroundColor:
           context.palette.appBarBackground,
       appBar: AppBar(
@@ -422,11 +470,22 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                         final branches = branchesState is FetchBranchesLoaded
                             ? branchesState.branches
                             : null;
-                        return TrackShipmentWidgets.buildTrackingDetails(
-                          isDarkMode: isDarkMode,
-                          shipments: state.trackShipmentModel,
-                          branches: branches,
-                          onDeliver: _handleDeliver,
+                        return BlocBuilder<AddShipmentBloc, AddShipmentState>(
+                          builder: (context, paymentState) {
+                            final isPaymentActionLoading =
+                                paymentState is InitiatePaymentLoading ||
+                                    paymentState is CheckPaymentStatusLoading;
+
+                            return TrackShipmentWidgets.buildTrackingDetails(
+                              isDarkMode: isDarkMode,
+                              shipments: state.trackShipmentModel,
+                              branches: branches,
+                              onDeliver: _handleDeliver,
+                              onPay: _handlePay,
+                              onRefreshPaymentStatus: _handleRefreshPaymentStatus,
+                              isPaymentActionLoading: isPaymentActionLoading,
+                            );
+                          },
                         );
                       },
                     );
@@ -490,6 +549,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }

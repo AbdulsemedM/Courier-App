@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
+import 'package:courier_app/core/utils/image_compression_helper.dart';
 
 class DeliverShipmentModal extends StatefulWidget {
   final String awb;
@@ -26,10 +27,12 @@ class DeliverShipmentModal extends StatefulWidget {
 class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
   final ImagePicker _imagePicker = ImagePicker();
   File? _customerIdFile;
+  int? _customerIdFileSizeBytes;
   bool _isSelf = true;
   final _deliveredToNameController = TextEditingController();
   final _deliveredToPhoneController = TextEditingController();
   bool _isLoading = false;
+  bool _isCompressingImage = false;
 
   @override
   void dispose() {
@@ -39,20 +42,45 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
+    if (_isCompressingImage || _isLoading) return;
+
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: source,
-        imageQuality: 85,
+        maxWidth: 1600,
+        maxHeight: 1600,
+        imageQuality: 70,
       );
-      if (image != null) {
-        setState(() {
-          _customerIdFile = File(image.path);
-        });
-      }
+      if (image == null || !mounted) return;
+
+      setState(() {
+        _isCompressingImage = true;
+        _customerIdFile = null;
+        _customerIdFileSizeBytes = null;
+      });
+
+      final compressedFile =
+          await ImageCompressionHelper.compressForUpload(File(image.path));
+      final fileSize = await compressedFile.length();
+
+      if (!mounted) return;
+      setState(() {
+        _customerIdFile = compressedFile;
+        _customerIdFileSizeBytes = fileSize;
+        _isCompressingImage = false;
+      });
     } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isCompressingImage = false;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error picking image: ${e.toString()}'),
+          content: Text(
+            e is Exception
+                ? e.toString().replaceFirst('Exception: ', '')
+                : 'Could not prepare the photo. Please try again.',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -60,6 +88,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
   }
 
   void _showImageSourceDialog() {
+    if (_isCompressingImage || _isLoading) return;
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -136,8 +165,6 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = context.isDarkMode;
-
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -187,8 +214,19 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
               ),
             ),
             const SizedBox(height: 8),
+            if (_customerIdFileSizeBytes != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  'Photo ready · ${ImageCompressionHelper.formatFileSize(_customerIdFileSizeBytes!)}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.green.shade700,
+                  ),
+                ),
+              ),
             GestureDetector(
-              onTap: _showImageSourceDialog,
+              onTap: _isCompressingImage ? null : _showImageSourceDialog,
               child: Container(
                 height: 150,
                 decoration: BoxDecoration(
@@ -198,7 +236,27 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
                     color: context.palette.border,
                   ),
                 ),
-                child: _customerIdFile != null
+                child: _isCompressingImage
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              height: 28,
+                              width: 28,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Compressing photo...',
+                              style: TextStyle(
+                                color: context.palette.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : _customerIdFile != null
                     ? Stack(
                         children: [
                           ClipRRect(
@@ -218,6 +276,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
                               onPressed: () {
                                 setState(() {
                                   _customerIdFile = null;
+                                  _customerIdFileSizeBytes = null;
                                 });
                               },
                             ),
@@ -316,7 +375,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
             ],
             // Submit button
             ElevatedButton(
-              onPressed: _isLoading ? null : _handleSubmit,
+              onPressed: (_isLoading || _isCompressingImage) ? null : _handleSubmit,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
