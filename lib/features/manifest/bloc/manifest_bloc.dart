@@ -43,12 +43,12 @@ class ManifestBloc extends Bloc<ManifestEvent, ManifestState> {
   ) async {
     emit(CreateManifestLoading());
     try {
-      final manifest = await manifestRepository.createManifest(
+      final message = await manifestRepository.createManifest(
         awbs: event.awbs,
         fileType: event.fileType,
         userId: event.userId,
       );
-      emit(CreateManifestSuccess(manifest: manifest));
+      emit(CreateManifestSuccess(message: message));
 
       if (_lastBranchId != null && _lastDate != null) {
         add(FetchManifests(branchId: _lastBranchId!, date: _lastDate!));

@@ -98,7 +98,7 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
         if (state is CreateManifestSuccess) {
           displaySnack(
             context,
-            'Manifest ${state.manifest.manifestId} created',
+            state.message,
             Colors.green,
           );
           Navigator.pop(context, true);

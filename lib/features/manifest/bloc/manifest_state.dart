@@ -32,12 +32,12 @@ final class FetchManifestsFailure extends ManifestState {
 final class CreateManifestLoading extends ManifestState {}
 
 final class CreateManifestSuccess extends ManifestState {
-  final ManifestModel manifest;
+  final String message;
 
-  const CreateManifestSuccess({required this.manifest});
+  const CreateManifestSuccess({required this.message});
 
   @override
-  List<Object> get props => [manifest];
+  List<Object> get props => [message];
 }
 
 final class CreateManifestFailure extends ManifestState {

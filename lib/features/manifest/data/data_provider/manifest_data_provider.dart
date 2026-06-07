@@ -29,7 +29,7 @@ class ManifestDataProvider {
     try {
       final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
       final response = await apiProvider.postRequest(
-        '/api/v1/shipments/manifest',
+        '/api/v1/manifest-shipment',
         {
           'awbs': awbs,
           'fileType': fileType,
