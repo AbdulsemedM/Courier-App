@@ -28,7 +28,7 @@ class ManifestRepository {
     }
   }
 
-  Future<ManifestModel> createManifest({
+  Future<String> createManifest({
     required List<String> awbs,
     required String fileType,
     required int userId,
@@ -43,12 +43,7 @@ class ManifestRepository {
       if (data['status'] != 200) {
         throw data['message'] ?? 'Failed to create manifest';
       }
-
-      final list = ManifestListResponse.fromJson(data).data;
-      if (list.isEmpty) {
-        throw 'No manifest returned from server';
-      }
-      return list.first;
+      return data['message']?.toString() ?? 'Manifest created successfully';
     } catch (e) {
       throw e.toString();
     }
