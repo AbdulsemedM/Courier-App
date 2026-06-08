@@ -24,12 +24,15 @@ class ApiProvider {
     this.timeout = const Duration(seconds: 30),
   });
 
-  bool _isLoginEndpoint(String endpoint) {
-    return endpoint == '/api/v1/login' || endpoint.endsWith('/api/v1/login');
+  bool _shouldIncludeAuth(String endpoint) {
+    if (endpoint.contains('/api/v1/login')) return false;
+    if (endpoint.contains('/api/v1/public/')) return false;
+    if (endpoint.contains('/api/v1/countries')) return false;
+    return true;
   }
 
   Future<Map<String, String>> _headersFor(String endpoint) {
-    return authInterceptor.getHeaders(includeAuth: !_isLoginEndpoint(endpoint));
+    return authInterceptor.getHeaders(includeAuth: _shouldIncludeAuth(endpoint));
   }
 
   Future<http.Response> getRequest(String endpoint,

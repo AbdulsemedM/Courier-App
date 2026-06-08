@@ -38,6 +38,7 @@ class LoginWidgets {
     required bool isDarkMode,
     required VoidCallback? onToggleTheme,
     required bool isDarkModeActive,
+    VoidCallback? onTrackShipment,
   }) {
     return Builder(
       builder: (context) {
@@ -213,7 +214,11 @@ class LoginWidgets {
                     alignment: WrapAlignment.center,
                     children: [
                       _featureChip(Icons.add_box_outlined, 'Ship'),
-                      _featureChip(Icons.radar_rounded, 'Track'),
+                      _featureChip(
+                        Icons.radar_rounded,
+                        'Track',
+                        onTap: onTrackShipment,
+                      ),
                       _featureChip(Icons.description_outlined, 'Manifest'),
                     ],
                   ),
@@ -226,13 +231,19 @@ class LoginWidgets {
     );
   }
 
-  static Widget _featureChip(IconData icon, String label) {
-    return Container(
+  static Widget _featureChip(
+    IconData icon,
+    String label, {
+    VoidCallback? onTap,
+  }) {
+    final chip = Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.18),
+        color: Colors.white.withValues(alpha: onTap != null ? 0.28 : 0.18),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: onTap != null ? 0.45 : 0.25),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -249,6 +260,138 @@ class LoginWidgets {
           ),
         ],
       ),
+    );
+
+    if (onTap == null) return chip;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: chip,
+      ),
+    );
+  }
+
+  static Widget buildPublicTrackPromoCard({
+    required bool isDarkMode,
+    required VoidCallback onTap,
+  }) {
+    return Builder(
+      builder: (context) {
+        final palette = context.palette;
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                onTap();
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Ink(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    colors: isDarkMode
+                        ? [
+                            Colors.white.withValues(alpha: 0.1),
+                            Colors.white.withValues(alpha: 0.06),
+                          ]
+                        : [
+                            palette.surface,
+                            palette.accentMuted.withValues(alpha: 0.6),
+                          ],
+                  ),
+                  border: Border.all(
+                    color: const Color(0xFFFF5A00).withValues(alpha: 0.4),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF5A00).withValues(alpha: 0.15),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      _PulsingRadarIcon(),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Track your shipment',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : palette.textPrimary,
+                                      letterSpacing: -0.3,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF5A00)
+                                        .withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Text(
+                                    'FREE · NO LOGIN',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFFFF5A00),
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'AWB · phone · tracking number',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDarkMode
+                                    ? Colors.white.withValues(alpha: 0.75)
+                                    : palette.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color: palette.accent,
+                        size: 22,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -488,6 +631,70 @@ class _LoginTextField extends StatelessWidget {
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
+    );
+  }
+}
+
+class _PulsingRadarIcon extends StatefulWidget {
+  @override
+  State<_PulsingRadarIcon> createState() => _PulsingRadarIconState();
+}
+
+class _PulsingRadarIconState extends State<_PulsingRadarIcon>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                Color.lerp(
+                  const Color(0xFFFF7A33),
+                  const Color(0xFFFF5A00),
+                  _controller.value,
+                )!,
+                const Color(0xFFFF5A00),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFF5A00)
+                    .withValues(alpha: 0.2 + _controller.value * 0.2),
+                blurRadius: 12 + _controller.value * 8,
+                spreadRadius: _controller.value * 2,
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.radar_rounded,
+            color: Colors.white,
+            size: 26,
+          ),
+        );
+      },
     );
   }
 }

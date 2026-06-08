@@ -24,6 +24,7 @@ class AuthInterceptor {
     }
     return {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
       if (includeAuth && token != null) 'Authorization': 'Bearer $token',
     };
   }

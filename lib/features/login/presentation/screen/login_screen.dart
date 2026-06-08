@@ -5,6 +5,7 @@ import 'package:courier_app/features/dashboard/presentation/dashboard_screen.dar
 import 'package:courier_app/features/forgot_password/presentation/screen/forgot_pass_screen.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
 import 'package:courier_app/features/login/presentation/widgets/login_widgets.dart';
+import 'package:courier_app/features/public_tracking/presentation/screens/public_tracking_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +47,13 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _openPublicTracking() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PublicTrackingScreen()),
+    );
   }
 
   void _handleLogin() {
@@ -109,6 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         isDarkMode: isDarkMode,
                         isDarkModeActive: isDarkMode,
                         onToggleTheme: themeProvider.toggleTheme,
+                        onTrackShipment: _openPublicTracking,
                       ),
                       LoginWidgets.buildLoginCard(
                         isDarkMode: isDarkMode,
@@ -133,6 +142,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           );
                         },
+                      ),
+                      LoginWidgets.buildPublicTrackPromoCard(
+                        isDarkMode: isDarkMode,
+                        onTap: _openPublicTracking,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 8, bottom: 24),

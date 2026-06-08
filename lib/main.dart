@@ -67,6 +67,9 @@ import 'package:courier_app/features/tellers/data/repository/teller_repository.d
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/data/data_provider/track_order_data_provider.dart';
 import 'package:courier_app/features/track_order/data/repository/track_order_repository.dart';
+import 'package:courier_app/features/public_tracking/bloc/public_tracking_bloc.dart';
+import 'package:courier_app/features/public_tracking/data/data_provider/public_tracking_data_provider.dart';
+import 'package:courier_app/features/public_tracking/data/repository/public_tracking_repository.dart';
 import 'package:courier_app/features/track_shipment/bloc/track_shipment_bloc.dart';
 import 'package:courier_app/features/track_shipment/data/data_provider/track_shipment_data_provider.dart';
 import 'package:courier_app/features/track_shipment/data/repository/track_shipment_repository.dart';
@@ -126,6 +129,11 @@ void main() async {
         BlocProvider(
           create: (context) => TrackShipmentBloc(
             TrackShipmentRepository(TrackShipmentDataProvider()),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => PublicTrackingBloc(
+            PublicTrackingRepository(PublicTrackingDataProvider()),
           ),
         ),
         BlocProvider(
