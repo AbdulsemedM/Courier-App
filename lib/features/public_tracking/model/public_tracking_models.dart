@@ -131,25 +131,73 @@ Map<String, dynamic> _extractStatus(
   final shipmentStatus = shipment['shipmentStatus'];
   if (shipmentStatus is Map<String, dynamic>) return shipmentStatus;
 
+  final history = shipment['history'] ?? map['history'];
+  if (history is List && history.isNotEmpty) {
+    final latest = history.last;
+    if (latest is Map<String, dynamic>) {
+      return {
+        'description': latest['status'],
+        'code': latest['code'],
+      };
+    }
+  }
+
   return {};
 }
 
-String? _branchName(Map<String, dynamic> shipment, {required bool isSender}) {
-  final key = isSender ? 'senderBranch' : 'receiverBranch';
-  final branch = shipment[key];
-  if (branch is Map<String, dynamic>) {
-    return branch['name']?.toString();
+List<PublicTrackingTimelineItem> timelineEventsFromShipment(
+  Map<String, dynamic> shipment,
+) {
+  final awb = shipment['awb']?.toString() ?? '';
+  final origin = _branchName(shipment, isSender: true);
+  final destination = _branchName(shipment, isSender: false);
+  final history = shipment['history'];
+
+  if (history is List && history.isNotEmpty) {
+    final entries = history.whereType<Map<String, dynamic>>().toList();
+    return entries.reversed
+        .map(
+          (entry) => PublicTrackingTimelineItem(
+            awb: awb,
+            description: entry['location']?.toString() ?? '',
+            statusLabel: entry['status']?.toString(),
+            statusCode: entry['code']?.toString(),
+            createdAt: entry['timestamp']?.toString(),
+            origin: origin,
+            destination: destination,
+          ),
+        )
+        .toList();
   }
 
+  return [PublicTrackingTimelineItem.fromMap(shipment)];
+}
+
+String? _branchName(Map<String, dynamic> shipment, {required bool isSender}) {
   if (isSender) {
+    final source = shipment['source']?.toString().trim();
+    if (source != null && source.isNotEmpty) return source;
+
+    final senderBranch = shipment['senderBranch'];
+    if (senderBranch is Map<String, dynamic>) {
+      return senderBranch['name']?.toString();
+    }
+
     return shipment['originBranchName']?.toString() ??
         (shipment['originBranch'] is Map<String, dynamic>
             ? (shipment['originBranch'] as Map)['name']?.toString()
             : null);
   }
 
+  final destination = shipment['destination']?.toString().trim();
+  if (destination != null && destination.isNotEmpty) return destination;
+
+  final receiverBranch = shipment['receiverBranch'];
+  if (receiverBranch is Map<String, dynamic>) {
+    return receiverBranch['name']?.toString();
+  }
+
   return shipment['destinationBranchName']?.toString() ??
-      shipment['destination']?.toString() ??
       (shipment['destinationBranch'] is Map<String, dynamic>
           ? (shipment['destinationBranch'] as Map)['name']?.toString()
           : null);

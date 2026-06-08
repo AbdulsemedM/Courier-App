@@ -35,16 +35,40 @@ class PublicTrackingRepository {
   }
 
   PublicTrackingResult _parseResponse(String response) {
-    final data = jsonDecode(response);
-    if (data['status'] != 200) {
-      throw data['message']?.toString() ?? 'Unable to find shipment';
-    }
-
-    if (data['data'] is! List) {
+    final decoded = jsonDecode(response);
+    if (decoded is! Map<String, dynamic>) {
       throw 'Invalid response format';
     }
 
-    final items = data['data'] as List;
+    if (decoded['status'] != 200) {
+      throw decoded['message']?.toString() ?? 'Unable to find shipment';
+    }
+
+    final rawData = decoded['data'];
+    if (rawData == null) {
+      throw 'No shipments found';
+    }
+
+    if (rawData is Map<String, dynamic>) {
+      return _parseSingleShipment(rawData);
+    }
+
+    if (rawData is List) {
+      return _parseShipmentList(rawData);
+    }
+
+    throw 'Invalid response format';
+  }
+
+  PublicTrackingResult _parseSingleShipment(Map<String, dynamic> shipment) {
+    final events = timelineEventsFromShipment(shipment);
+    if (events.isEmpty) {
+      throw 'No shipments found';
+    }
+    return PublicTrackingResult.single(events);
+  }
+
+  PublicTrackingResult _parseShipmentList(List<dynamic> items) {
     if (items.isEmpty) {
       throw 'No shipments found';
     }
@@ -54,34 +78,31 @@ class PublicTrackingRepository {
       throw 'No shipments found';
     }
 
+    if (maps.length == 1) {
+      final shipment = maps.first;
+      final history = shipment['history'];
+      if (history is List && history.isNotEmpty) {
+        return _parseSingleShipment(shipment);
+      }
+    }
+
     final summaries = maps
         .map(PublicShipmentSummary.fromMap)
         .where((s) => s.awb.isNotEmpty)
         .toList();
 
-    final uniqueAwbs = summaries.map((s) => s.awb).toSet();
-
-    if (uniqueAwbs.length > 1) {
-      return PublicTrackingResult.multiple(summaries);
+    if (summaries.isEmpty) {
+      throw 'No shipments found';
     }
 
-    final events = maps.map(PublicTrackingTimelineItem.fromMap).toList();
-    final looksLikeTimeline = maps.any(
-      (m) => m.containsKey('description') || m.containsKey('status'),
-    );
-
-    if (looksLikeTimeline && events.isNotEmpty) {
-      return PublicTrackingResult.single(events);
+    if (summaries.length == 1) {
+      final shipment = maps.firstWhere((m) => m['awb']?.toString() == summaries.first.awb);
+      final history = shipment['history'];
+      if (history is List && history.isNotEmpty) {
+        return _parseSingleShipment(shipment);
+      }
     }
 
-    if (summaries.isNotEmpty) {
-      return PublicTrackingResult.multiple(summaries);
-    }
-
-    if (events.isNotEmpty) {
-      return PublicTrackingResult.single(events);
-    }
-
-    throw 'No shipments found';
+    return PublicTrackingResult.multiple(summaries);
   }
 }
