@@ -5,6 +5,7 @@ class ShipmentStatusHelper {
   static const pendingStatusCode = 'PAR';
   static const readyForPickupStatusCode = 'R4P';
   static const arrivedStatusCode = 'ARR';
+  static const deliveredStatusCode = 'DEL';
 
   static StatusModel pendingStatus() {
     return StatusModel(
@@ -80,11 +81,27 @@ class ShipmentStatusHelper {
     return paymentStatus.trim().toUpperCase() != 'SUCCESS';
   }
 
+  static bool isCashPayment(String? paymentMode) {
+    if (paymentMode == null || paymentMode.trim().isEmpty) {
+      return false;
+    }
+
+    final normalized = paymentMode.trim().toUpperCase();
+    return normalized == 'CASH' ||
+        normalized == 'COD' ||
+        normalized.contains('CASH ON DELIVERY');
+  }
+
   /// Whether the shipments table should show the Pay action for a row.
   static bool shouldShowPayAction({
     required String shipmentStatusCode,
     required String? paymentStatus,
+    String? paymentMode,
   }) {
+    if (isCashPayment(paymentMode)) {
+      return false;
+    }
+
     final code = shipmentStatusCode.trim().toUpperCase();
 
     // PAR: only show Pay when payment status is known and not successful.
@@ -107,8 +124,42 @@ class ShipmentStatusHelper {
     return normalized == 'SUCCESS' || normalized == 'PAID';
   }
 
+  static bool isDeliveredStatusCode(String? statusCode) {
+    if (statusCode == null || statusCode.trim().isEmpty) {
+      return false;
+    }
+
+    final normalized = statusCode.trim().toUpperCase();
+    return normalized == deliveredStatusCode ||
+        normalized == 'DELIVERED' ||
+        normalized == 'COMPLETED';
+  }
+
+  static bool isDeliveredStatusLabel(String? statusLabel) {
+    if (statusLabel == null || statusLabel.trim().isEmpty) {
+      return false;
+    }
+
+    final normalized = statusLabel.trim().toUpperCase();
+    return normalized == 'DELIVERED' ||
+        normalized == 'COMPLETED' ||
+        normalized.contains('DELIVERED');
+  }
+
+  static bool isAlreadyDelivered({
+    String? shipmentStatusCode,
+    String? shipmentStatusLabel,
+  }) {
+    return isDeliveredStatusCode(shipmentStatusCode) ||
+        isDeliveredStatusLabel(shipmentStatusLabel);
+  }
+
   static bool isDeliverableStatusCode(String? statusCode) {
     if (statusCode == null || statusCode.trim().isEmpty) {
+      return false;
+    }
+
+    if (isDeliveredStatusCode(statusCode)) {
       return false;
     }
 
@@ -121,6 +172,10 @@ class ShipmentStatusHelper {
       return false;
     }
 
+    if (isDeliveredStatusLabel(statusLabel)) {
+      return false;
+    }
+
     final normalized = statusLabel.trim().toUpperCase();
     return normalized == 'ARRIVED' || normalized == 'READY FOR PICKUP';
   }
@@ -129,17 +184,45 @@ class ShipmentStatusHelper {
     required String? shipmentStatusCode,
     required String? shipmentStatusLabel,
     required String? paymentStatus,
+    String? paymentMode,
   }) {
+    if (isAlreadyDelivered(
+      shipmentStatusCode: shipmentStatusCode,
+      shipmentStatusLabel: shipmentStatusLabel,
+    )) {
+      return false;
+    }
+
     final isDeliverable = isDeliverableStatusCode(shipmentStatusCode) ||
         isDeliverableStatusLabel(shipmentStatusLabel);
-    return isDeliverable && isPaymentFulfilled(paymentStatus);
+    if (!isDeliverable) {
+      return false;
+    }
+
+    if (isCashPayment(paymentMode)) {
+      return true;
+    }
+
+    return isPaymentFulfilled(paymentStatus);
   }
 
   static bool shouldShowPayBeforeDeliverAction({
     required String? shipmentStatusCode,
     required String? shipmentStatusLabel,
     required String? paymentStatus,
+    String? paymentMode,
   }) {
+    if (isCashPayment(paymentMode)) {
+      return false;
+    }
+
+    if (isAlreadyDelivered(
+      shipmentStatusCode: shipmentStatusCode,
+      shipmentStatusLabel: shipmentStatusLabel,
+    )) {
+      return false;
+    }
+
     final isDeliverable = isDeliverableStatusCode(shipmentStatusCode) ||
         isDeliverableStatusLabel(shipmentStatusLabel);
     return isDeliverable && needsPayment(paymentStatus);

@@ -107,15 +107,18 @@ class TrackShipmentWidgets {
     bool isPaymentActionLoading = false,
   }) {
     final mainShipment = shipments.first;
+    final latestShipment = _latestShipmentForActions(shipments);
     final canDeliver = ShipmentStatusHelper.shouldShowDeliverAction(
-      shipmentStatusCode: mainShipment.statusCode,
-      shipmentStatusLabel: mainShipment.statusDescription,
-      paymentStatus: mainShipment.paymentStatus,
+      shipmentStatusCode: latestShipment.statusCode,
+      shipmentStatusLabel: latestShipment.statusDescription,
+      paymentStatus: latestShipment.paymentStatus,
+      paymentMode: latestShipment.method,
     );
     final canPay = ShipmentStatusHelper.shouldShowPayBeforeDeliverAction(
-      shipmentStatusCode: mainShipment.statusCode,
-      shipmentStatusLabel: mainShipment.statusDescription,
-      paymentStatus: mainShipment.paymentStatus,
+      shipmentStatusCode: latestShipment.statusCode,
+      shipmentStatusLabel: latestShipment.statusDescription,
+      paymentStatus: latestShipment.paymentStatus,
+      paymentMode: latestShipment.method,
     );
 
     return SingleChildScrollView(
@@ -163,6 +166,33 @@ class TrackShipmentWidgets {
         ),
       ),
     );
+  }
+
+  /// Uses the newest timeline entry for deliver/pay actions, not the oldest.
+  static TrackShipmentModel _latestShipmentForActions(
+    List<TrackShipmentModel> shipments,
+  ) {
+    if (shipments.length <= 1) return shipments.first;
+
+    TrackShipmentModel latest = shipments.first;
+    DateTime? latestTime;
+
+    for (final shipment in shipments) {
+      final createdAt = shipment.createdAt.trim();
+      if (createdAt.isEmpty) continue;
+
+      try {
+        final parsed = DateTime.parse(createdAt);
+        if (latestTime == null || parsed.isAfter(latestTime)) {
+          latestTime = parsed;
+          latest = shipment;
+        }
+      } catch (_) {
+        // Ignore unparsable timestamps.
+      }
+    }
+
+    return latestTime != null ? latest : shipments.last;
   }
 
   static String? _getBranchName(int? branchId, List<BranchesModel>? branches) {

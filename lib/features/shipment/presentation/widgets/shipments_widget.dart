@@ -100,7 +100,6 @@ class ShipmentsWidgets {
     required bool isDarkMode,
     required List<ShipmentModel> shipments,
     required List<StatusModel> statuses,
-    bool showDeliverButton = false,
     Function(String)? onDeliver,
     Function(String)? onPay,
   }) {
@@ -193,9 +192,17 @@ class ShipmentsWidgets {
             ],
             rows: shipments.map((shipment) {
               final statusCode = shipment.shipmentStatus?.code ?? '';
+              final paymentMode = shipment.paymentMethod?.method;
               final showPay = ShipmentStatusHelper.shouldShowPayAction(
                 shipmentStatusCode: statusCode,
                 paymentStatus: shipment.paymentStatus,
+                paymentMode: paymentMode,
+              );
+              final showDeliver = ShipmentStatusHelper.shouldShowDeliverAction(
+                shipmentStatusCode: statusCode,
+                shipmentStatusLabel: shipment.shipmentStatus?.description,
+                paymentStatus: shipment.paymentStatus,
+                paymentMode: paymentMode,
               );
 
               return DataRow(
@@ -285,7 +292,7 @@ class ShipmentsWidgets {
                               },
                               tooltip: 'Pay',
                             ),
-                          if (showDeliverButton && onDeliver != null)
+                          if (showDeliver && onDeliver != null)
                             IconButton(
                               icon: Icon(
                                 Icons.local_shipping,

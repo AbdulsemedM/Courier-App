@@ -1,6 +1,18 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+String _paymentModeCode(dynamic paymentData) {
+  if (paymentData is Map<String, dynamic>) {
+    return paymentData['method']?.toString() ??
+        paymentData['code']?.toString() ??
+        '';
+  }
+  if (paymentData is String) {
+    return paymentData;
+  }
+  return '';
+}
+
 class TrackShipmentModel {
   final String awb;
   final String senderName;
@@ -291,9 +303,9 @@ class TrackShipmentModel {
       receiverBranchName: receiverBranchName,
       netFee: (shipment['netFee'] ?? '').toString(),
       shipmentDescription: shipment['shipmentDescription'] as String? ?? '',
-      method: (shipment['paymentMethod'] is Map<String, dynamic>)
-          ? (shipment['paymentMethod'] as Map<String, dynamic>)['method'] as String? ?? ''
-          : '',
+      method: _paymentModeCode(
+        shipment['paymentMethod'] ?? shipment['paymentMode'],
+      ),
       updatedBy: addedByFirstName ?? '',
       description: description,
       createdAt:

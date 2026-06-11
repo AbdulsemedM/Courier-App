@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:courier_app/features/shelves_management/bloc/shelves_management_bloc.dart';
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
+import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:courier_app/features/shelves_management/presentation/widgets/shelves_widgets.dart';
 
 class ShelvesScreen extends StatefulWidget {
@@ -56,37 +57,47 @@ class _ShelvesScreenState extends State<ShelvesScreen> {
 
           // Shelves Table
           Expanded(
-            child: BlocBuilder<ShelvesManagementBloc, ShelvesManagementState>(
-              builder: (context, state) {
-                if (state is FetchShelvesLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (state is FetchShelvesSuccess) {
-                  return ShelvesTable(
-                    shelves: state.shelves,
-                    selectedBranchId: selectedBranchId,
-                    onEdit: (shelf) {
-                      // TODO: Implement edit functionality
-                      _refreshData();
-                    },
-                  );
-                }
-                if (state is FetchShelvesFailure) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Error: ${state.message}'),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _refreshData,
-                          child: const Text('Retry'),
+            child: BlocBuilder<BranchesBloc, BranchesState>(
+              builder: (context, branchesState) {
+                final branches = branchesState is FetchBranchesLoaded
+                    ? branchesState.branches
+                    : <BranchesModel>[];
+
+                return BlocBuilder<ShelvesManagementBloc,
+                    ShelvesManagementState>(
+                  builder: (context, state) {
+                    if (state is FetchShelvesLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (state is FetchShelvesSuccess) {
+                      return ShelvesTable(
+                        shelves: state.shelves,
+                        branches: branches,
+                        selectedBranchId: selectedBranchId,
+                        onEdit: (shelf) {
+                          // TODO: Implement edit functionality
+                          _refreshData();
+                        },
+                      );
+                    }
+                    if (state is FetchShelvesFailure) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Error: ${state.message}'),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _refreshData,
+                              child: const Text('Retry'),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                }
-                return const Center(child: Text('No shelves found'));
+                      );
+                    }
+                    return const Center(child: Text('No shelves found'));
+                  },
+                );
               },
             ),
           ),

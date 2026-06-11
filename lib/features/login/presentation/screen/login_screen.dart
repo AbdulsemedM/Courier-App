@@ -1,6 +1,5 @@
 import 'package:courier_app/app/utils/responsive_helper.dart';
 import 'package:courier_app/core/services/remembered_credentials_vault.dart';
-import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:courier_app/features/forgot_password/presentation/screen/forgot_pass_screen.dart';
 import 'package:courier_app/features/login/bloc/login_bloc.dart';
@@ -72,7 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    final palette = context.palette;
 
     return BlocListener<LoginBloc, LoginState>(
       listener: (context, state) {
@@ -117,7 +115,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         isDarkMode: isDarkMode,
                         isDarkModeActive: isDarkMode,
                         onToggleTheme: themeProvider.toggleTheme,
-                        onTrackShipment: _openPublicTracking,
                       ),
                       LoginWidgets.buildLoginCard(
                         isDarkMode: isDarkMode,
@@ -147,16 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         isDarkMode: isDarkMode,
                         onTap: _openPublicTracking,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8, bottom: 24),
-                        child: Text(
-                          'HudHud Courier · v1.0.3',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: palette.textSecondary,
-                          ),
-                        ),
-                      ),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),

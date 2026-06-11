@@ -38,7 +38,6 @@ class LoginWidgets {
     required bool isDarkMode,
     required VoidCallback? onToggleTheme,
     required bool isDarkModeActive,
-    VoidCallback? onTrackShipment,
   }) {
     return Builder(
       builder: (context) {
@@ -207,70 +206,12 @@ class LoginWidgets {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      _featureChip(Icons.add_box_outlined, 'Ship'),
-                      _featureChip(
-                        Icons.radar_rounded,
-                        'Track',
-                        onTap: onTrackShipment,
-                      ),
-                      _featureChip(Icons.description_outlined, 'Manifest'),
-                    ],
-                  ),
                 ],
               ),
             ],
           ),
         );
       },
-    );
-  }
-
-  static Widget _featureChip(
-    IconData icon,
-    String label, {
-    VoidCallback? onTap,
-  }) {
-    final chip = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: onTap != null ? 0.28 : 0.18),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: onTap != null ? 0.45 : 0.25),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: Colors.white),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (onTap == null) return chip;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: chip,
-      ),
     );
   }
 

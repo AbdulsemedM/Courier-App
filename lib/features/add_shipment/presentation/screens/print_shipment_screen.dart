@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 import 'package:courier_app/app/utils/responsive_helper.dart';
+import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
+import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -9,7 +11,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:device_info_plus/device_info_plus.dart';
-import '../../bloc/add_shipment_bloc.dart';
+import 'package:image/image.dart' as img;
+import '../../bloc/add_shipment_bloc.dart' hide FetchBranches;
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
 import 'package:sunmi_printer_plus/sunmi_style.dart';
 import 'package:sunmi_printer_plus/enums.dart';
@@ -27,6 +30,7 @@ class PrintShipmentScreen extends StatefulWidget {
 class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
   Map<String, dynamic>? shipmentData;
   bool _isSunmiDevice = false;
+  List<BranchesModel> _branches = [];
 
   @override
   void initState() {
@@ -34,15 +38,19 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
     print(
         '[PrintShipmentScreen] initState called with trackingNumber: ${widget.trackingNumber}');
     _checkIfSunmiDevice();
-    try {
-      context.read<AddShipmentBloc>().add(
-            FetchShipmentDetailsEvent(trackingNumber: widget.trackingNumber),
-          );
-      print('[PrintShipmentScreen] FetchShipmentDetailsEvent dispatched');
-    } catch (e) {
-      print('[PrintShipmentScreen] Error in initState: ${e.toString()}');
-      print('[PrintShipmentScreen] Error stack trace: ${StackTrace.current}');
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<BranchesBloc>().add(FetchBranches());
+      try {
+        context.read<AddShipmentBloc>().add(
+              FetchShipmentDetailsEvent(trackingNumber: widget.trackingNumber),
+            );
+        print('[PrintShipmentScreen] FetchShipmentDetailsEvent dispatched');
+      } catch (e) {
+        print('[PrintShipmentScreen] Error in initState: ${e.toString()}');
+        print('[PrintShipmentScreen] Error stack trace: ${StackTrace.current}');
+      }
+    });
   }
 
   Future<void> _checkIfSunmiDevice() async {
@@ -74,11 +82,17 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Shipment Details'),
-      ),
-      body: BlocConsumer<AddShipmentBloc, AddShipmentState>(
+    return BlocListener<BranchesBloc, BranchesState>(
+      listener: (context, state) {
+        if (state is FetchBranchesLoaded) {
+          setState(() => _branches = state.branches);
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Shipment Details'),
+        ),
+        body: BlocConsumer<AddShipmentBloc, AddShipmentState>(
         listener: (context, state) {
           print(
               '[PrintShipmentScreen] BlocConsumer listener - state: ${state.runtimeType}');
@@ -240,7 +254,47 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
           );
         },
       ),
+      ),
     );
+  }
+
+  String? _branchCodeFromAwb(String awb) {
+    final match = RegExp(r'^ET([A-Z]{2})').firstMatch(awb.toUpperCase());
+    return match?.group(1);
+  }
+
+  String _resolveBranchName({
+    String? name,
+    int? branchId,
+    required List<BranchesModel> branches,
+    String? awb,
+  }) {
+    if (name != null && name.trim().isNotEmpty) {
+      return name.trim().toUpperCase();
+    }
+    if (branchId != null) {
+      for (final branch in branches) {
+        if (branch.id == branchId) {
+          return branch.name.toUpperCase();
+        }
+      }
+    }
+    final code = awb != null ? _branchCodeFromAwb(awb) : null;
+    if (code != null) {
+      for (final branch in branches) {
+        if (branch.code.toUpperCase() == code) {
+          return branch.name.toUpperCase();
+        }
+      }
+    }
+    return '';
+  }
+
+  List<BranchesModel> _branchesForPrint(BuildContext context) {
+    if (_branches.isNotEmpty) return _branches;
+    final state = context.read<BranchesBloc>().state;
+    if (state is FetchBranchesLoaded) return state.branches;
+    return const [];
   }
 
   String _formatDate(dynamic dateValue) {
@@ -358,15 +412,16 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
       await SunmiPrinter.startTransactionPrint(true);
 
       // Extract data for printing
+      final branches = _branchesForPrint(context);
       final senderName =
           (shipmentData!['senderName'] ?? '').toString().toUpperCase();
-      final senderMobile = (shipmentData!['senderMobile'] ?? '').toString();
       final senderBranch = (shipmentData!['senderBranch'] ?? '').toString();
+      final senderBranchId = shipmentData!['senderBranchId'] as int?;
 
       final receiverName =
           (shipmentData!['receiverName'] ?? '').toString().toUpperCase();
-      final receiverMobile = (shipmentData!['receiverMobile'] ?? '').toString();
       final receiverBranch = (shipmentData!['receiverBranch'] ?? '').toString();
+      final receiverBranchId = shipmentData!['receiverBranchId'] as int?;
 
       final shipDate = _formatShipDate(shipmentData!['createdAt']);
       final weight =
@@ -383,9 +438,20 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
 
       final dateTime = _formatDateTime(shipmentData!['createdAt']);
 
-      // Get origin location
+      final resolvedOrigin = _resolveBranchName(
+        name: senderBranch.isNotEmpty ? senderBranch : null,
+        branchId: senderBranchId,
+        branches: branches,
+      );
       final originLocation =
-          senderBranch.isNotEmpty ? senderBranch.toUpperCase() : 'ADDIS ABABA';
+          resolvedOrigin.isNotEmpty ? resolvedOrigin : 'ADDIS ABABA';
+
+      final destination = _resolveBranchName(
+        name: receiverBranch.isNotEmpty ? receiverBranch : null,
+        branchId: receiverBranchId,
+        branches: branches,
+        awb: widget.trackingNumber,
+      );
 
       // Get service mode
       String courierText = 'COURIER';
@@ -401,155 +467,119 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
         }
       }
 
-      // Print header
+      // Compact header
       await SunmiPrinter.setAlignment(SunmiPrintAlign.CENTER);
       await SunmiPrinter.printText(
         'HudHud Express',
+        style: SunmiStyle(
+          bold: true,
+          fontSize: SunmiFontSize.MD,
+        ),
+      );
+      await SunmiPrinter.lineWrap(1);
+      await SunmiPrinter.printText(
+        'TRK# ${widget.trackingNumber}',
         style: SunmiStyle(
           bold: true,
           fontSize: SunmiFontSize.LG,
         ),
       );
       await SunmiPrinter.lineWrap(1);
-
-      // Print tracking number (large and bold)
-      await SunmiPrinter.printText(
-        'TRK# ${widget.trackingNumber}',
-        style: SunmiStyle(
-          bold: true,
-          fontSize: SunmiFontSize.XL,
-        ),
-      );
-      await SunmiPrinter.lineWrap(2);
-
-      // Print line separator
       await SunmiPrinter.line();
       await SunmiPrinter.lineWrap(1);
 
-      // Print origin info
       await SunmiPrinter.setAlignment(SunmiPrintAlign.LEFT);
       await SunmiPrinter.printText(
-        'ORIGIN ID: $originLocation',
-        style: SunmiStyle(bold: true),
+        'ORIGIN: $originLocation',
+        style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
       );
       await SunmiPrinter.lineWrap(1);
 
       if (senderName.isNotEmpty) {
         await SunmiPrinter.printText(
           senderName,
-          style: SunmiStyle(bold: true),
-        );
-        await SunmiPrinter.lineWrap(1);
-      }
-
-      if (senderMobile.isNotEmpty) {
-        await SunmiPrinter.printText(senderMobile);
-        await SunmiPrinter.lineWrap(1);
-      }
-
-      // Print ship date, weight, account (right aligned)
-      await SunmiPrinter.setAlignment(SunmiPrintAlign.RIGHT);
-      await SunmiPrinter.printText(
-        'SHIP DATE: $shipDate',
-        style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
-      );
-      await SunmiPrinter.lineWrap(1);
-      await SunmiPrinter.printText(
-        'WT: $weight',
-        style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
-      );
-      await SunmiPrinter.lineWrap(1);
-      if (account.isNotEmpty) {
-        await SunmiPrinter.printText(
-          'ACCT: $account',
-          style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
-        );
-        await SunmiPrinter.lineWrap(1);
-      }
-      if (billText.isNotEmpty) {
-        await SunmiPrinter.printText(
-          billText,
           style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
         );
         await SunmiPrinter.lineWrap(1);
       }
 
+      await SunmiPrinter.printText(
+        'SHIP DATE: $shipDate | WT: $weight',
+        style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
+      );
       await SunmiPrinter.lineWrap(1);
 
-      // Print TO section
-      await SunmiPrinter.setAlignment(SunmiPrintAlign.LEFT);
+      final metaLine2 = [
+        if (account.isNotEmpty) 'ACCT: $account',
+        if (billText.isNotEmpty) billText,
+      ].join(' | ');
+      if (metaLine2.isNotEmpty) {
+        await SunmiPrinter.printText(
+          metaLine2,
+          style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
+        );
+        await SunmiPrinter.lineWrap(1);
+      }
+
       await SunmiPrinter.printText(
         'TO:',
         style: SunmiStyle(bold: true),
       );
       await SunmiPrinter.lineWrap(1);
 
-      if (receiverName.isNotEmpty) {
+      if (destination.isNotEmpty) {
         await SunmiPrinter.printText(
-          receiverName,
-          style: SunmiStyle(bold: true),
+          'DESTINATION: $destination',
+          style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
         );
         await SunmiPrinter.lineWrap(1);
       }
 
-      if (receiverMobile.isNotEmpty) {
-        await SunmiPrinter.printText(receiverMobile);
+      if (receiverName.isNotEmpty) {
+        await SunmiPrinter.printText(
+          receiverName,
+          style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
+        );
         await SunmiPrinter.lineWrap(1);
       }
 
-      if (receiverBranch.isNotEmpty) {
-        await SunmiPrinter.printText('BRANCH $receiverBranch');
-        await SunmiPrinter.lineWrap(1);
-      }
-
-      await SunmiPrinter.lineWrap(1);
-
-      // Print reference
       await SunmiPrinter.printText(
         'REF: $refNumber',
-        style: SunmiStyle(bold: true),
+        style: SunmiStyle(bold: true, fontSize: SunmiFontSize.SM),
       );
-      await SunmiPrinter.lineWrap(2);
+      await SunmiPrinter.lineWrap(1);
 
-      // Print QR code (centered)
       await SunmiPrinter.setAlignment(SunmiPrintAlign.CENTER);
       final qrCodeUrl =
           'https://hudhudexpress.com/order?awb=${widget.trackingNumber}';
-      await SunmiPrinter.printQRCode(qrCodeUrl);
-      await SunmiPrinter.lineWrap(2);
+      await SunmiPrinter.printQRCode(
+        qrCodeUrl,
+        size: 8,
+        errorLevel: SunmiQrcodeLevel.LEVEL_H,
+      );
+      await SunmiPrinter.lineWrap(1);
 
-      // Print barcode if available
       final barcodeUrl = shipmentData!['barcodeUrl'] as String?;
       if (barcodeUrl != null && barcodeUrl.isNotEmpty) {
         try {
           final barcodeImageBytes = await _downloadImage(barcodeUrl);
           if (barcodeImageBytes != null) {
-            await SunmiPrinter.printImage(barcodeImageBytes);
-            await SunmiPrinter.lineWrap(2);
+            final scaledBytes =
+                _scaleBarcodeForPrint(barcodeImageBytes, targetWidth: 384);
+            await SunmiPrinter.printImage(scaledBytes);
+            await SunmiPrinter.lineWrap(1);
           }
         } catch (e) {
           print('[PrintShipmentScreen] Error printing barcode: $e');
         }
       }
 
-      // Print footer
       await SunmiPrinter.line();
-      await SunmiPrinter.lineWrap(1);
       await SunmiPrinter.printText(
-        courierText,
-        style: SunmiStyle(bold: true),
-      );
-      await SunmiPrinter.lineWrap(1);
-      await SunmiPrinter.printText(
-        'REF# $refShort',
+        '$courierText | REF# $refShort | $dateTime',
         style: SunmiStyle(fontSize: SunmiFontSize.SM),
       );
       await SunmiPrinter.lineWrap(1);
-      await SunmiPrinter.printText(
-        dateTime,
-        style: SunmiStyle(fontSize: SunmiFontSize.SM),
-      );
-      await SunmiPrinter.lineWrap(2);
 
       // Exit transaction and cut paper
       await SunmiPrinter.exitTransactionPrint(true);
@@ -1018,6 +1048,13 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
           '[PrintShipmentScreen] Error formatting date/time: ${e.toString()}');
       return 'N/A';
     }
+  }
+
+  Uint8List _scaleBarcodeForPrint(Uint8List bytes, {int targetWidth = 384}) {
+    final decoded = img.decodeImage(bytes);
+    if (decoded == null) return bytes;
+    final resized = img.copyResize(decoded, width: targetWidth);
+    return Uint8List.fromList(img.encodePng(resized));
   }
 
   // Download image from URL

@@ -34,21 +34,110 @@ class ThirdPage extends StatefulWidget {
 }
 
 class _ThirdPageState extends State<ThirdPage> {
-  var selectedPaymentMode;
+  String? selectedPaymentMode;
   double? rate;
   EstimatedRateModel? cachedEstimatedRate;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializePaymentDefaults();
+    });
+  }
+
+  bool _hasValidPaymentMethodId() {
+    final id = widget.formData['paymentMethodId'];
+    if (id == null) return false;
+    if (id is int) return true;
+    return int.tryParse(id.toString()) != null;
+  }
+
+  PaymentModeModel? _findPaymentModeById(dynamic id) {
+    if (id == null || widget.paymentModes.isEmpty) return null;
+    final parsedId = id is int ? id : int.tryParse(id.toString());
+    if (parsedId == null) return null;
+    for (final mode in widget.paymentModes) {
+      if (mode.id == parsedId) return mode;
+    }
+    return null;
+  }
+
+  void _initializePaymentDefaults() {
+    if (widget.paymentModes.isEmpty) return;
+
+    final existingMode = _findPaymentModeById(widget.formData['paymentModeId']);
+    final defaultMode = existingMode ??
+        widget.paymentModes.firstWhere(
+          (mode) => mode.isCash,
+          orElse: () => widget.paymentModes.first,
+        );
+
+    _applyPaymentMode(defaultMode, notify: true);
+  }
+
+  void _applyPaymentMode(PaymentModeModel mode, {bool notify = false}) {
+    if (mode.id == null) return;
+
+    void apply() {
+      selectedPaymentMode = mode.code;
+      widget.formData['paymentModeId'] = mode.id;
+      Provider.of<PaymentService>(context, listen: false)
+          .setPaymentInfo(mode.description ?? mode.code ?? '');
+      _ensurePaymentMethodForMode(mode);
+    }
+
+    if (notify) {
+      setState(apply);
+    } else {
+      apply();
+    }
+  }
+
+  void _ensurePaymentMethodForMode(PaymentModeModel mode) {
+    if (widget.paymentMethods.isEmpty) return;
+
+    if (mode.isCash) {
+      widget.formData['paymentMethodId'] = null;
+      return;
+    }
+
+    final method = widget.paymentMethods.firstWhere(
+      (item) => item.id != null,
+      orElse: () => widget.paymentMethods.first,
+    );
+    if (method.id == null) return;
+
+    widget.formData['paymentMethodId'] = method.id;
+    Provider.of<PaymentService>(context, listen: false)
+        .setPaymentMethod(method.method ?? '');
+  }
+
+  void _selectPaymentMethod(String value) {
+    final selectedMethod = widget.paymentMethods.firstWhere(
+      (method) => method.id?.toString() == value,
+      orElse: () => PaymentMethodModel(),
+    );
+    if (selectedMethod.id == null) return;
+
+    setState(() {
+      widget.formData['paymentMethodId'] = selectedMethod.id;
+      Provider.of<PaymentService>(context, listen: false)
+          .setPaymentMethod(selectedMethod.method ?? '');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final paymentService = Provider.of<PaymentService>(context);
     final isDarkMode = context.isDarkMode;
-    // widget.formData['paymentMethodId'] = widget.paymentMethods[0].id;
     return BlocBuilder<AddShipmentBloc, AddShipmentState>(
       builder: (context, state) {
         final isLoading =
             widget.isSubmitting || state is AddShipmentLoading;
         final isDisabled = widget.formData['paymentModeId'] == null ||
             widget.formData['paymentModeId'] == '' ||
+            !_hasValidPaymentMethodId() ||
             isLoading;
         return Stack(
           children: [
@@ -370,7 +459,7 @@ class _ThirdPageState extends State<ThirdPage> {
                         const SizedBox(height: 24),
                         _buildDropdownField(
                           label: 'Payment Mode',
-                          value: widget.paymentModes[0].id?.toString(),
+                          value: selectedPaymentMode,
                           items: widget.paymentModes
                               .map((mode) => DropdownMenuItem(
                                     value: mode.code?.toString(),
@@ -379,31 +468,27 @@ class _ThirdPageState extends State<ThirdPage> {
                                   ))
                               .toList(),
                           onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                final selectedMode =
-                                    widget.paymentModes.firstWhere(
-                                  (mode) => mode.code?.toString() == value,
-                                  orElse: () => PaymentModeModel(),
-                                );
-                                selectedPaymentMode = selectedMode.code;
-                                widget.formData['paymentModeId'] =
-                                    selectedMode.id; // Store the ID
-                                print(selectedMode.description);
-                                paymentService
-                                    .setPaymentInfo(selectedMode.description!);
-                              });
-                            }
+                            if (value == null) return;
+                            final selectedMode =
+                                widget.paymentModes.firstWhere(
+                              (mode) => mode.code?.toString() == value,
+                              orElse: () => PaymentModeModel(),
+                            );
+                            if (selectedMode.id == null) return;
+                            _applyPaymentMode(selectedMode, notify: true);
+                            paymentService.setPaymentInfo(
+                              selectedMode.description ?? selectedMode.code ?? '',
+                            );
                           },
                           isDarkMode: isDarkMode,
                           icon: Icons.payment,
                         ),
                         const SizedBox(height: 24),
-                        // Show payment method selector only for CASH mode
                         selectedPaymentMode == 'CASH'
                             ? _buildDropdownField(
                                 label: 'Payment Method',
-                                value: null,
+                                value: widget.formData['paymentMethodId']
+                                    ?.toString(),
                                 items: widget.paymentMethods
                                     .map((method) => DropdownMenuItem(
                                           value: method.id?.toString(),
@@ -412,23 +497,7 @@ class _ThirdPageState extends State<ThirdPage> {
                                     .toList(),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    print(value);
-                                    setState(() {
-                                      widget.formData['paymentMethodId'] =
-                                          int.parse(value); // Store the ID
-                                      final selectedMethod =
-                                          widget.paymentMethods.firstWhere(
-                                              (method) =>
-                                                  method.id?.toString() ==
-                                                  value,
-                                              orElse: () =>
-                                                  PaymentMethodModel());
-                                      paymentService.setPaymentMethod(
-                                          selectedMethod.method!);
-                                      print(selectedMethod.id);
-                                      // print(widget.formData['paymentMethodId']);
-                                      // selectedPaymentMethod = selectedMethod.description;
-                                    });
+                                    _selectPaymentMethod(value);
                                   }
                                 },
                                 isDarkMode: isDarkMode,
@@ -691,11 +760,10 @@ class _ThirdPageState extends State<ThirdPage> {
     required bool isDarkMode,
     IconData? icon,
   }) {
-    // Ensure value is null if it's empty or not in the valid items list
-    // final validValue =
-    //     value?.isNotEmpty == true && items.any((item) => item.value == value)
-    //         ? value
-    //         : null;
+    final validValue =
+        value?.isNotEmpty == true && items.any((item) => item.value == value)
+            ? value
+            : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -710,7 +778,7 @@ class _ThirdPageState extends State<ThirdPage> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          // value: validValue, // Use validated value
+          value: validValue,
           items: items,
           onChanged: onChanged,
           style: TextStyle(

@@ -67,13 +67,12 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
   };
   final authService = AuthService();
   final Map<String, dynamic> formData3 = {
-    // "paymentMethodId": 1,
     "hudhudPercent": 10.5,
     "hudhudNet": 95.75,
     "creditAccount": "",
     "creditAmount": 0.0,
-    "paymentModeId": "",
-    "paymentMethodId": "",
+    "paymentModeId": null,
+    "paymentMethodId": null,
     "payerAccount": "",
     "addedBy": "",
   };
@@ -614,29 +613,35 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                             isSubmitting: _isSubmitting,
                             onSubmit: () {
                               if (_isSubmitting) return;
-                              print('[UI] Submit button pressed on step 3');
-                              print('[UI] Form validation started');
                               if (_formKey.currentState!.validate()) {
-                                print('[UI] Form validation passed');
-                                print('[UI] formData1: $formData1');
-                                print('[UI] formData2: $formData2');
-                                print('[UI] formData3: $formData3');
+                                final paymentMethodId =
+                                    formData3['paymentMethodId'];
+                                if (paymentMethodId == null ||
+                                    paymentMethodId.toString().trim().isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Please select a payment method',
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+
                                 final Map<String, dynamic> completeFormData = {
                                   ...formData1,
                                   ...formData2,
                                   ...formData3,
+                                  'paymentMethodId': paymentMethodId is int
+                                      ? paymentMethodId
+                                      : int.parse(
+                                          paymentMethodId.toString(),
+                                        ),
                                 };
-                                print(
-                                    '[UI] Complete form data: $completeFormData');
-                                print(
-                                    '[UI] Dispatching AddShipment event to bloc');
                                 setState(() => _isSubmitting = true);
-                                context
-                                    .read<AddShipmentBloc>()
-                                    .add(AddShipment(body: completeFormData));
-                                print('[UI] AddShipment event dispatched');
-                              } else {
-                                print('[UI] Form validation failed');
+                                context.read<AddShipmentBloc>().add(
+                                      AddShipment(body: completeFormData),
+                                    );
                               }
                             },
                           ),

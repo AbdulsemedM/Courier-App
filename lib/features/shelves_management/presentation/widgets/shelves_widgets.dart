@@ -4,15 +4,31 @@ import 'package:courier_app/features/branches/model/branches_model.dart';
 
 class ShelvesTable extends StatelessWidget {
   final List<ShelvesModel> shelves;
+  final List<BranchesModel> branches;
   final int? selectedBranchId;
   final Function(ShelvesModel) onEdit;
 
   const ShelvesTable({
     Key? key,
     required this.shelves,
+    this.branches = const [],
     required this.onEdit,
     this.selectedBranchId,
   }) : super(key: key);
+
+  String _branchLabel(ShelvesModel shelf) {
+    if (shelf.branchName != null && shelf.branchName!.isNotEmpty) {
+      return shelf.branchName!;
+    }
+    if (shelf.branchId != null) {
+      for (final branch in branches) {
+        if (branch.id == shelf.branchId) {
+          return branch.name;
+        }
+      }
+    }
+    return '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +50,7 @@ class ShelvesTable extends StatelessWidget {
           return DataRow(cells: [
             DataCell(Text(shelf.shelfCode ?? '')),
             DataCell(Text(shelf.binCode ?? '')),
-            DataCell(Text(shelf.branchName ?? '')),
+            DataCell(Text(_branchLabel(shelf))),
             DataCell(Text(shelf.description ?? '')),
             DataCell(IconButton(
               icon: const Icon(Icons.edit),

@@ -245,12 +245,10 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                   if (_filteredShipments.isEmpty) {
                     return ShipmentsWidgets.buildEmptyState(context);
                   }
-                  final showDeliverButton = _selectedStatus == 'ARR';
                   return ShipmentsWidgets.buildShipmentsTable(
                     isDarkMode: isDarkMode,
                     shipments: _filteredShipments,
                     statuses: _statuses,
-                    showDeliverButton: showDeliverButton,
                     onDeliver: _handleDeliver,
                     onPay: _handlePay,
                   );

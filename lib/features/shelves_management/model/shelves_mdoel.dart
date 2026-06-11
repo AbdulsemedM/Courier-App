@@ -47,14 +47,23 @@ class ShelvesModel {
   }
 
   factory ShelvesModel.fromMap(Map<String, dynamic> map) {
+    int? branchId;
+    String? branchName;
+
+    final branch = map['branch'];
+    if (branch is Map) {
+      branchId = branch['id'] as int?;
+      branchName = branch['name'] as String?;
+    } else if (branch is int) {
+      branchId = branch;
+    }
+
     return ShelvesModel(
       id: map['id'] != null ? map['id'] as int : null,
       shelfCode: map['shelfCode'] != null ? map['shelfCode'] as String : null,
       binCode: map['binCode'] != null ? map['binCode'] as String : null,
-      branchId: map['branch']['id'] != null ? map['branch']['id'] as int : null,
-      branchName: map['branch']['name'] != null
-          ? map['branch']['name'] as String
-          : null,
+      branchId: branchId,
+      branchName: branchName,
       description:
           map['description'] != null ? map['description'] as String : null,
     );
