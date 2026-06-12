@@ -209,6 +209,14 @@ class ScannerService {
     }
   }
 
+  /// Release screen-level listeners without tearing down the shared Sunmi stream.
+  void release() {
+    _sunmiSubscription?.cancel();
+    _urovoSubscription?.cancel();
+    _sunmiSubscription = null;
+    _urovoSubscription = null;
+  }
+
   /// Stop the scanner (for Sunmi devices)
   Future<void> stopScanner() async {
     if (_scannerType == ScannerType.sunmi) {
@@ -221,13 +229,11 @@ class ScannerService {
     }
   }
 
-  /// Dispose resources
+  /// Fully dispose scanner resources. Prefer [release] from individual screens.
   void dispose() {
-    _sunmiSubscription?.cancel();
-    _urovoSubscription?.cancel();
+    release();
     _sunmiStreamController?.close();
-    _sunmiSubscription = null;
-    _urovoSubscription = null;
     _sunmiStreamController = null;
+    _scannerType = null;
   }
 }

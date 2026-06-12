@@ -32,6 +32,7 @@ class MainActivity: FlutterActivity() {
         if (isSunmi) {
             Log.d("MainActivity", "Sunmi device detected - Manufacturer: ${Build.MANUFACTURER}, Model: ${Build.MODEL}")
             Log.d("MainActivity", "Auto-registering receiver and enabling scanner")
+            configureSunmiBroadcastOutput()
             registerBarcodeReceiver()
             
             // Try multiple ways to enable scanner immediately
@@ -84,8 +85,8 @@ class MainActivity: FlutterActivity() {
                     try {
                         Log.d("MainActivity", "startScan called - registering receiver and activating scanner")
                         
-                        // Register broadcast receiver for Sunmi barcode scans
                         registerBarcodeReceiver()
+                        configureSunmiBroadcastOutput()
                         
                         // Try multiple ways to enable/start/open the scanner
                         val scannerActions = listOf(
@@ -259,6 +260,18 @@ class MainActivity: FlutterActivity() {
         }
     }
 
+    private fun configureSunmiBroadcastOutput() {
+        try {
+            val intent = Intent("com.sunmi.scanner.ACTION_BAR_DEVICES_SETTING")
+            intent.putExtra("type", 2)
+            intent.putExtra("toast", false)
+            sendBroadcast(intent)
+            Log.d("MainActivity", "Requested Sunmi scanner broadcast output mode")
+        } catch (e: Exception) {
+            Log.d("MainActivity", "Could not configure Sunmi broadcast mode: ${e.message}")
+        }
+    }
+
     private fun registerBarcodeReceiver() {
         // Always re-register to ensure it's active
         if (barcodeReceiver != null) {
@@ -423,19 +436,18 @@ class MainActivity: FlutterActivity() {
         val isSunmi = Build.MANUFACTURER.equals("SUNMI", ignoreCase = true) ||
                      Build.MODEL.contains("SUNMI", ignoreCase = true) ||
                      Build.MODEL.contains("V3", ignoreCase = true)
-        if (isSunmi && methodChannel != null) {
+        if (isSunmi) {
             try {
-                methodChannel?.invokeMethod("startScan", null, object : MethodChannel.Result {
-                    override fun success(result: Any?) {
-                        Log.d("MainActivity", "Scanner reactivated on resume")
-                    }
-                    override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
-                        Log.d("MainActivity", "Could not reactivate scanner: $errorMessage")
-                    }
-                    override fun notImplemented() {
-                        Log.d("MainActivity", "startScan not implemented")
-                    }
-                })
+                registerBarcodeReceiver()
+                configureSunmiBroadcastOutput()
+                listOf(
+                    "com.sunmi.scanner.ACTION_ENABLE_SCANNER",
+                    "com.sunmi.scanner.ACTION_OPEN_SCANNER",
+                    "com.sunmi.scanner.ACTION_START_SCAN"
+                ).forEach { action ->
+                    sendBroadcast(Intent(action))
+                }
+                Log.d("MainActivity", "Scanner reactivated on resume")
             } catch (e: Exception) {
                 Log.d("MainActivity", "Error reactivating scanner on resume: ${e.message}")
             }

@@ -64,7 +64,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
     _trackingController.dispose();
     _focusNode.dispose();
     _barcodeStreamSubscription?.cancel();
-    _scannerService.dispose();
+    _scannerService.release();
     super.dispose();
   }
 

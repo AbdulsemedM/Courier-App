@@ -31,7 +31,8 @@ class SunmiBarcodeReceiver(private val onBarcodeScanned: (String) -> Unit) : Bro
             if (extras != null) {
                 val possibleKeys = listOf(
                     "data", "barcode", "value", "SCAN_BARCODE1", "SCAN_BARCODE",
-                    "code", "result", "content", "text", "string"
+                    "code", "result", "content", "text", "string",
+                    "scannerdata", "scanResult", "SCAN_RESULT", "RESULT"
                 )
                 for (key in possibleKeys) {
                     val value = extras.get(key)
@@ -39,6 +40,15 @@ class SunmiBarcodeReceiver(private val onBarcodeScanned: (String) -> Unit) : Bro
                         barcode = value
                         Log.d("SunmiBarcodeReceiver", "Found barcode in key '$key': $barcode")
                         break
+                    }
+                }
+
+                if (barcode.isNullOrEmpty()) {
+                    val sourceBytes = extras.getByteArray("source_byte")
+                        ?: extras.getByteArray("source")
+                    if (sourceBytes != null && sourceBytes.isNotEmpty()) {
+                        barcode = String(sourceBytes, Charsets.UTF_8).trim()
+                        Log.d("SunmiBarcodeReceiver", "Found barcode in byte array: $barcode")
                     }
                 }
             }

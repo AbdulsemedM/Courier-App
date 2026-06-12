@@ -297,6 +297,37 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
     return const [];
   }
 
+  String? _resolvePaymentField(dynamic value) {
+    if (value == null) return null;
+    if (value is Map) {
+      final field = value['method'] ??
+          value['code'] ??
+          value['description'] ??
+          value['type'];
+      if (field != null && field.toString().trim().isNotEmpty) {
+        return field.toString().trim();
+      }
+      return null;
+    }
+    final text = value.toString().trim();
+    return text.isEmpty ? null : text;
+  }
+
+  String _formatPaymentBillLine(Map<String, dynamic> data) {
+    final paymentMethod = _resolvePaymentField(data['paymentMethod']);
+    final paymentMode = _resolvePaymentField(data['paymentMode']);
+    final label = (paymentMethod ?? paymentMode)?.toUpperCase();
+    if (label == null || label.isEmpty) return '';
+
+    if (label == 'CASH' ||
+        label == 'COD' ||
+        label.contains('CASH ON DELIVERY')) {
+      return 'BILL CASH ON DELIVERY';
+    }
+
+    return 'PAY: $label';
+  }
+
   String _formatDate(dynamic dateValue) {
     try {
       if (dateValue == null || dateValue.toString().isEmpty) {
@@ -427,8 +458,7 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
       final weight =
           '${shipmentData!['qty'] ?? 1} ${(shipmentData!['unit'] ?? 'kg').toString().toUpperCase()}';
       final account = (shipmentData!['transactionReference'] ?? '').toString();
-      final paymentMode = (shipmentData!['paymentMode'] ?? '').toString();
-      final billText = paymentMode == 'CASH' ? 'BILL CASH ON DELIVERY' : '';
+      final billText = _formatPaymentBillLine(shipmentData!);
 
       final refNumber =
           (shipmentData!['transactionReference'] ?? '').toString();
@@ -550,14 +580,6 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
       await SunmiPrinter.lineWrap(1);
 
       await SunmiPrinter.setAlignment(SunmiPrintAlign.CENTER);
-      final qrCodeUrl =
-          'https://hudhudexpress.com/order?awb=${widget.trackingNumber}';
-      await SunmiPrinter.printQRCode(
-        qrCodeUrl,
-        size: 8,
-        errorLevel: SunmiQrcodeLevel.LEVEL_H,
-      );
-      await SunmiPrinter.lineWrap(1);
 
       final barcodeUrl = shipmentData!['barcodeUrl'] as String?;
       if (barcodeUrl != null && barcodeUrl.isNotEmpty) {
@@ -565,7 +587,7 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
           final barcodeImageBytes = await _downloadImage(barcodeUrl);
           if (barcodeImageBytes != null) {
             final scaledBytes =
-                _scaleBarcodeForPrint(barcodeImageBytes, targetWidth: 384);
+                _scaleBarcodeForPrint(barcodeImageBytes, targetWidth: 460);
             await SunmiPrinter.printImage(scaledBytes);
             await SunmiPrinter.lineWrap(1);
           }
@@ -573,6 +595,15 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
           print('[PrintShipmentScreen] Error printing barcode: $e');
         }
       }
+
+      final qrCodeUrl =
+          'https://hudhudexpress.com/order?awb=${widget.trackingNumber}';
+      await SunmiPrinter.printQRCode(
+        qrCodeUrl,
+        size: 4,
+        errorLevel: SunmiQrcodeLevel.LEVEL_H,
+      );
+      await SunmiPrinter.lineWrap(1);
 
       await SunmiPrinter.line();
       await SunmiPrinter.printText(

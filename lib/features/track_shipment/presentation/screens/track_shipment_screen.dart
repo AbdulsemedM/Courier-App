@@ -15,7 +15,6 @@ import 'package:courier_app/features/shipment/presentation/widgets/deliver_shipm
 import 'package:courier_app/features/track_shipment/bloc/track_shipment_bloc.dart';
 import 'package:courier_app/features/track_shipment/presentation/widgets/track_shipment_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -31,14 +30,12 @@ class TrackShipmentScreen extends StatefulWidget {
 class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   final _searchController = TextEditingController();
   final FocusNode _textFieldFocusNode = FocusNode();
-  final FocusNode _keyboardFocusNode = FocusNode();
   final ScannerService _scannerService = ScannerService();
   StreamSubscription<String>? _barcodeStreamSubscription;
   ScannerType? _scannerType;
   bool _isHardwareScanner = false;
   bool _hasCameraPermission = false;
-  String _scannerBuffer = '';
-  DateTime? _lastScannerInput;
+  bool _handlingHidScan = false;
 
   @override
   void initState() {
@@ -55,25 +52,20 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Ensure scanner is activated when screen becomes visible
     Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted && _scannerType == ScannerType.sunmi) {
-        _scannerService.startScanner();
-      }
-      // Request focus for keyboard input (Sunmi HID mode)
-      if (mounted && _scannerType == ScannerType.sunmi) {
-        _keyboardFocusNode.requestFocus();
-      }
+      if (!mounted || _scannerType != ScannerType.sunmi) return;
+      _scannerService.startScanner();
+      _textFieldFocusNode.requestFocus();
     });
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchControllerChanged);
     _searchController.dispose();
     _textFieldFocusNode.dispose();
-    _keyboardFocusNode.dispose();
     _barcodeStreamSubscription?.cancel();
-    _scannerService.dispose();
+    _scannerService.release();
     super.dispose();
   }
 
@@ -89,10 +81,12 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
       if (_scannerType == ScannerType.sunmi ||
           _scannerType == ScannerType.urovo) {
-        // Initialize hardware scanner (Sunmi or Urovo)
+        if (_scannerType == ScannerType.sunmi) {
+          _searchController.addListener(_onSearchControllerChanged);
+        }
+
         final stream = _scannerService.initializeScanner();
 
-        // Set up listener for barcode scans
         _barcodeStreamSubscription = stream.listen(
           (barcode) {
             if (barcode.isNotEmpty && mounted) {
@@ -105,9 +99,15 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
           cancelOnError: false,
         );
 
-        // Start Sunmi scanner if applicable
+        await Future.delayed(const Duration(milliseconds: 100));
+
         if (_scannerType == ScannerType.sunmi) {
           await _scannerService.startScanner();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _textFieldFocusNode.requestFocus();
+            }
+          });
           _keepScannerActive();
         }
       }
@@ -123,16 +123,32 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   void _onBarcodeDetected(String barcode) {
     if (barcode.isEmpty) return;
 
-    // Trim whitespace
     barcode = barcode.trim();
 
-    // Set the barcode to the search field
     setState(() {
       _searchController.text = barcode;
     });
 
-    // Automatically trigger search
     _onSearch();
+  }
+
+  void _onSearchControllerChanged() {
+    if (_handlingHidScan || _scannerType != ScannerType.sunmi) return;
+
+    final value = _searchController.text;
+    if (!value.contains('\n') && !value.contains('\r')) return;
+
+    _handlingHidScan = true;
+    final cleaned = value.replaceAll(RegExp(r'[\r\n]+'), '').trim();
+    _searchController.value = TextEditingValue(
+      text: cleaned,
+      selection: TextSelection.collapsed(offset: cleaned.length),
+    );
+    _handlingHidScan = false;
+
+    if (cleaned.isNotEmpty) {
+      _onSearch();
+    }
   }
 
   // Keep scanner active by periodically reactivating it (for Sunmi)
@@ -332,36 +348,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
           ),
         ),
       ),
-      body: KeyboardListener(
-        focusNode: _keyboardFocusNode,
-        onKeyEvent: (event) {
-          // Capture keyboard input from scanner (HID mode for Sunmi)
-          if (event is KeyDownEvent && _scannerType == ScannerType.sunmi) {
-            final keyLabel = event.logicalKey.keyLabel;
-
-            // If it's a printable character, add to buffer
-            if (keyLabel.length == 1 && event.character != null) {
-              final now = DateTime.now();
-              if (_lastScannerInput != null) {
-                final timeDiff = now.difference(_lastScannerInput!);
-                // If more than 100ms passed, assume new scan started
-                if (timeDiff.inMilliseconds > 100) {
-                  _scannerBuffer = '';
-                }
-              }
-              _scannerBuffer += event.character!;
-              _lastScannerInput = now;
-            } else if (event.logicalKey == LogicalKeyboardKey.enter) {
-              // Enter key indicates end of barcode
-              if (_scannerBuffer.isNotEmpty) {
-                _onBarcodeDetected(_scannerBuffer.trim());
-                _scannerBuffer = '';
-                _lastScannerInput = null;
-              }
-            }
-          }
-        },
-        child: Column(
+      body: Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -548,7 +535,6 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
             ),
           ],
         ),
-      ),
     ),
     );
   }
