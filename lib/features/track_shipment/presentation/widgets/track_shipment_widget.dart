@@ -108,17 +108,18 @@ class TrackShipmentWidgets {
   }) {
     final mainShipment = shipments.first;
     final latestShipment = _latestShipmentForActions(shipments);
+    final paymentShipment = _shipmentWithPaymentDetails(shipments);
     final canDeliver = ShipmentStatusHelper.shouldShowDeliverAction(
       shipmentStatusCode: latestShipment.statusCode,
       shipmentStatusLabel: latestShipment.statusDescription,
-      paymentStatus: latestShipment.paymentStatus,
-      paymentMode: latestShipment.method,
+      paymentStatus: paymentShipment.paymentStatus,
+      paymentMode: paymentShipment.method,
     );
     final canPay = ShipmentStatusHelper.shouldShowPayBeforeDeliverAction(
       shipmentStatusCode: latestShipment.statusCode,
       shipmentStatusLabel: latestShipment.statusDescription,
-      paymentStatus: latestShipment.paymentStatus,
-      paymentMode: latestShipment.method,
+      paymentStatus: paymentShipment.paymentStatus,
+      paymentMode: paymentShipment.method,
     );
 
     return SingleChildScrollView(
@@ -193,6 +194,22 @@ class TrackShipmentWidgets {
     }
 
     return latestTime != null ? latest : shipments.last;
+  }
+
+  /// Timeline entries after the first often only include a shipment ID, not
+  /// payment fields. Use the entry that still has payment data for Pay/Deliver.
+  static TrackShipmentModel _shipmentWithPaymentDetails(
+    List<TrackShipmentModel> shipments,
+  ) {
+    for (final shipment in shipments) {
+      final hasPaymentStatus =
+          shipment.paymentStatus != null && shipment.paymentStatus!.trim().isNotEmpty;
+      final hasPaymentMode = shipment.method.trim().isNotEmpty;
+      if (hasPaymentStatus || hasPaymentMode) {
+        return shipment;
+      }
+    }
+    return shipments.first;
   }
 
   static String? _getBranchName(int? branchId, List<BranchesModel>? branches) {

@@ -5,12 +5,20 @@ String _paymentModeCode(dynamic paymentData) {
   if (paymentData is Map<String, dynamic>) {
     return paymentData['method']?.toString() ??
         paymentData['code']?.toString() ??
+        paymentData['description']?.toString() ??
         '';
   }
   if (paymentData is String) {
     return paymentData;
   }
   return '';
+}
+
+String _resolvePaymentMode(Map<String, dynamic> shipment) {
+  final fromMethod = _paymentModeCode(shipment['paymentMethod']);
+  if (fromMethod.isNotEmpty) return fromMethod;
+
+  return _paymentModeCode(shipment['paymentMode']);
 }
 
 class TrackShipmentModel {
@@ -303,9 +311,7 @@ class TrackShipmentModel {
       receiverBranchName: receiverBranchName,
       netFee: (shipment['netFee'] ?? '').toString(),
       shipmentDescription: shipment['shipmentDescription'] as String? ?? '',
-      method: _paymentModeCode(
-        shipment['paymentMethod'] ?? shipment['paymentMode'],
-      ),
+      method: _resolvePaymentMode(shipment),
       updatedBy: addedByFirstName ?? '',
       description: description,
       createdAt:
