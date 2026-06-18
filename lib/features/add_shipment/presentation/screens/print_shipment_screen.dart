@@ -171,7 +171,7 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
                             'Shipment Date':
                                 _formatDate(shipmentData!['createdAt']),
                             'Payment Method':
-                                shipmentData!['paymentMethod'] ?? '',
+                                _formatPaymentDisplayLabel(shipmentData!),
                             'Delivery Type':
                                 shipmentData!['deliveryType'] ?? '',
                             'Description':
@@ -300,10 +300,7 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
   String? _resolvePaymentField(dynamic value) {
     if (value == null) return null;
     if (value is Map) {
-      final field = value['method'] ??
-          value['code'] ??
-          value['description'] ??
-          value['type'];
+      final field = value['method'] ?? value['code'];
       if (field != null && field.toString().trim().isNotEmpty) {
         return field.toString().trim();
       }
@@ -313,19 +310,72 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
     return text.isEmpty ? null : text;
   }
 
-  String _formatPaymentBillLine(Map<String, dynamic> data) {
-    final paymentMethod = _resolvePaymentField(data['paymentMethod']);
-    final paymentMode = _resolvePaymentField(data['paymentMode']);
-    final label = (paymentMethod ?? paymentMode)?.toUpperCase();
-    if (label == null || label.isEmpty) return '';
+  String? _resolvePaymentModeField(dynamic value) {
+    if (value == null) return null;
+    if (value is Map) {
+      final field = value['code'] ?? value['method'];
+      if (field != null && field.toString().trim().isNotEmpty) {
+        return field.toString().trim();
+      }
+      return null;
+    }
+    final text = value.toString().trim();
+    return text.isEmpty ? null : text;
+  }
 
-    if (label == 'CASH' ||
-        label == 'COD' ||
-        label.contains('CASH ON DELIVERY')) {
+  bool _isCodPayment(String? value) {
+    if (value == null || value.trim().isEmpty) return false;
+    final normalized = value.trim().toUpperCase();
+    return normalized == 'COD' || normalized == 'CASH ON DELIVERY';
+  }
+
+  String _formatPaymentDisplayLabel(Map<String, dynamic> data) {
+    final paymentMode = _resolvePaymentModeField(data['paymentMode']);
+    final paymentMethod = _resolvePaymentField(data['paymentMethod']);
+
+    if (paymentMethod != null && paymentMethod.isNotEmpty) {
+      if (paymentMode != null &&
+          paymentMode.isNotEmpty &&
+          paymentMode.toUpperCase() != paymentMethod.toUpperCase()) {
+        return '$paymentMethod ($paymentMode)';
+      }
+      return paymentMethod;
+    }
+
+    return paymentMode ?? '';
+  }
+
+  String _formatPaymentBillLine(Map<String, dynamic> data) {
+    final paymentMode = _resolvePaymentModeField(data['paymentMode'])?.toUpperCase();
+    final paymentMethod =
+        _resolvePaymentField(data['paymentMethod'])?.toUpperCase();
+
+    // Payment method is the actual tender used; prefer it over payment mode.
+    if (_isCodPayment(paymentMethod)) {
       return 'BILL CASH ON DELIVERY';
     }
 
-    return 'PAY: $label';
+    if (paymentMethod == 'CASH') {
+      return 'BILL CASH';
+    }
+
+    if (paymentMethod != null && paymentMethod.isNotEmpty) {
+      return 'PAY: $paymentMethod';
+    }
+
+    if (_isCodPayment(paymentMode)) {
+      return 'BILL CASH ON DELIVERY';
+    }
+
+    if (paymentMode == 'CASH') {
+      return 'BILL CASH';
+    }
+
+    if (paymentMode != null && paymentMode.isNotEmpty) {
+      return 'PAY: $paymentMode';
+    }
+
+    return '';
   }
 
   String _formatDate(dynamic dateValue) {
@@ -677,8 +727,7 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
     final weight =
         '${shipmentData!['qty'] ?? 1} ${(shipmentData!['unit'] ?? 'kg').toString().toUpperCase()}';
     final account = (shipmentData!['transactionReference'] ?? '').toString();
-    final paymentMode = (shipmentData!['paymentMode'] ?? '').toString();
-    final billText = paymentMode == 'CASH' ? 'BILL CASH ON DELIVERY' : '';
+    final billText = _formatPaymentBillLine(shipmentData!);
 
     final refNumber = (shipmentData!['transactionReference'] ?? '').toString();
     final refShort = refNumber.length > 6

@@ -1,10 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-String? _parsePaymentMethodField(
-  dynamic paymentMethod,
-  Map<String, dynamic> map,
-) {
+String? _parsePaymentMethodField(dynamic paymentMethod) {
   if (paymentMethod is Map<String, dynamic>) {
     return paymentMethod['method']?.toString() ??
         paymentMethod['code']?.toString();
@@ -12,9 +9,16 @@ String? _parsePaymentMethodField(
   if (paymentMethod is String && paymentMethod.trim().isNotEmpty) {
     return paymentMethod.trim();
   }
-  final paymentMode = map['paymentMode'];
+  return null;
+}
+
+String? _parsePaymentModeField(dynamic paymentMode) {
   if (paymentMode is Map<String, dynamic>) {
-    return paymentMode['code']?.toString() ?? paymentMode['method']?.toString();
+    return paymentMode['code']?.toString() ??
+        paymentMode['method']?.toString();
+  }
+  if (paymentMode is String && paymentMode.trim().isNotEmpty) {
+    return paymentMode.trim();
   }
   return null;
 }
@@ -33,6 +37,8 @@ class PaymentInvoiceModel {
   final String? shipmentDescription;
   final String? paymentMethod;
   final String? paymentMode;
+  final Map<String, dynamic>? paymentMethodData;
+  final Map<String, dynamic>? paymentModeData;
   final String? deliveryType;
   final String? shipmentStatus;
   final String? paymentStatus;
@@ -62,6 +68,8 @@ class PaymentInvoiceModel {
     this.shipmentDescription,
     this.paymentMethod,
     this.paymentMode,
+    this.paymentMethodData,
+    this.paymentModeData,
     this.deliveryType,
     this.shipmentStatus,
     this.paymentStatus,
@@ -92,6 +100,8 @@ class PaymentInvoiceModel {
     String? shipmentDescription,
     String? paymentMethod,
     String? paymentMode,
+    Map<String, dynamic>? paymentMethodData,
+    Map<String, dynamic>? paymentModeData,
     String? deliveryType,
     String? shipmentStatus,
     String? paymentStatus,
@@ -122,6 +132,8 @@ class PaymentInvoiceModel {
       shipmentDescription: shipmentDescription ?? this.shipmentDescription,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       paymentMode: paymentMode ?? this.paymentMode,
+      paymentMethodData: paymentMethodData ?? this.paymentMethodData,
+      paymentModeData: paymentModeData ?? this.paymentModeData,
       deliveryType: deliveryType ?? this.deliveryType,
       shipmentStatus: shipmentStatus ?? this.shipmentStatus,
       paymentStatus: paymentStatus ?? this.paymentStatus,
@@ -153,8 +165,8 @@ class PaymentInvoiceModel {
       'receiverBranch': receiverBranch,
       'receiverBranchPhone': receiverBranchPhone,
       'shipmentDescription': shipmentDescription,
-      'paymentMethod': paymentMethod,
-      'paymentMode': paymentMode,
+      'paymentMethod': paymentMethodData ?? paymentMethod,
+      'paymentMode': paymentModeData ?? paymentMode,
       'deliveryType': deliveryType,
       'shipmentStatus': shipmentStatus,
       'paymentStatus': paymentStatus,
@@ -180,6 +192,7 @@ class PaymentInvoiceModel {
       final senderBranch = map['senderBranch'];
       final receiverBranch = map['receiverBranch'];
       final paymentMethod = map['paymentMethod'];
+      final paymentMode = map['paymentMode'];
       final deliveryType = map['deliveryType'];
       final shipmentStatus = map['shipmentStatus'];
 
@@ -239,14 +252,14 @@ class PaymentInvoiceModel {
         shipmentDescription: map['shipmentDescription'] != null
             ? map['shipmentDescription'] as String
             : null,
-        paymentMethod: _parsePaymentMethodField(paymentMethod, map),
-        paymentMode: (paymentMethod is Map<String, dynamic> &&
-                paymentMethod["mode"] != null)
-            ? paymentMethod["mode"] as String
-            : (map['paymentMode'] is Map<String, dynamic> &&
-                    map['paymentMode']["code"] != null)
-                ? map['paymentMode']["code"] as String
-                : null,
+        paymentMethod: _parsePaymentMethodField(paymentMethod),
+        paymentMode: _parsePaymentModeField(paymentMode),
+        paymentMethodData: paymentMethod is Map<String, dynamic>
+            ? Map<String, dynamic>.from(paymentMethod)
+            : null,
+        paymentModeData: paymentMode is Map<String, dynamic>
+            ? Map<String, dynamic>.from(paymentMode)
+            : null,
         deliveryType: (deliveryType is Map<String, dynamic> &&
                 deliveryType["type"] != null)
             ? deliveryType["type"] as String
