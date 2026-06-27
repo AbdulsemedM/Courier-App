@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-String _paymentModeCode(dynamic paymentData) {
+String _paymentMethodLabel(dynamic paymentData) {
   if (paymentData is Map<String, dynamic>) {
     return paymentData['method']?.toString() ??
         paymentData['code']?.toString() ??
@@ -14,11 +14,24 @@ String _paymentModeCode(dynamic paymentData) {
   return '';
 }
 
-String _resolvePaymentMode(Map<String, dynamic> shipment) {
-  final fromMethod = _paymentModeCode(shipment['paymentMethod']);
-  if (fromMethod.isNotEmpty) return fromMethod;
+String _paymentModeLabel(dynamic paymentData) {
+  if (paymentData is Map<String, dynamic>) {
+    return paymentData['code']?.toString() ??
+        paymentData['method']?.toString() ??
+        paymentData['description']?.toString() ??
+        '';
+  }
+  if (paymentData is String) {
+    return paymentData;
+  }
+  return '';
+}
 
-  return _paymentModeCode(shipment['paymentMode']);
+String _resolvePaymentMode(Map<String, dynamic> shipment) {
+  final fromMode = _paymentModeLabel(shipment['paymentMode']);
+  if (fromMode.isNotEmpty) return fromMode;
+
+  return _paymentMethodLabel(shipment['paymentMethod']);
 }
 
 class TrackShipmentModel {
