@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:courier_app/app/utils/dialog_utils.dart';
 import 'package:courier_app/configuration/auth_service.dart';
+import 'package:courier_app/core/services/scanner_service.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/features/barcode_reader/presentation/widgets/barcode_reader_widget.dart';
 import 'package:courier_app/features/manifest/bloc/manifest_bloc.dart';
@@ -24,6 +27,12 @@ class CreateManifestScreen extends StatefulWidget {
 class _CreateManifestScreenState extends State<CreateManifestScreen> {
   final AuthService _authService = AuthService();
   final TextEditingController _awbController = TextEditingController();
+  final FocusNode _awbFocusNode = FocusNode();
+  final ScannerService _scannerService = ScannerService();
+  StreamSubscription<String>? _barcodeStreamSubscription;
+  ScannerType? _scannerType;
+  bool _isHardwareScanner = false;
+  bool _handlingHidScan = false;
 
   final List<String> _awbs = [];
   String _fileType = 'EXCEL';
@@ -32,6 +41,7 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeScanner();
     final date = DateFormat('yyyy-MM-dd').format(widget.selectedDate);
     context.read<ManifestBloc>().add(
           FetchManifests(branchId: widget.branchId, date: date),
@@ -39,9 +49,100 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      if (_scannerType == ScannerType.sunmi) {
+        _scannerService.startScanner();
+        _awbFocusNode.requestFocus();
+      } else if (_scannerType == ScannerType.urovo) {
+        _scannerService.startUrovoScanner();
+        _awbFocusNode.requestFocus();
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    _awbController.removeListener(_onAwbControllerChanged);
     _awbController.dispose();
+    _awbFocusNode.dispose();
+    _barcodeStreamSubscription?.cancel();
+    _scannerService.release();
     super.dispose();
+  }
+
+  Future<void> _initializeScanner() async {
+    try {
+      _scannerType = await _scannerService.detectScannerType();
+
+      setState(() {
+        _isHardwareScanner = _scannerType == ScannerType.sunmi ||
+            _scannerType == ScannerType.urovo;
+      });
+
+      if (_scannerType == ScannerType.sunmi ||
+          _scannerType == ScannerType.urovo) {
+        _awbController.addListener(_onAwbControllerChanged);
+
+        final stream = _scannerService.initializeScanner();
+        _barcodeStreamSubscription = stream.listen(
+          (barcode) {
+            if (barcode.isNotEmpty && mounted) {
+              _addAwb(barcode);
+            }
+          },
+          onError: (error) {
+            print('Manifest scanner error: $error');
+          },
+          cancelOnError: false,
+        );
+
+        await Future.delayed(const Duration(milliseconds: 100));
+
+        if (_scannerType == ScannerType.sunmi) {
+          await _scannerService.startScanner();
+        } else if (_scannerType == ScannerType.urovo) {
+          await _scannerService.startUrovoScanner();
+        }
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _awbFocusNode.requestFocus();
+          }
+        });
+      }
+    } catch (e) {
+      print('Error initializing manifest scanner: $e');
+      setState(() {
+        _scannerType = ScannerType.camera;
+        _isHardwareScanner = false;
+      });
+    }
+  }
+
+  void _onAwbControllerChanged() {
+    if (_handlingHidScan ||
+        (_scannerType != ScannerType.sunmi &&
+            _scannerType != ScannerType.urovo)) {
+      return;
+    }
+
+    final value = _awbController.text;
+    if (!value.contains('\n') && !value.contains('\r')) return;
+
+    _handlingHidScan = true;
+    final cleaned = value.replaceAll(RegExp(r'[\r\n]+'), '').trim();
+    _awbController.value = TextEditingValue(
+      text: cleaned,
+      selection: TextSelection.collapsed(offset: cleaned.length),
+    );
+    _handlingHidScan = false;
+
+    if (cleaned.isNotEmpty) {
+      _addAwb(cleaned);
+    }
   }
 
   void _addAwb(String raw) {
@@ -145,14 +246,25 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
                         Expanded(
                           child: TextField(
                             controller: _awbController,
+                            focusNode: _awbFocusNode,
                             textCapitalization: TextCapitalization.characters,
                             style: TextStyle(color: palette.textPrimary),
                             decoration: InputDecoration(
-                              hintText: 'Enter AWB',
+                              hintText: _isHardwareScanner
+                                  ? 'Enter or scan AWB'
+                                  : 'Enter AWB',
                               hintStyle:
                                   TextStyle(color: palette.textSecondary),
                               filled: true,
                               fillColor: palette.surface,
+                              suffixIcon: _isHardwareScanner
+                                  ? Icon(
+                                      _scannerType == ScannerType.sunmi
+                                          ? Icons.qr_code_scanner
+                                          : Icons.scanner,
+                                      color: palette.textSecondary,
+                                    )
+                                  : null,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,
@@ -175,7 +287,7 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
                         ),
                       ],
                     ),
-                    if (_isScanning) ...[
+                    if (_isScanning && !_isHardwareScanner) ...[
                       const SizedBox(height: 12),
                       SizedBox(
                         height: 260,

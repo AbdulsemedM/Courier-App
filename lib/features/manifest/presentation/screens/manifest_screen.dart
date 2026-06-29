@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:courier_app/app/utils/dialog_utils.dart';
 import 'package:courier_app/configuration/auth_service.dart';
+import 'package:courier_app/core/services/scanner_service.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:courier_app/features/branches/model/branches_model.dart';
@@ -94,18 +97,27 @@ class _ManifestScreenState extends State<ManifestScreen> {
     }
   }
 
+  DateTime _manifestSortKey(ManifestModel manifest) {
+    return DateTime.tryParse(manifest.displayDateTime) ??
+        DateTime.fromMillisecondsSinceEpoch(0);
+  }
+
   List<ManifestModel> _filterManifests(List<ManifestModel> manifests) {
     final query = _searchController.text.toLowerCase().trim();
-    if (query.isEmpty) return manifests;
 
-    return manifests.where((m) {
-      return m.manifestId.toLowerCase().contains(query) ||
-          m.branch.name.toLowerCase().contains(query) ||
-          m.receiverBranch.name.toLowerCase().contains(query) ||
-          m.creatorLabel.toLowerCase().contains(query) ||
-          m.createdBy.email.toLowerCase().contains(query) ||
-          m.awbList.any((awb) => awb.toLowerCase().contains(query));
-    }).toList();
+    final filtered = query.isEmpty
+        ? List<ManifestModel>.from(manifests)
+        : manifests.where((m) {
+            return m.manifestId.toLowerCase().contains(query) ||
+                m.branch.name.toLowerCase().contains(query) ||
+                m.receiverBranch.name.toLowerCase().contains(query) ||
+                m.creatorLabel.toLowerCase().contains(query) ||
+                m.createdBy.email.toLowerCase().contains(query) ||
+                m.awbList.any((awb) => awb.toLowerCase().contains(query));
+          }).toList();
+
+    filtered.sort((a, b) => _manifestSortKey(b).compareTo(_manifestSortKey(a)));
+    return filtered;
   }
 
   List<ManifestModel> _paginate(List<ManifestModel> manifests) {
@@ -117,124 +129,17 @@ class _ManifestScreenState extends State<ManifestScreen> {
 
   void _openManageAwbs(ManifestModel manifest) {
     if (_branchId == null) return;
-    final addController = TextEditingController();
     final date = DateFormat('yyyy-MM-dd').format(_selectedDate);
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (sheetContext) {
-        final palette = sheetContext.palette;
-        return Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(sheetContext).size.height * 0.8,
-          ),
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 20,
-          ),
-          decoration: BoxDecoration(
-            color: palette.surface,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Manifest #${manifest.id} AWBs',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: palette.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              if (manifest.awbList.isEmpty)
-                Text(
-                  'No AWBs on this manifest yet',
-                  style: TextStyle(color: palette.textSecondary),
-                )
-              else
-                Flexible(
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: manifest.awbList
-                        .map(
-                          (awb) => ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(
-                              awb,
-                              style: TextStyle(color: palette.textPrimary),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                color: Colors.red,
-                              ),
-                              onPressed: () {
-                                context.read<ManifestBloc>().add(
-                                      RemoveAwbFromManifest(
-                                        manifestId: manifest.id,
-                                        awb: awb,
-                                        branchId: _branchId!,
-                                        date: date,
-                                      ),
-                                    );
-                                Navigator.pop(sheetContext);
-                              },
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: addController,
-                decoration: InputDecoration(
-                  labelText: 'Add AWBs (comma-separated)',
-                  filled: true,
-                  fillColor: palette.surfaceMuted,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  final awbs = addController.text
-                      .split(',')
-                      .map((s) => s.trim())
-                      .where((s) => s.isNotEmpty)
-                      .toList();
-                  if (awbs.isEmpty) return;
-                  context.read<ManifestBloc>().add(
-                        AddAwbsToManifest(
-                          manifestId: manifest.id,
-                          awbs: awbs,
-                          branchId: _branchId!,
-                          date: date,
-                        ),
-                      );
-                  Navigator.pop(sheetContext);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: palette.accent,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Add AWBs'),
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (sheetContext) => _ManageManifestAwbsSheet(
+        manifest: manifest,
+        branchId: _branchId!,
+        date: date,
+      ),
     );
   }
 
@@ -620,6 +525,315 @@ class _ManifestScreenState extends State<ManifestScreen> {
           Text(
             'Total: $totalItems',
             style: TextStyle(color: palette.textSecondary, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ManageManifestAwbsSheet extends StatefulWidget {
+  final ManifestModel manifest;
+  final int branchId;
+  final String date;
+
+  const _ManageManifestAwbsSheet({
+    required this.manifest,
+    required this.branchId,
+    required this.date,
+  });
+
+  @override
+  State<_ManageManifestAwbsSheet> createState() =>
+      _ManageManifestAwbsSheetState();
+}
+
+class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
+  final TextEditingController _addController = TextEditingController();
+  final FocusNode _awbFocusNode = FocusNode();
+  final ScannerService _scannerService = ScannerService();
+  StreamSubscription<String>? _barcodeStreamSubscription;
+  ScannerType? _scannerType;
+  bool _isHardwareScanner = false;
+  bool _handlingHidScan = false;
+  final List<String> _pendingAwbs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeScanner();
+  }
+
+  @override
+  void dispose() {
+    _addController.removeListener(_onAwbControllerChanged);
+    _addController.dispose();
+    _awbFocusNode.dispose();
+    _barcodeStreamSubscription?.cancel();
+    _scannerService.release();
+    super.dispose();
+  }
+
+  Future<void> _initializeScanner() async {
+    try {
+      _scannerType = await _scannerService.detectScannerType();
+
+      if (!mounted) return;
+      setState(() {
+        _isHardwareScanner = _scannerType == ScannerType.sunmi ||
+            _scannerType == ScannerType.urovo;
+      });
+
+      if (_scannerType == ScannerType.sunmi ||
+          _scannerType == ScannerType.urovo) {
+        _addController.addListener(_onAwbControllerChanged);
+
+        final stream = _scannerService.initializeScanner();
+        _barcodeStreamSubscription = stream.listen(
+          (barcode) {
+            if (barcode.isNotEmpty && mounted) {
+              _queueAwb(barcode);
+            }
+          },
+          onError: (error) {
+            print('Edit manifest scanner error: $error');
+          },
+          cancelOnError: false,
+        );
+
+        await Future.delayed(const Duration(milliseconds: 100));
+
+        if (_scannerType == ScannerType.sunmi) {
+          await _scannerService.startScanner();
+        } else if (_scannerType == ScannerType.urovo) {
+          await _scannerService.startUrovoScanner();
+        }
+
+        if (mounted) {
+          _awbFocusNode.requestFocus();
+        }
+      }
+    } catch (e) {
+      print('Error initializing edit manifest scanner: $e');
+      if (mounted) {
+        setState(() {
+          _scannerType = ScannerType.camera;
+          _isHardwareScanner = false;
+        });
+      }
+    }
+  }
+
+  void _onAwbControllerChanged() {
+    if (_handlingHidScan ||
+        (_scannerType != ScannerType.sunmi &&
+            _scannerType != ScannerType.urovo)) {
+      return;
+    }
+
+    final value = _addController.text;
+    if (!value.contains('\n') && !value.contains('\r')) return;
+
+    _handlingHidScan = true;
+    final cleaned = value.replaceAll(RegExp(r'[\r\n]+'), '').trim();
+    _addController.value = TextEditingValue(
+      text: '',
+      selection: const TextSelection.collapsed(offset: 0),
+    );
+    _handlingHidScan = false;
+
+    if (cleaned.isNotEmpty) {
+      _queueAwb(cleaned);
+    }
+  }
+
+  void _queueAwb(String raw) {
+    final awb = raw.replaceAll(' ', '').toUpperCase();
+    if (awb.isEmpty) return;
+
+    if (widget.manifest.awbList.contains(awb) ||
+        _pendingAwbs.contains(awb)) {
+      displaySnack(context, 'AWB already on manifest', Colors.orange);
+      return;
+    }
+
+    setState(() => _pendingAwbs.add(awb));
+  }
+
+  void _removePendingAwb(String awb) {
+    setState(() => _pendingAwbs.remove(awb));
+  }
+
+  void _submitAwbs() {
+    final manualAwbs = _addController.text
+        .split(',')
+        .map((s) => s.trim().toUpperCase())
+        .where((s) => s.isNotEmpty);
+
+    final awbs = {
+      ..._pendingAwbs,
+      ...manualAwbs,
+    }.toList();
+
+    if (awbs.isEmpty) return;
+
+    context.read<ManifestBloc>().add(
+          AddAwbsToManifest(
+            manifestId: widget.manifest.id,
+            awbs: awbs,
+            branchId: widget.branchId,
+            date: widget.date,
+          ),
+        );
+
+    setState(() {
+      _pendingAwbs.clear();
+      _addController.clear();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.8,
+      ),
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      decoration: BoxDecoration(
+        color: palette.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Manifest #${widget.manifest.id} AWBs',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: palette.textPrimary,
+            ),
+          ),
+          if (_isHardwareScanner) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  _scannerType == ScannerType.sunmi
+                      ? Icons.qr_code_scanner
+                      : Icons.scanner,
+                  size: 18,
+                  color: palette.textSecondary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Scanner ready — scan to add AWBs',
+                  style: TextStyle(
+                    color: palette.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 12),
+          if (widget.manifest.awbList.isEmpty)
+            Text(
+              'No AWBs on this manifest yet',
+              style: TextStyle(color: palette.textSecondary),
+            )
+          else
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: widget.manifest.awbList
+                    .map(
+                      (awb) => ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          awb,
+                          style: TextStyle(color: palette.textPrimary),
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            context.read<ManifestBloc>().add(
+                                  RemoveAwbFromManifest(
+                                    manifestId: widget.manifest.id,
+                                    awb: awb,
+                                    branchId: widget.branchId,
+                                    date: widget.date,
+                                  ),
+                                );
+                          },
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          if (_pendingAwbs.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _pendingAwbs
+                  .map(
+                    (awb) => Chip(
+                      label: Text(awb),
+                      deleteIcon: const Icon(Icons.close, size: 16),
+                      onDeleted: () => _removePendingAwb(awb),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+          const SizedBox(height: 12),
+          TextField(
+            controller: _addController,
+            focusNode: _awbFocusNode,
+            textCapitalization: TextCapitalization.characters,
+            style: TextStyle(color: palette.textPrimary),
+            decoration: InputDecoration(
+              labelText: _isHardwareScanner
+                  ? 'Enter or scan AWBs (comma-separated)'
+                  : 'Add AWBs (comma-separated)',
+              filled: true,
+              fillColor: palette.surfaceMuted,
+              suffixIcon: _isHardwareScanner
+                  ? Icon(
+                      _scannerType == ScannerType.sunmi
+                          ? Icons.qr_code_scanner
+                          : Icons.scanner,
+                      color: palette.textSecondary,
+                    )
+                  : null,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+            onSubmitted: _queueAwb,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _submitAwbs,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: palette.accent,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Add AWBs'),
           ),
         ],
       ),

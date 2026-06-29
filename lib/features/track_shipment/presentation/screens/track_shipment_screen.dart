@@ -53,9 +53,14 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     Future.delayed(const Duration(milliseconds: 500), () {
-      if (!mounted || _scannerType != ScannerType.sunmi) return;
-      _scannerService.startScanner();
-      _textFieldFocusNode.requestFocus();
+      if (!mounted) return;
+      if (_scannerType == ScannerType.sunmi) {
+        _scannerService.startScanner();
+        _textFieldFocusNode.requestFocus();
+      } else if (_scannerType == ScannerType.urovo) {
+        _scannerService.startUrovoScanner();
+        _textFieldFocusNode.requestFocus();
+      }
     });
   }
 
@@ -81,7 +86,8 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
       if (_scannerType == ScannerType.sunmi ||
           _scannerType == ScannerType.urovo) {
-        if (_scannerType == ScannerType.sunmi) {
+        if (_scannerType == ScannerType.sunmi ||
+            _scannerType == ScannerType.urovo) {
           _searchController.addListener(_onSearchControllerChanged);
         }
 
@@ -109,6 +115,13 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
             }
           });
           _keepScannerActive();
+        } else if (_scannerType == ScannerType.urovo) {
+          await _scannerService.startUrovoScanner();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _textFieldFocusNode.requestFocus();
+            }
+          });
         }
       }
     } catch (e) {
@@ -133,7 +146,11 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   }
 
   void _onSearchControllerChanged() {
-    if (_handlingHidScan || _scannerType != ScannerType.sunmi) return;
+    if (_handlingHidScan ||
+        (_scannerType != ScannerType.sunmi &&
+            _scannerType != ScannerType.urovo)) {
+      return;
+    }
 
     final value = _searchController.text;
     if (!value.contains('\n') && !value.contains('\r')) return;

@@ -51,10 +51,14 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Ensure scanner is activated when screen becomes visible
-    // Wait a bit for initialization to complete
     Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted && _scannerType == ScannerType.sunmi) {
+      if (!mounted) return;
+      if (_scannerType == ScannerType.sunmi) {
         _scannerService.startScanner();
+        _focusNode.requestFocus();
+      } else if (_scannerType == ScannerType.urovo) {
+        _scannerService.startUrovoScanner();
+        _focusNode.requestFocus();
       }
     });
   }
@@ -164,6 +168,13 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
 
           // Keep scanner active - retry periodically
           _keepScannerActive();
+        } else if (_scannerType == ScannerType.urovo) {
+          await _scannerService.startUrovoScanner();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _focusNode.requestFocus();
+            }
+          });
         }
       } else {
         // Initialize regular camera scanner
@@ -699,7 +710,9 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
         focusNode: _focusNode,
         onKeyEvent: (event) {
           // Capture keyboard input from scanner (HID mode)
-          if (event is KeyDownEvent && _scannerType == ScannerType.sunmi) {
+          if (event is KeyDownEvent &&
+              (_scannerType == ScannerType.sunmi ||
+                  _scannerType == ScannerType.urovo)) {
             final keyLabel = event.logicalKey.keyLabel;
             print('🔍 Key pressed: $keyLabel (${event.logicalKey.keyId})');
 

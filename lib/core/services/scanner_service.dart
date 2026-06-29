@@ -17,10 +17,12 @@ class ScannerService {
   ScannerType? _scannerType;
   String? _deviceName;
   StreamSubscription<String>? _sunmiSubscription;
-  StreamSubscription<String?>? _urovoSubscription;
+  StreamSubscription<String?>? _urovoNativeSubscription;
   static const MethodChannel _sunmiChannel =
       MethodChannel('com.hudhud.courier/sunmi_scanner');
+  static const MethodChannel _urovoChannel = MethodChannel('urovo_scanner');
   StreamController<String>? _sunmiStreamController;
+  StreamController<String>? _urovoStreamController;
 
   ScannerType? get scannerType => _scannerType;
   String? get deviceName => _deviceName;
@@ -158,26 +160,47 @@ class ScannerService {
 
   /// Initialize Urovo scanner
   Stream<String> _initializeUrovoScanner() {
-    final controller = StreamController<String>();
-
-    try {
-      _urovoSubscription = UrovoScanner.barcodeStream.listen(
-        (barcode) {
-          if (barcode != null && barcode.isNotEmpty) {
-            controller.add(barcode);
-          }
-        },
-        onError: (error) {
-          print('Urovo scanner error: $error');
-          controller.addError(error);
-        },
-      );
-    } catch (e) {
-      print('Error initializing Urovo scanner: $e');
-      controller.addError(e);
+    if (_urovoStreamController == null || _urovoStreamController!.isClosed) {
+      _urovoStreamController = StreamController<String>.broadcast();
     }
 
-    return controller.stream;
+    if (_urovoNativeSubscription == null) {
+      try {
+        _urovoNativeSubscription = UrovoScanner.barcodeStream.listen(
+          (barcode) {
+            if (barcode != null &&
+                barcode.isNotEmpty &&
+                _urovoStreamController != null &&
+                !_urovoStreamController!.isClosed) {
+              _urovoStreamController!.add(barcode);
+            }
+          },
+          onError: (error) {
+            print('Urovo scanner error: $error');
+            if (_urovoStreamController != null &&
+                !_urovoStreamController!.isClosed) {
+              _urovoStreamController!.addError(error);
+            }
+          },
+        );
+      } catch (e) {
+        print('Error initializing Urovo scanner: $e');
+      }
+    }
+
+    unawaited(startUrovoScanner());
+
+    return _urovoStreamController!.stream;
+  }
+
+  /// Start the Urovo hardware scanner decode session.
+  Future<void> startUrovoScanner() async {
+    if (_scannerType != ScannerType.urovo) return;
+    try {
+      await _urovoChannel.invokeMethod('startScanner');
+    } catch (e) {
+      print('Error starting Urovo scanner: $e');
+    }
   }
 
   /// Start the scanner (for Sunmi devices)
@@ -209,12 +232,10 @@ class ScannerService {
     }
   }
 
-  /// Release screen-level listeners without tearing down the shared Sunmi stream.
+  /// Release screen-level listeners without tearing down shared hardware streams.
   void release() {
     _sunmiSubscription?.cancel();
-    _urovoSubscription?.cancel();
     _sunmiSubscription = null;
-    _urovoSubscription = null;
   }
 
   /// Stop the scanner (for Sunmi devices)
@@ -232,8 +253,12 @@ class ScannerService {
   /// Fully dispose scanner resources. Prefer [release] from individual screens.
   void dispose() {
     release();
+    _urovoNativeSubscription?.cancel();
+    _urovoNativeSubscription = null;
     _sunmiStreamController?.close();
     _sunmiStreamController = null;
+    _urovoStreamController?.close();
+    _urovoStreamController = null;
     _scannerType = null;
   }
 }
