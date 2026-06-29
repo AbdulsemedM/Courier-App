@@ -54,6 +54,10 @@ class PaymentInvoiceModel {
   final int? numBoxes;
   final int? senderBranchId;
   final int? receiverBranchId;
+  final Map<String, dynamic>? serviceModeData;
+  final double? vatAmount;
+  final double? vatRate;
+  final String? updatedAt;
   PaymentInvoiceModel({
     this.id,
     this.awb,
@@ -85,6 +89,10 @@ class PaymentInvoiceModel {
     this.numBoxes,
     this.senderBranchId,
     this.receiverBranchId,
+    this.serviceModeData,
+    this.vatAmount,
+    this.vatRate,
+    this.updatedAt,
   });
 
   PaymentInvoiceModel copyWith({
@@ -117,6 +125,10 @@ class PaymentInvoiceModel {
     int? numBoxes,
     int? senderBranchId,
     int? receiverBranchId,
+    Map<String, dynamic>? serviceModeData,
+    double? vatAmount,
+    double? vatRate,
+    String? updatedAt,
   }) {
     return PaymentInvoiceModel(
       id: id ?? this.id,
@@ -149,6 +161,10 @@ class PaymentInvoiceModel {
       numBoxes: numBoxes ?? this.numBoxes,
       senderBranchId: senderBranchId ?? this.senderBranchId,
       receiverBranchId: receiverBranchId ?? this.receiverBranchId,
+      serviceModeData: serviceModeData ?? this.serviceModeData,
+      vatAmount: vatAmount ?? this.vatAmount,
+      vatRate: vatRate ?? this.vatRate,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -182,6 +198,10 @@ class PaymentInvoiceModel {
       'numBoxes': numBoxes,
       'senderBranchId': senderBranchId,
       'receiverBranchId': receiverBranchId,
+      'serviceMode': serviceModeData,
+      'vatAmount': vatAmount,
+      'vatRate': vatRate,
+      'updatedAt': updatedAt,
     };
   }
 
@@ -306,6 +326,19 @@ class PaymentInvoiceModel {
                 ? map['numBoxes'] as int
                 : (map['numBoxes'] as num).toInt())
             : null,
+        serviceModeData: map['serviceMode'] is Map<String, dynamic>
+            ? Map<String, dynamic>.from(map['serviceMode'] as Map)
+            : null,
+        vatAmount: map['vatAmount'] != null
+            ? (map['vatAmount'] as num).toDouble()
+            : null,
+        vatRate: map['vatRate'] != null
+            ? (map['vatRate'] as num).toDouble()
+            : (map['vatConfig'] is Map<String, dynamic>
+                ? (map['vatConfig']['vatRate'] as num?)?.toDouble()
+                : null),
+        updatedAt:
+            map['updatedAt'] != null ? map['updatedAt'] as String : null,
       );
     } catch (e) {
       print('[Model] Error in PaymentInvoiceModel.fromMap: ${e.toString()}');
@@ -356,7 +389,11 @@ class PaymentInvoiceModel {
         other.numPcs == numPcs &&
         other.numBoxes == numBoxes &&
         other.senderBranchId == senderBranchId &&
-        other.receiverBranchId == receiverBranchId;
+        other.receiverBranchId == receiverBranchId &&
+        other.serviceModeData == serviceModeData &&
+        other.vatAmount == vatAmount &&
+        other.vatRate == vatRate &&
+        other.updatedAt == updatedAt;
   }
 
   @override
@@ -388,6 +425,10 @@ class PaymentInvoiceModel {
         numPcs.hashCode ^
         numBoxes.hashCode ^
         senderBranchId.hashCode ^
-        receiverBranchId.hashCode;
+        receiverBranchId.hashCode ^
+        serviceModeData.hashCode ^
+        vatAmount.hashCode ^
+        vatRate.hashCode ^
+        updatedAt.hashCode;
   }
 }

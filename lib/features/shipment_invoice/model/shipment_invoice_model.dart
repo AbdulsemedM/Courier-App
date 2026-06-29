@@ -1,6 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:courier_app/core/utils/branch_name_resolver.dart';
+import 'package:courier_app/features/branches/model/branches_model.dart';
+
 class ShipmentInvoiceModel {
   final String awb;
   final String senderName;
@@ -14,6 +17,16 @@ class ShipmentInvoiceModel {
   final String invoiceDate;
   final String shipmentDescription;
   final double netFee;
+  final int qty;
+  final String unit;
+  final int numPcs;
+  final String serviceModeName;
+  final String paymentModeName;
+  final double totalAmount;
+  final double vatAmount;
+  final double vatRate;
+  final int? senderBranchId;
+  final int? receiverBranchId;
   ShipmentInvoiceModel({
     required this.awb,
     required this.senderName,
@@ -27,6 +40,16 @@ class ShipmentInvoiceModel {
     required this.invoiceDate,
     required this.shipmentDescription,
     required this.netFee,
+    this.qty = 1,
+    this.unit = 'kg',
+    this.numPcs = 0,
+    this.serviceModeName = 'COURIER',
+    this.paymentModeName = 'N/A',
+    this.totalAmount = 0,
+    this.vatAmount = 0,
+    this.vatRate = 0,
+    this.senderBranchId,
+    this.receiverBranchId,
   });
 
   ShipmentInvoiceModel copyWith({
@@ -59,6 +82,73 @@ class ShipmentInvoiceModel {
     );
   }
 
+  ShipmentInvoiceModel withResolvedBranchNames(
+    List<BranchesModel> branches,
+  ) {
+    final lookup = BranchNameResolver.lookupFromBranches(branches);
+    return ShipmentInvoiceModel(
+      awb: awb,
+      senderName: senderName,
+      senderMobile: senderMobile,
+      senderbranchName: BranchNameResolver.resolve(
+        name: senderbranchName,
+        branchId: senderBranchId,
+        branchNamesById: lookup,
+        branches: branches,
+      ),
+      receiverName: receiverName,
+      receiverMobile: receiverMobile,
+      receiverBranchName: BranchNameResolver.resolve(
+        name: receiverBranchName,
+        branchId: receiverBranchId,
+        branchNamesById: lookup,
+        branches: branches,
+        awb: awb,
+      ),
+      paymentMethodName: paymentMethodName,
+      shipmentDate: shipmentDate,
+      invoiceDate: invoiceDate,
+      shipmentDescription: shipmentDescription,
+      netFee: netFee,
+      qty: qty,
+      unit: unit,
+      numPcs: numPcs,
+      serviceModeName: serviceModeName,
+      paymentModeName: paymentModeName,
+      totalAmount: totalAmount,
+      vatAmount: vatAmount,
+      vatRate: vatRate,
+      senderBranchId: senderBranchId,
+      receiverBranchId: receiverBranchId,
+    );
+  }
+
+  Map<String, dynamic> toPrintMap() {
+    return <String, dynamic>{
+      'senderName': senderName,
+      'senderMobile': senderMobile,
+      'senderBranch': senderbranchName,
+      'senderBranchId': senderBranchId,
+      'receiverName': receiverName,
+      'receiverMobile': receiverMobile,
+      'receiverBranch': receiverBranchName,
+      'receiverBranchId': receiverBranchId,
+      'shipmentDescription': shipmentDescription,
+      'qty': qty,
+      'unit': unit,
+      'numPcs': numPcs,
+      'netFee': netFee,
+      'totalAmount': totalAmount > 0 ? totalAmount : netFee,
+      'vatAmount': vatAmount,
+      'vatRate': vatRate,
+      'serviceMode': {'description': serviceModeName},
+      'paymentMode': paymentModeName,
+      'paymentMethod': {'method': paymentMethodName},
+      'createdAt': shipmentDate,
+      'updatedAt': invoiceDate,
+    };
+  }
+
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'awb': awb,
@@ -76,13 +166,22 @@ class ShipmentInvoiceModel {
     };
   }
 
-  static String _branchNameFrom(dynamic branch) {
-    if (branch == null) return 'N/A';
-    if (branch is Map<String, dynamic>) {
-      return branch['name'] as String? ?? 'N/A';
-    }
-    if (branch is int) return branch.toString();
-    return branch.toString();
+  static String _branchNameFrom(Map<String, dynamic> map, String branchKey) {
+    final parsed = BranchNameResolver.parseName(map[branchKey]);
+    if (parsed.isNotEmpty) return parsed;
+
+    final altKey = branchKey == 'senderBranch'
+        ? 'senderBranchName'
+        : 'receiverBranchName';
+    final altValue = map[altKey]?.toString().trim() ?? '';
+    if (!BranchNameResolver.isMissingName(altValue)) return altValue;
+
+    return '';
+  }
+
+  static int? _branchIdFrom(Map<String, dynamic> map, String branchKey) {
+    return BranchNameResolver.parseId(map[branchKey]) ??
+        BranchNameResolver.parseId(map['${branchKey}Id']);
   }
 
   static String _paymentMethodNameFrom(dynamic paymentMethod) {
@@ -93,20 +192,55 @@ class ShipmentInvoiceModel {
     return paymentMethod.toString();
   }
 
+  static String _paymentModeNameFrom(dynamic paymentMode) {
+    if (paymentMode == null) return 'N/A';
+    if (paymentMode is Map<String, dynamic>) {
+      return paymentMode['code'] as String? ??
+          paymentMode['method'] as String? ??
+          'N/A';
+    }
+    return paymentMode.toString();
+  }
+
+  static String _serviceModeNameFrom(dynamic serviceMode) {
+    if (serviceMode == null) return 'COURIER';
+    if (serviceMode is Map<String, dynamic>) {
+      return serviceMode['description'] as String? ??
+          serviceMode['code'] as String? ??
+          'COURIER';
+    }
+    return serviceMode.toString();
+  }
+
   factory ShipmentInvoiceModel.fromMap(Map<String, dynamic> map) {
+    final netFee = (map['netFee'] as num?)?.toDouble() ?? 0.0;
     return ShipmentInvoiceModel(
       awb: map['awb'] as String,
       senderName: map['senderName'] as String,
       senderMobile: map['senderMobile'] as String,
-      senderbranchName: _branchNameFrom(map['senderBranch']),
+      senderbranchName: _branchNameFrom(map, 'senderBranch'),
+      senderBranchId: _branchIdFrom(map, 'senderBranch'),
       receiverName: map['receiverName'] as String,
       receiverMobile: map['receiverMobile'] as String,
-      receiverBranchName: _branchNameFrom(map['receiverBranch']),
+      receiverBranchName: _branchNameFrom(map, 'receiverBranch'),
+      receiverBranchId: _branchIdFrom(map, 'receiverBranch'),
       paymentMethodName: _paymentMethodNameFrom(map['paymentMethod']),
+      paymentModeName: _paymentModeNameFrom(map['paymentMode']),
       shipmentDate: map['createdAt'] as String,
       invoiceDate: map['updatedAt'] as String,
       shipmentDescription: map['shipmentDescription'] as String,
-      netFee: (map['netFee'] as num?)?.toDouble() ?? 0.0,
+      netFee: netFee,
+      qty: (map['qty'] as num?)?.toInt() ?? 1,
+      unit: map['unit'] as String? ?? 'kg',
+      numPcs: (map['numPcs'] as num?)?.toInt() ?? 0,
+      serviceModeName: _serviceModeNameFrom(map['serviceMode']),
+      totalAmount: (map['totalAmount'] as num?)?.toDouble() ?? netFee,
+      vatAmount: (map['vatAmount'] as num?)?.toDouble() ?? 0.0,
+      vatRate: (map['vatRate'] as num?)?.toDouble() ??
+          (map['vatConfig'] is Map<String, dynamic>
+              ? (map['vatConfig']['vatRate'] as num?)?.toDouble()
+              : null) ??
+          0.0,
     );
   }
 

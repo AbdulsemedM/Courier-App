@@ -326,12 +326,13 @@ class ShipmentInvoiceWidgets {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            branch,
-            style: TextStyle(
-              color: AppPalette.forMode(isDarkMode).textSecondary,
+          if (branch.trim().isNotEmpty)
+            Text(
+              'Branch: $branch',
+              style: TextStyle(
+                color: AppPalette.forMode(isDarkMode).textSecondary,
+              ),
             ),
-          ),
         ],
       ),
     );

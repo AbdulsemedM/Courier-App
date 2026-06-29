@@ -10,9 +10,9 @@ import 'package:printing/printing.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:image/image.dart' as img;
 import '../../bloc/add_shipment_bloc.dart' hide FetchBranches;
+import 'package:courier_app/core/services/sunmi_invoice_printer.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
 import 'package:sunmi_printer_plus/sunmi_style.dart';
 import 'package:sunmi_printer_plus/enums.dart';
@@ -55,23 +55,13 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
 
   Future<void> _checkIfSunmiDevice() async {
     try {
-      final deviceInfo = DeviceInfoPlugin();
-      final androidInfo = await deviceInfo.androidInfo;
-      final manufacturer = androidInfo.manufacturer.toUpperCase();
-      final model = androidInfo.model.toUpperCase();
-
-      final isSunmi = manufacturer.contains('SUNMI') ||
-          model.contains('V3 MIX') ||
-          model.contains('V3MIX') ||
-          model.contains('SUNMI') ||
-          model.contains('V3');
+      final isSunmi = await SunmiInvoicePrinter.isSunmiDevice();
 
       setState(() {
         _isSunmiDevice = isSunmi;
       });
 
-      print(
-          '[PrintShipmentScreen] Device check - Manufacturer: ${androidInfo.manufacturer}, Model: ${androidInfo.model}, IsSunmi: $isSunmi');
+      print('[PrintShipmentScreen] IsSunmi: $isSunmi');
     } catch (e) {
       print('[PrintShipmentScreen] Error checking device: ${e.toString()}');
       setState(() {
@@ -483,7 +473,6 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
 
   Future<bool> _printWithSunmiPrinter(BuildContext context) async {
     try {
-      // Bind printer first (required)
       final bool? binded = await SunmiPrinter.bindingPrinter();
       if (binded != true) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -495,13 +484,9 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
         return false;
       }
 
-      // Initialize printer
       await SunmiPrinter.initPrinter();
-
-      // Start transaction print
       await SunmiPrinter.startTransactionPrint(true);
 
-      // Extract data for printing
       final branches = _branchesForPrint(context);
       final senderName =
           (shipmentData!['senderName'] ?? '').toString().toUpperCase();
@@ -542,7 +527,6 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
         awb: widget.trackingNumber,
       );
 
-      // Get service mode
       String courierText = 'COURIER';
       if (shipmentData!.containsKey('serviceMode')) {
         final serviceMode = shipmentData!['serviceMode'];
@@ -556,7 +540,6 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
         }
       }
 
-      // Compact header
       await SunmiPrinter.setAlignment(SunmiPrintAlign.CENTER);
       await SunmiPrinter.printText(
         'HudHud Express',
@@ -671,10 +654,10 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
       );
       await SunmiPrinter.lineWrap(1);
 
-      // Exit transaction and cut paper
       await SunmiPrinter.exitTransactionPrint(true);
       await SunmiPrinter.cut();
 
+      if (!context.mounted) return true;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Printed successfully!'),
@@ -686,6 +669,7 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
       return true;
     } catch (e) {
       print('[PrintShipmentScreen] Error printing with Sunmi printer: $e');
+      if (!context.mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${e.toString()}'),

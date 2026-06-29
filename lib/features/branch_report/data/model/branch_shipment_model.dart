@@ -6,10 +6,12 @@ class BranchShipmentModel {
   final String? senderName;
   final String? senderMobile;
   final int? senderBranch;
+  final Branch? senderBranchDetail;
   final String? receiverName;
   final String? receiverMobile;
   final int? receiverBranch;
-  final int? qty;
+  final Branch? receiverBranchDetail;
+  final double? qty;
   final String? unit;
   final int? numPcs;
   final int? numBoxes;
@@ -38,6 +40,10 @@ class BranchShipmentModel {
   final String? paymentReference;
   final String? payerAccount;
   final bool? softDelete;
+  final String? reportPaymentMethod;
+  final String? reportStatus;
+  final String? reportCreatedByName;
+  final String? reportBranchName;
 
   BranchShipmentModel({
     this.id,
@@ -45,9 +51,11 @@ class BranchShipmentModel {
     this.senderName,
     this.senderMobile,
     this.senderBranch,
+    this.senderBranchDetail,
     this.receiverName,
     this.receiverMobile,
     this.receiverBranch,
+    this.receiverBranchDetail,
     this.qty,
     this.unit,
     this.numPcs,
@@ -77,7 +85,87 @@ class BranchShipmentModel {
     this.paymentReference,
     this.payerAccount,
     this.softDelete,
+    this.reportPaymentMethod,
+    this.reportStatus,
+    this.reportCreatedByName,
+    this.reportBranchName,
   });
+
+  factory BranchShipmentModel.fromReportJson(Map<String, dynamic> json) {
+    double? toDouble(dynamic value) {
+      if (value == null) return null;
+      if (value is num) return value.toDouble();
+      return double.tryParse(value.toString());
+    }
+
+    PaymentMethod? parsePaymentMethod() {
+      final value = json['paymentMethod'];
+      if (value == null) return null;
+      if (value is Map<String, dynamic>) {
+        return PaymentMethod.fromJson(value);
+      }
+      if (value is String) {
+        return PaymentMethod(method: value);
+      }
+      return null;
+    }
+
+    ShipmentStatus? parseShipmentStatus() {
+      final value = json['status'] ?? json['shipmentStatus'];
+      if (value == null) return null;
+      if (value is Map<String, dynamic>) {
+        return ShipmentStatus.fromJson(value);
+      }
+      if (value is String) {
+        return ShipmentStatus(code: value);
+      }
+      return null;
+    }
+
+    final paymentMethodValue = json['paymentMethod'];
+    final statusValue = json['status'] ?? json['shipmentStatus'];
+
+    String? firstNonEmpty(List<dynamic> values) {
+      for (final value in values) {
+        final text = value?.toString().trim();
+        if (text != null && text.isNotEmpty) {
+          return text;
+        }
+      }
+      return null;
+    }
+
+    return BranchShipmentModel(
+      id: json['id'],
+      awb: json['awb']?.toString(),
+      senderName: json['senderName']?.toString(),
+      senderMobile: firstNonEmpty([
+        json['senderMobile'],
+        json['senderPhone'],
+        json['senderMobileNumber'],
+        json['senderMobileNo'],
+      ]),
+      receiverName: json['receiverName']?.toString(),
+      receiverMobile: firstNonEmpty([
+        json['receiverMobile'],
+        json['receiverPhone'],
+        json['receiverMobileNumber'],
+        json['receiverMobileNo'],
+      ]),
+      qty: toDouble(json['qty'] ?? json['quantity']),
+      netFee: toDouble(json['netFee']),
+      totalAmount: toDouble(json['totalAmount'] ?? json['codAmount']),
+      shipmentDescription: json['shipmentDescription']?.toString(),
+      paymentMethod: parsePaymentMethod(),
+      shipmentStatus: parseShipmentStatus(),
+      createdAt: json['createdAt']?.toString(),
+      reportPaymentMethod:
+          paymentMethodValue is String ? paymentMethodValue : null,
+      reportStatus: statusValue is String ? statusValue : null,
+      reportCreatedByName: json['createdByName']?.toString(),
+      reportBranchName: json['createdByBranch']?.toString(),
+    );
+  }
 
   factory BranchShipmentModel.fromJson(Map<String, dynamic> json) {
     int? _toInt(dynamic value) {
@@ -100,28 +188,53 @@ class BranchShipmentModel {
       return null;
     }
 
-    // Handle senderBranch - can be int (ID) or Map (object)
-    int? parseSenderBranch() {
-      if (json['senderBranch'] == null) return null;
-      if (json['senderBranch'] is int) {
-        return json['senderBranch'] as int;
+    double? _toDouble(dynamic value) {
+      if (value == null) return null;
+      if (value is num) return value.toDouble();
+      return double.tryParse(value.toString());
+    }
+
+    Branch? parseBranchDetail(dynamic branchData) {
+      if (branchData == null) return null;
+      if (branchData is Map<String, dynamic>) {
+        return Branch.fromJson(branchData);
       }
-      if (json['senderBranch'] is Map<String, dynamic>) {
-        return json['senderBranch']['id'] as int?;
+      if (branchData is num) {
+        return Branch(id: branchData.toInt());
       }
       return null;
     }
 
-    // Handle receiverBranch - can be int (ID) or Map (object)
-    int? parseReceiverBranch() {
-      if (json['receiverBranch'] == null) return null;
-      if (json['receiverBranch'] is int) {
-        return json['receiverBranch'] as int;
+    PaymentMethod? _parsePaymentMethod(dynamic value) {
+      if (value == null) return null;
+      if (value is Map<String, dynamic>) {
+        return PaymentMethod.fromJson(value);
       }
-      if (json['receiverBranch'] is Map<String, dynamic>) {
-        return json['receiverBranch']['id'] as int?;
+      if (value is String) {
+        return PaymentMethod(method: value);
       }
       return null;
+    }
+
+    ShipmentStatus? _parseShipmentStatus(dynamic value) {
+      if (value == null) return null;
+      if (value is Map<String, dynamic>) {
+        return ShipmentStatus.fromJson(value);
+      }
+      if (value is String) {
+        return ShipmentStatus(code: value);
+      }
+      return null;
+    }
+
+    // Handle senderBranch - can be int (ID) or Map (object)
+    int? parseSenderBranch() {
+      return parseBranchDetail(json['senderBranch'])?.id;
+    }
+
+    // Handle receiverBranch - can be int (ID) or Map (object)
+    int? parseReceiverBranch() {
+      return parseBranchDetail(json['receiverBranch'])?.id;
     }
 
     return BranchShipmentModel(
@@ -130,10 +243,12 @@ class BranchShipmentModel {
       senderName: json['senderName'],
       senderMobile: json['senderMobile'],
       senderBranch: parseSenderBranch(),
+      senderBranchDetail: parseBranchDetail(json['senderBranch']),
       receiverName: json['receiverName'],
       receiverMobile: json['receiverMobile'],
       receiverBranch: parseReceiverBranch(),
-      qty: _toInt(json['qty']),
+      receiverBranchDetail: parseBranchDetail(json['receiverBranch']),
+      qty: _toDouble(json['qty'] ?? json['quantity']),
       unit: json['unit'],
       numPcs: _toInt(json['numPcs']),
       numBoxes: _toInt(json['numBoxes']),
@@ -144,9 +259,7 @@ class BranchShipmentModel {
       serviceMode: json['serviceMode'] != null
           ? ServiceMode.fromJson(json['serviceMode'])
           : null,
-      paymentMethod: json['paymentMethod'] != null
-          ? PaymentMethod.fromJson(json['paymentMethod'])
-          : null,
+      paymentMethod: _parsePaymentMethod(json['paymentMethod']),
       paymentMode: json['paymentMode'] != null
           ? PaymentMode.fromJson(json['paymentMode'])
           : null,
@@ -156,9 +269,9 @@ class BranchShipmentModel {
       deliveryType: json['deliveryType'] != null
           ? DeliveryType.fromJson(json['deliveryType'])
           : null,
-      shipmentStatus: json['shipmentStatus'] != null
-          ? ShipmentStatus.fromJson(json['shipmentStatus'])
-          : null,
+      shipmentStatus: _parseShipmentStatus(
+        json['shipmentStatus'] ?? json['status'],
+      ),
       addedBy: _parseUser(json['addedBy']),
       shipmentType: json['shipmentType'] != null
           ? ShipmentType.fromJson(json['shipmentType'])
@@ -179,6 +292,90 @@ class BranchShipmentModel {
       payerAccount: json['payerAccount'],
       softDelete: json['softDelete'],
     );
+  }
+
+  String get paymentMethodCode {
+    if (reportPaymentMethod != null && reportPaymentMethod!.isNotEmpty) {
+      return reportPaymentMethod!.toUpperCase();
+    }
+    final method = paymentMethod?.method ??
+        paymentMode?.code ??
+        paymentMode?.description ??
+        '';
+    return method.toUpperCase();
+  }
+
+  String get statusCode =>
+      reportStatus ?? shipmentStatus?.code ?? 'N/A';
+
+  double get feeAmount => netFee ?? totalAmount ?? 0;
+
+  String? get branchDisplayName =>
+      reportBranchName ??
+      senderBranchDetail?.name ??
+      receiverBranchDetail?.name;
+
+  String get addedByName {
+    if (reportCreatedByName != null && reportCreatedByName!.isNotEmpty) {
+      return reportCreatedByName!;
+    }
+    if (addedBy == null) return '';
+    return [
+      addedBy!.firstName,
+      addedBy!.secondName,
+      addedBy!.lastName,
+    ].whereType<String>().where((part) => part.trim().isNotEmpty).join(' ');
+  }
+
+  String get senderMobileDisplay {
+    final mobile = senderMobile?.trim();
+    if (mobile == null || mobile.isEmpty) return 'No mobile';
+    return mobile;
+  }
+
+  String get receiverMobileDisplay {
+    final mobile = receiverMobile?.trim();
+    if (mobile == null || mobile.isEmpty) return 'No mobile';
+    return mobile;
+  }
+
+  static String _digitsOnly(String? value) {
+    if (value == null) return '';
+    return value.replaceAll(RegExp(r'\D'), '');
+  }
+
+  bool matchesSearch(String query) {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return true;
+
+    final lowerQuery = trimmed.toLowerCase();
+    final digitQuery = _digitsOnly(trimmed);
+
+    if ((awb ?? '').toLowerCase().contains(lowerQuery)) {
+      return true;
+    }
+
+    if ((senderName ?? '').toLowerCase().contains(lowerQuery)) {
+      return true;
+    }
+
+    if ((receiverName ?? '').toLowerCase().contains(lowerQuery)) {
+      return true;
+    }
+
+    if (digitQuery.isNotEmpty) {
+      final senderDigits = _digitsOnly(senderMobile);
+      final receiverDigits = _digitsOnly(receiverMobile);
+
+      if (senderDigits.contains(digitQuery)) {
+        return true;
+      }
+      if (receiverDigits.contains(digitQuery)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 

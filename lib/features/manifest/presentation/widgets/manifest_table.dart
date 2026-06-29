@@ -1,11 +1,13 @@
 import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/core/utils/shipment_status_helper.dart';
+import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:courier_app/features/manifest/data/model/manifest_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ManifestTable extends StatelessWidget {
   final List<ManifestModel> manifests;
+  final Map<int, BranchesModel> branchLookup;
   final void Function(ManifestModel manifest)? onManageAwbs;
   final void Function(ManifestModel manifest)? onDownload;
   final void Function(ManifestModel manifest)? onShowQr;
@@ -13,10 +15,28 @@ class ManifestTable extends StatelessWidget {
   const ManifestTable({
     super.key,
     required this.manifests,
+    this.branchLookup = const {},
     this.onManageAwbs,
     this.onDownload,
     this.onShowQr,
   });
+
+  String _branchName(ManifestBranch branch) {
+    if (branch.name.trim().isNotEmpty) return branch.name.trim();
+    return branchLookup[branch.id]?.name.trim() ?? '';
+  }
+
+  String _branchInitials(ManifestBranch branch) {
+    if (branch.code.trim().isNotEmpty) return branch.initials;
+    final resolved = branchLookup[branch.id];
+    final code = resolved?.code.trim() ?? '';
+    if (code.isNotEmpty) {
+      return code.substring(0, code.length.clamp(0, 2)).toUpperCase();
+    }
+    final name = resolved?.name.trim() ?? '';
+    if (name.isNotEmpty) return name.substring(0, 1).toUpperCase();
+    return branch.initials;
+  }
 
   String _formatWeight(double value) {
     return NumberFormat('#,##0.##').format(value);
@@ -24,6 +44,16 @@ class ManifestTable extends StatelessWidget {
 
   String _formatValue(double value) {
     return NumberFormat('#,##0.00').format(value);
+  }
+
+  String _formatDateTime(String raw) {
+    if (raw.isEmpty) return '-';
+    try {
+      final parsed = DateTime.parse(raw);
+      return DateFormat('d MMM yyyy, HH:mm').format(parsed);
+    } catch (_) {
+      return raw;
+    }
   }
 
   @override
@@ -50,8 +80,11 @@ class ManifestTable extends StatelessWidget {
             columnSpacing: 20,
             headingRowHeight: 48,
             dataRowMinHeight: 72,
+            dataRowMaxHeight: double.infinity,
             headingRowColor: WidgetStateProperty.all(palette.surfaceMuted),
             columns: [
+              _column('Manifest', palette),
+              _column('Date', palette),
               _column('Route', palette),
               _column('Status Change', palette),
               _column('Totals', palette),
@@ -62,6 +95,8 @@ class ManifestTable extends StatelessWidget {
             rows: manifests.map((manifest) {
               return DataRow(
                 cells: [
+                  DataCell(_manifestIdCell(manifest, palette)),
+                  DataCell(_dateCell(manifest, palette)),
                   DataCell(_routeCell(manifest, palette)),
                   DataCell(_statusCell(manifest, palette)),
                   DataCell(_totalsCell(manifest, palette)),
@@ -77,44 +112,56 @@ class ManifestTable extends StatelessWidget {
     );
   }
 
+  Widget _manifestIdCell(ManifestModel manifest, AppPalette palette) {
+    final label =
+        manifest.manifestId.isNotEmpty ? manifest.manifestId : '#${manifest.id}';
+    return Text(
+      label,
+      style: TextStyle(
+        color: palette.accent,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _dateCell(ManifestModel manifest, AppPalette palette) {
+    return SizedBox(
+      width: 110,
+      child: Text(
+        _formatDateTime(manifest.displayDateTime),
+        style: TextStyle(color: palette.textPrimary, fontSize: 13),
+      ),
+    );
+  }
+
   Widget _routeCell(ManifestModel manifest, AppPalette palette) {
-    final origin = manifest.branch.name.trim();
-    final destination = manifest.receiverBranch.name.trim();
+    final origin = _branchName(manifest.branch);
+    final destination = _branchName(manifest.receiverBranch);
 
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 180, maxWidth: 260),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (origin.isNotEmpty) ...[
-            Flexible(
-              child: Text(
-                origin,
-                style: TextStyle(color: palette.textPrimary),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: Icon(
-                Icons.arrow_forward,
-                size: 14,
-                color: palette.textSecondary,
-              ),
-            ),
-          ],
-          CircleAvatar(
-            radius: 14,
-            backgroundColor: Colors.deepPurple,
+          _branchAvatar(_branchInitials(manifest.branch), Colors.blue),
+          const SizedBox(width: 8),
+          Flexible(
             child: Text(
-              manifest.receiverBranch.initials,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
+              origin.isNotEmpty ? origin : '-',
+              style: TextStyle(color: palette.textPrimary),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Icon(
+              Icons.arrow_forward,
+              size: 14,
+              color: palette.textSecondary,
+            ),
+          ),
+          _branchAvatar(
+              _branchInitials(manifest.receiverBranch), Colors.deepPurple),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
@@ -127,6 +174,21 @@ class ManifestTable extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _branchAvatar(String initials, Color color) {
+    return CircleAvatar(
+      radius: 14,
+      backgroundColor: color,
+      child: Text(
+        initials,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

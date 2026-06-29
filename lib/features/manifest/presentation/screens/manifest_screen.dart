@@ -1,6 +1,8 @@
 import 'package:courier_app/app/utils/dialog_utils.dart';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
+import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
+import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:courier_app/features/manifest/bloc/manifest_bloc.dart';
 import 'package:courier_app/features/manifest/data/model/manifest_model.dart';
 import 'package:courier_app/features/manifest/presentation/screens/create_manifest_screen.dart';
@@ -25,6 +27,7 @@ class _ManifestScreenState extends State<ManifestScreen> {
   int? _branchId;
   int _currentPage = 0;
   int _itemsPerPage = 10;
+  Map<int, BranchesModel> _branchLookup = const {};
 
   @override
   void initState() {
@@ -49,6 +52,7 @@ class _ManifestScreenState extends State<ManifestScreen> {
     }
 
     setState(() => _branchId = int.tryParse(branch));
+    context.read<BranchesBloc>().add(FetchBranches());
     _fetchManifests();
   }
 
@@ -123,6 +127,9 @@ class _ManifestScreenState extends State<ManifestScreen> {
       builder: (sheetContext) {
         final palette = sheetContext.palette;
         return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(sheetContext).size.height * 0.8,
+          ),
           padding: EdgeInsets.only(
             left: 20,
             right: 20,
@@ -153,24 +160,37 @@ class _ManifestScreenState extends State<ManifestScreen> {
                   style: TextStyle(color: palette.textSecondary),
                 )
               else
-                ...manifest.awbList.map(
-                  (awb) => ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(awb, style: TextStyle(color: palette.textPrimary)),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      onPressed: () {
-                        context.read<ManifestBloc>().add(
-                              RemoveAwbFromManifest(
-                                manifestId: manifest.id,
-                                awb: awb,
-                                branchId: _branchId!,
-                                date: date,
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: manifest.awbList
+                        .map(
+                          (awb) => ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              awb,
+                              style: TextStyle(color: palette.textPrimary),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
                               ),
-                            );
-                        Navigator.pop(sheetContext);
-                      },
-                    ),
+                              onPressed: () {
+                                context.read<ManifestBloc>().add(
+                                      RemoveAwbFromManifest(
+                                        manifestId: manifest.id,
+                                        awb: awb,
+                                        branchId: _branchId!,
+                                        date: date,
+                                      ),
+                                    );
+                                Navigator.pop(sheetContext);
+                              },
+                            ),
+                          ),
+                        )
+                        .toList(),
                   ),
                 ),
               const SizedBox(height: 12),
@@ -301,16 +321,33 @@ class _ManifestScreenState extends State<ManifestScreen> {
     final palette = context.palette;
     final dateLabel = DateFormat('MM/dd/yyyy').format(_selectedDate);
 
-    return BlocListener<ManifestBloc, ManifestState>(
-      listenWhen: (prev, curr) =>
-          curr is ManifestAwbActionSuccess || curr is ManifestAwbActionFailure,
-      listener: (context, state) {
-        if (state is ManifestAwbActionSuccess) {
-          displaySnack(context, state.message, Colors.green);
-        } else if (state is ManifestAwbActionFailure) {
-          displaySnack(context, state.message, Colors.red);
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ManifestBloc, ManifestState>(
+          listenWhen: (prev, curr) =>
+              curr is ManifestAwbActionSuccess ||
+              curr is ManifestAwbActionFailure,
+          listener: (context, state) {
+            if (state is ManifestAwbActionSuccess) {
+              displaySnack(context, state.message, Colors.green);
+            } else if (state is ManifestAwbActionFailure) {
+              displaySnack(context, state.message, Colors.red);
+            }
+          },
+        ),
+        BlocListener<BranchesBloc, BranchesState>(
+          listenWhen: (prev, curr) => curr is FetchBranchesLoaded,
+          listener: (context, state) {
+            if (state is FetchBranchesLoaded) {
+              setState(() {
+                _branchLookup = {
+                  for (final branch in state.branches) branch.id: branch,
+                };
+              });
+            }
+          },
+        ),
+      ],
       child: Scaffold(
       backgroundColor: palette.background,
       appBar: AppBar(
@@ -501,6 +538,7 @@ class _ManifestScreenState extends State<ManifestScreen> {
                             Expanded(
                               child: ManifestTable(
                                 manifests: pageItems,
+                                branchLookup: _branchLookup,
                                 onManageAwbs: _openManageAwbs,
                                 onDownload: _downloadManifest,
                                 onShowQr: _showManifestQr,

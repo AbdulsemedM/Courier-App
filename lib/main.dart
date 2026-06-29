@@ -143,7 +143,11 @@ void main() async {
         ),
         BlocProvider(
             create: (context) => ShipmentInvoiceBloc(ShipmentInvoiceRepository(
-                shipmentInvoiceDataProvider: ShipmentInvoiceDataProvider()))),
+                  shipmentInvoiceDataProvider: ShipmentInvoiceDataProvider(),
+                  branchesRepository: BranchesRepository(
+                    branchesDataProvider: BranchesDataProvider(),
+                  ),
+                ))),
         BlocProvider(
             create: (context) => ShipmentsBloc(ShipmentRepository(
                 shipmentDataProvider: ShipmentDataProvider()))),

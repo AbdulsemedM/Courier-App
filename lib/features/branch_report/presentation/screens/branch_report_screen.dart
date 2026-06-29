@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/features/branch_report/bloc/branch_report_bloc.dart';
 import 'package:courier_app/features/branch_report/data/model/branch_shipment_model.dart';
+import 'package:courier_app/features/branch_report/data/model/branch_shipment_report_summary.dart';
+import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 
 class BranchReportScreen extends StatefulWidget {
@@ -14,19 +20,30 @@ class BranchReportScreen extends StatefulWidget {
 }
 
 class _BranchReportScreenState extends State<BranchReportScreen> {
-  DateTime _fromDate = DateTime.now().subtract(const Duration(days: 90));
-  DateTime _toDate = DateTime.now();
+  late DateTime _startDate;
+  late DateTime _endDate;
   int? _selectedBranchId;
+  String? _branchName;
   final AuthService _authService = AuthService();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    final today = DateTime.now();
+    _startDate = DateTime(today.year, today.month, today.day);
+    _endDate = _startDate;
     _initializeData();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _initializeData() async {
-    // Get user's branch as default
+    context.read<BranchesBloc>().add(FetchBranches());
     final branch = await _authService.getBranch();
     if (branch != null) {
       setState(() {
@@ -36,46 +53,72 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
     }
   }
 
-  Future<void> _selectFromDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  String _resolveBranchName(BranchReportLoaded? state) {
+    if (state?.branchName != null && state!.branchName!.isNotEmpty) {
+      return state.branchName!;
+    }
+    if (_branchName != null && _branchName!.isNotEmpty) {
+      return _branchName!;
+    }
+
+    final branchesState = context.read<BranchesBloc>().state;
+    if (branchesState is FetchBranchesLoaded && _selectedBranchId != null) {
+      for (final branch in branchesState.branches) {
+        if (branch.id == _selectedBranchId) {
+          return branch.name;
+        }
+      }
+    }
+
+    return 'Branch';
+  }
+
+  Future<void> _selectStartDate(BuildContext context) async {
+    final picked = await _pickDate(
       context: context,
-      initialDate: _fromDate,
+      initialDate: _startDate,
       firstDate: DateTime(2015),
-      lastDate: _toDate,
-      builder: (context, child) {
-        final isDarkMode = context.isDarkMode;
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: context.palette.accent,
-              onPrimary: Colors.white,
-              surface: context.palette.surface,
-              onSurface: context.palette.textPrimary,
-            ),
-          ),
-          child: child!,
-        );
-      },
+      lastDate: _endDate,
     );
-    if (picked != null && picked != _fromDate) {
+    if (picked != null && picked != _startDate) {
       setState(() {
-        _fromDate = picked;
-        if (_fromDate.isAfter(_toDate)) {
-          _toDate = _fromDate;
+        _startDate = picked;
+        if (_startDate.isAfter(_endDate)) {
+          _endDate = _startDate;
         }
       });
-      _fetchShipments();
     }
   }
 
-  Future<void> _selectToDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectEndDate(BuildContext context) async {
+    final picked = await _pickDate(
       context: context,
-      initialDate: _toDate,
-      firstDate: _fromDate,
+      initialDate: _endDate,
+      firstDate: _startDate,
       lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _endDate) {
+      setState(() {
+        _endDate = picked;
+        if (_endDate.isBefore(_startDate)) {
+          _startDate = _endDate;
+        }
+      });
+    }
+  }
+
+  Future<DateTime?> _pickDate({
+    required BuildContext context,
+    required DateTime initialDate,
+    required DateTime firstDate,
+    required DateTime lastDate,
+  }) {
+    return showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
       builder: (context, child) {
-        final isDarkMode = context.isDarkMode;
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
@@ -89,338 +132,209 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
         );
       },
     );
-    if (picked != null && picked != _toDate) {
-      setState(() {
-        _toDate = picked;
-        if (_toDate.isBefore(_fromDate)) {
-          _fromDate = _toDate;
-        }
-      });
-      _fetchShipments();
-    }
   }
 
   void _fetchShipments() {
-    if (_selectedBranchId != null) {
-      final fromDateString = DateFormat('yyyy-MM-dd').format(_fromDate);
-      final toDateString = DateFormat('yyyy-MM-dd').format(_toDate);
-      context.read<BranchReportBloc>().add(
-            FetchBranchShipments(
-              branchId: _selectedBranchId!,
-              fromDate: fromDateString,
-              toDate: toDateString,
-            ),
-          );
+    if (_selectedBranchId == null) return;
+
+    final startDateString = DateFormat('yyyy-MM-dd').format(_startDate);
+    final endDateString = DateFormat('yyyy-MM-dd').format(_endDate);
+    context.read<BranchReportBloc>().add(
+          FetchBranchShipments(
+            branchId: _selectedBranchId!,
+            startDate: startDateString,
+            endDate: endDateString,
+          ),
+        );
+  }
+
+  List<BranchShipmentModel> _filterShipments(
+    List<BranchShipmentModel> shipments,
+  ) {
+    final query = _searchController.text.trim();
+    if (query.isEmpty) return shipments;
+    return shipments.where((shipment) => shipment.matchesSearch(query)).toList();
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {});
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    setState(() {});
+  }
+
+  Future<void> _copyAwb(String? awb) async {
+    final value = awb?.trim();
+    if (value == null || value.isEmpty) return;
+
+    await Clipboard.setData(ClipboardData(text: value));
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('AWB copied: $value')),
+    );
+  }
+
+  Future<void> _exportReport(
+    List<BranchShipmentModel> shipments,
+    String branchName,
+  ) async {
+    if (shipments.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No shipments to export')),
+      );
+      return;
     }
+
+    try {
+      final buffer = StringBuffer(
+        'Shipment ID,Sender,Sender Mobile,Receiver,Receiver Mobile,Qty,Status,Payment Method,Amount,Staff,Branch\n',
+      );
+
+      for (final shipment in shipments) {
+        buffer.writeln([
+          _csvCell(shipment.awb),
+          _csvCell(shipment.senderName),
+          _csvCell(shipment.senderMobileDisplay),
+          _csvCell(shipment.receiverName),
+          _csvCell(shipment.receiverMobileDisplay),
+          _csvCell(shipment.qty?.toString()),
+          _csvCell(shipment.statusCode),
+          _csvCell(shipment.paymentMethodCode),
+          _csvCell(shipment.feeAmount.toStringAsFixed(0)),
+          _csvCell(shipment.addedByName),
+          _csvCell(shipment.branchDisplayName ?? branchName),
+        ].join(','));
+      }
+
+      final directory = await getTemporaryDirectory();
+      final fileName =
+          'branch_report_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.csv';
+      final file = File('${directory.path}/$fileName');
+      await file.writeAsString(buffer.toString());
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Exported to ${file.path}')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: $e')),
+      );
+    }
+  }
+
+  String _csvCell(String? value) {
+    final safe = (value ?? '').replaceAll('"', '""');
+    return '"$safe"';
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor:
-          context.palette.background,
+      backgroundColor: context.palette.background,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: context.palette.appBarBackground,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: context.palette.textPrimary,
-          ),
+          icon: Icon(Icons.arrow_back, color: context.palette.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Branch Report',
+          'Branch Shipment Report',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
             color: context.palette.textPrimary,
           ),
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDarkMode
-                ? [
-                    const Color(0xFF1A1C2E),
-                    const Color(0xFF2D3250),
-                  ]
-                : [context.palette.background, context.palette.background],
-          ),
-        ),
-        child: Column(
-          children: [
-            // Filters Section
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: context.palette.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
+      body: BlocListener<BranchesBloc, BranchesState>(
+        listener: (context, state) {
+          if (state is FetchBranchesLoaded && _selectedBranchId != null) {
+            final branch = state.branches.firstWhere(
+              (item) => item.id == _selectedBranchId,
+              orElse: () => state.branches.first,
+            );
+            if (mounted) {
+              setState(() => _branchName = branch.name);
+            }
+          }
+        },
+        child: BlocBuilder<BranchReportBloc, BranchReportState>(
+          builder: (context, state) {
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Date Range Selection
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => _selectFromDate(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color:
-                              context.palette.surfaceMuted,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: context.palette.border,
-                          ),
+                  _buildFilterSection(),
+                  if (state is BranchReportLoading)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 64),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: context.palette.accent,
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      ),
+                    )
+                  else if (state is BranchReportError)
+                    _buildErrorState(state.message)
+                  else if (state is BranchReportLoaded) ...[
+                    Builder(
+                      builder: (context) {
+                        final branchName = _resolveBranchName(state);
+                        final filteredShipments =
+                            _filterShipments(state.shipments);
+                        final hasSearch =
+                            _searchController.text.trim().isNotEmpty;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'From Date',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: context.palette.textSecondary,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  DateFormat('MMM dd, yyyy').format(_fromDate),
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: context.palette.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Icon(
-                              Icons.calendar_today,
-                              color:
-                                  context.palette.textSecondary,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => _selectToDate(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color:
-                              context.palette.surfaceMuted,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: context.palette.border,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'To Date',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: context.palette.textSecondary,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  DateFormat('MMM dd, yyyy').format(_toDate),
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: context.palette.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Icon(
-                              Icons.calendar_today,
-                              color:
-                                  context.palette.textSecondary,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Shipments Table
-            Expanded(
-              child: BlocBuilder<BranchReportBloc, BranchReportState>(
-                builder: (context, state) {
-                  if (state is BranchReportLoading) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        color: context.palette.accent,
-                      ),
-                    );
-                  }
-                  if (state is BranchReportError) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            size: 64,
-                            color: Colors.red[300],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Error: ${state.message}',
-                            style: TextStyle(
-                              color: context.palette.textPrimary,
-                              fontSize: 16,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: _fetchShipments,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: context.palette.accent,
-                            ),
-                            child: const Text('Retry'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  if (state is BranchReportLoaded) {
-                    if (state.shipments.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.inbox_outlined,
-                              size: 64,
-                              color: isDarkMode
-                                  ? Colors.white38
-                                  : Colors.grey[400],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No shipments found',
-                              style: TextStyle(
-                                color: context.palette.textSecondary,
-                                fontSize: 16,
+                            _buildHeaderCard(
+                              branchName: branchName,
+                              onExport: () => _exportReport(
+                                filteredShipments,
+                                branchName,
                               ),
                             ),
+                            _buildSearchBar(),
+                            _buildSummaryCards(state.summary),
+                            if (filteredShipments.isEmpty)
+                              _buildEmptyState(hasSearch: hasSearch)
+                            else
+                              _buildShipmentsTable(
+                                shipments: filteredShipments,
+                                branchName: branchName,
+                              ),
                           ],
-                        ),
-                      );
-                    }
-                    return Column(
-                      children: [
-                        // Summary Cards
-                        _buildSummaryCards(
-                          isDarkMode: isDarkMode,
-                          shipments: state.shipments,
-                        ),
-                        // Shipments Table
-                        Expanded(
-                          child: _buildShipmentsTable(
-                            isDarkMode: isDarkMode,
-                            shipments: state.shipments,
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
+                        );
+                      },
+                    ),
+                  ] else
+                    const SizedBox(height: 32),
+                ],
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildSummaryCards({
-    required bool isDarkMode,
-    required List<BranchShipmentModel> shipments,
-  }) {
-    final currencyFormat =
-        NumberFormat.currency(symbol: 'ETB ', decimalDigits: 2);
-
-    int totalShipments = shipments.length;
-    double totalQuantity = shipments.fold(0.0, (sum, s) => sum + (s.qty ?? 0));
-    String unit = shipments.isNotEmpty ? shipments.first.unit ?? 'kg' : 'kg';
-    double totalNetFee = shipments.fold(0.0, (sum, s) => sum + (s.netFee ?? 0));
-
+  Widget _buildFilterSection() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildSummaryCard(
-              isDarkMode: isDarkMode,
-              title: 'Total Shipments',
-              value: totalShipments.toString(),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildSummaryCard(
-              isDarkMode: isDarkMode,
-              title: 'Total Quantity',
-              value: '${totalQuantity.toStringAsFixed(0)} $unit',
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildSummaryCard(
-              isDarkMode: isDarkMode,
-              title: 'Total Net Fee',
-              value: currencyFormat.format(totalNetFee),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryCard({
-    required bool isDarkMode,
-    required String title,
-    required String value,
-  }) {
-    return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: context.palette.surface,
-        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -429,254 +343,493 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: context.palette.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
+            'Filter Options',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: context.palette.textPrimary,
             ),
           ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDateField(
+                  label: 'Starting Date',
+                  date: _startDate,
+                  onTap: () => _selectStartDate(context),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDateField(
+                  label: 'Ending Date',
+                  date: _endDate,
+                  onTap: () => _selectEndDate(context),
+                ),
+              ),
+              const SizedBox(width: 12),
+              OutlinedButton.icon(
+                onPressed: _fetchShipments,
+                icon: Icon(Icons.refresh, color: context.palette.accent),
+                label: Text(
+                  'Refresh',
+                  style: TextStyle(color: context.palette.accent),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 18,
+                  ),
+                  side: BorderSide(color: context.palette.border),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildShipmentsTable({
-    required bool isDarkMode,
-    required List<BranchShipmentModel> shipments,
+  Widget _buildDateField({
+    required String label,
+    required DateTime date,
+    required VoidCallback onTap,
   }) {
-    final currencyFormat =
-        NumberFormat.currency(symbol: 'ETB ', decimalDigits: 2);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: context.palette.surfaceMuted,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: context.palette.border),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: context.palette.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    DateFormat('MM/dd/yyyy').format(date),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: context.palette.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.calendar_today, color: context.palette.textSecondary),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderCard({
+    required String branchName,
+    required VoidCallback onExport,
+  }) {
+    final dateRange =
+        '${DateFormat('yyyy-MM-dd').format(_startDate)} → ${DateFormat('yyyy-MM-dd').format(_endDate)}';
 
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: context.palette.surface,
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF4F46E5),
+            Color(0xFF7C3AED),
+            Color(0xFF0D9488),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: const Color(0xFF4F46E5).withOpacity(0.25),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  branchName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  dateRange,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: onExport,
+            icon: const Icon(Icons.download, size: 18),
+            label: const Text('Export'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF22C55E),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: context.palette.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: context.palette.border),
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _onSearchChanged,
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.search,
+        decoration: InputDecoration(
+          hintText: 'Search by AWB, sender phone, or receiver phone',
+          hintStyle: TextStyle(
+            color: context.palette.textSecondary,
+            fontSize: 14,
+          ),
+          border: InputBorder.none,
+          icon: Icon(Icons.search, color: context.palette.textSecondary),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: Icon(
+                    Icons.clear,
+                    color: context.palette.textSecondary,
+                  ),
+                  onPressed: _clearSearch,
+                )
+              : null,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryCards(BranchShipmentReportSummary summary) {
+    final cards = [
+      _SummaryCardData('Total Shipments', summary.totalShipments.toString(),
+          const Color(0xFF2563EB)),
+      _SummaryCardData('CASH', summary.cash.toString(), const Color(0xFF16A34A)),
+      _SummaryCardData('COD', summary.cod.toString(), const Color(0xFFEA580C)),
+      _SummaryCardData('EBIRR', summary.ebirr.toString(), const Color(0xFF9333EA)),
+      _SummaryCardData('SAHAY', summary.sahay.toString(), const Color(0xFFDB2777)),
+      _SummaryCardData(
+        'Total Fee',
+        summary.totalFee.toStringAsFixed(0),
+        const Color(0xFF0D9488),
+      ),
+    ];
+
+    return SizedBox(
+      height: 96,
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        scrollDirection: Axis.horizontal,
+        itemCount: cards.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final card = cards[index];
+          return Container(
+            width: 140,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: card.color,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: card.color.withOpacity(0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  card.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  card.value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildShipmentsTable({
+    required List<BranchShipmentModel> shipments,
+    required String branchName,
+  }) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: context.palette.surfaceMuted,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
         child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
           child: DataTable(
-            headingRowColor: MaterialStateProperty.resolveWith<Color>(
-              (Set<MaterialState> states) =>
-                  context.palette.surfaceMuted,
+            headingRowColor: WidgetStateProperty.all(
+              context.palette.surface,
             ),
-            dataRowColor: MaterialStateProperty.resolveWith<Color>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
-                  return isDarkMode
-                      ? Colors.blue.withOpacity(0.1)
-                      : Colors.blue[100]!;
-                }
-                return context.palette.surface;
-              },
+            dataRowColor: WidgetStateProperty.all(
+              context.palette.surfaceMuted,
             ),
+            columnSpacing: 24,
             columns: [
-              DataColumn(
-                label: Text(
-                  'AWB',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: context.palette.textPrimary,
-                  ),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Status',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: context.palette.textPrimary,
-                  ),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Payment Status',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: context.palette.textPrimary,
-                  ),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Sender',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: context.palette.textPrimary,
-                  ),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Receiver',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: context.palette.textPrimary,
-                  ),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Net Fee',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: context.palette.textPrimary,
-                  ),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Total Amount',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: context.palette.textPrimary,
-                  ),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Created At',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: context.palette.textPrimary,
-                  ),
-                ),
-              ),
-            ],
-            rows: shipments.map((shipment) {
-              return DataRow(
-                cells: [
-                  DataCell(Text(
-                    shipment.awb ?? '',
-                    style: TextStyle(
-                      color: context.palette.textPrimary,
-                    ),
-                  )),
-                  DataCell(
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                _tableColumn('Shipment ID'),
+                _tableColumn('Sender'),
+                _tableColumn('Receiver'),
+                _tableColumn('Qty'),
+                _tableColumn('Status'),
+                _tableColumn('Payment Method'),
+                _tableColumn('Amount'),
+                _tableColumn('Staff'),
+                _tableColumn('Branch'),
+              ],
+              rows: shipments.map((shipment) {
+                return DataRow(
+                  color: WidgetStateProperty.all(context.palette.surfaceMuted),
+                  cells: [
+                    DataCell(
+                      Text(
+                        shipment.awb ?? '',
+                        style: TextStyle(color: context.palette.textPrimary),
                       ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(
-                            shipment.shipmentStatus?.code ?? ''),
-                        borderRadius: BorderRadius.circular(12),
+                      onLongPress: () => _copyAwb(shipment.awb),
+                    ),
+                    DataCell(_buildContactCell(
+                      name: shipment.senderName,
+                      mobile: shipment.senderMobileDisplay,
+                    )),
+                    DataCell(_buildContactCell(
+                      name: shipment.receiverName,
+                      mobile: shipment.receiverMobileDisplay,
+                    )),
+                    DataCell(Text(
+                      _formatQty(shipment.qty),
+                      style: TextStyle(color: context.palette.textPrimary),
+                    )),
+                    DataCell(_buildStatusBadge(shipment.statusCode)),
+                    DataCell(Text(
+                      shipment.paymentMethodCode,
+                      style: TextStyle(
+                        color: context.palette.textPrimary,
+                        fontWeight: FontWeight.w600,
                       ),
-                      child: Text(
-                        shipment.shipmentStatus?.code ?? 'N/A',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                  DataCell(
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getPaymentStatusColor(
-                            shipment.paymentStatus ?? ''),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        shipment.paymentStatus ?? 'N/A',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                  DataCell(Text(
-                    shipment.senderName ?? '',
-                    style: TextStyle(
-                      color: context.palette.textPrimary,
-                    ),
-                  )),
-                  DataCell(Text(
-                    shipment.receiverName ?? '',
-                    style: TextStyle(
-                      color: context.palette.textPrimary,
-                    ),
-                  )),
-                  DataCell(Text(
-                    currencyFormat.format(shipment.netFee ?? 0),
-                    style: TextStyle(
-                      color: context.palette.textPrimary,
-                    ),
-                  )),
-                  DataCell(Text(
-                    currencyFormat.format(shipment.totalAmount ?? 0),
-                    style: TextStyle(
-                      color: context.palette.textPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )),
-                  DataCell(Text(
-                    shipment.createdAt != null
-                        ? DateFormat('MMM dd, yyyy').format(
-                            DateTime.parse(shipment.createdAt!),
-                          )
-                        : 'N/A',
-                    style: TextStyle(
-                      color: context.palette.textPrimary,
-                    ),
-                  )),
-                ],
-              );
-            }).toList(),
+                    )),
+                    DataCell(Text(
+                      shipment.feeAmount.toStringAsFixed(0),
+                      style: TextStyle(color: context.palette.textPrimary),
+                    )),
+                    DataCell(Text(
+                      shipment.addedByName,
+                      style: TextStyle(color: context.palette.textPrimary),
+                    )),
+                    DataCell(Text(
+                      shipment.branchDisplayName ?? branchName,
+                      style: TextStyle(color: context.palette.textPrimary),
+                    )),
+                  ],
+                );
+              }).toList(),
           ),
         ),
       ),
     );
   }
 
-  Color _getStatusColor(String status) {
-    switch (status.toUpperCase()) {
-      case 'ARR':
-        return Colors.green;
-      case 'PAR':
-        return Colors.orange;
-      case 'DEL':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
+  DataColumn _tableColumn(String label) {
+    return DataColumn(
+      label: Text(
+        label,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: context.palette.textPrimary,
+        ),
+      ),
+    );
   }
 
-  Color _getPaymentStatusColor(String status) {
-    switch (status.toUpperCase()) {
-      case 'SUCCESS':
-        return Colors.green;
-      case 'PENDING':
-        return Colors.orange;
-      case 'FAILED':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
+  Widget _buildContactCell({String? name, required String mobile}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          (name ?? '').toUpperCase(),
+          style: TextStyle(
+            color: context.palette.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          mobile,
+          style: TextStyle(
+            color: context.palette.textSecondary,
+            fontSize: 12,
+          ),
+        ),
+      ],
+    );
   }
+
+  Widget _buildStatusBadge(String? status) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: context.palette.surfaceMuted,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: context.palette.border),
+      ),
+      child: Text(
+        status ?? 'N/A',
+        style: TextStyle(
+          color: context.palette.textPrimary,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  String _formatQty(double? qty) {
+    if (qty == null) return '0';
+    if (qty == qty.roundToDouble()) {
+      return qty.toInt().toString();
+    }
+    return qty.toString();
+  }
+
+  Widget _buildEmptyState({bool hasSearch = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+      child: Column(
+        children: [
+          Icon(
+            hasSearch ? Icons.search_off : Icons.inbox_outlined,
+            size: 64,
+            color: context.palette.textSecondary,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            hasSearch
+                ? 'No shipments match your search'
+                : 'No shipments found',
+            style: TextStyle(
+              color: context.palette.textSecondary,
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+      child: Column(
+        children: [
+          Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
+          const SizedBox(height: 16),
+          Text(
+            'Error: $message',
+            style: TextStyle(
+              color: context.palette.textPrimary,
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _fetchShipments,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: context.palette.accent,
+            ),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryCardData {
+  final String title;
+  final String value;
+  final Color color;
+
+  const _SummaryCardData(this.title, this.value, this.color);
 }

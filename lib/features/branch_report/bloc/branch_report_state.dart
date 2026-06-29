@@ -8,8 +8,14 @@ class BranchReportLoading extends BranchReportState {}
 
 class BranchReportLoaded extends BranchReportState {
   final List<BranchShipmentModel> shipments;
+  final BranchShipmentReportSummary summary;
+  final String? branchName;
 
-  BranchReportLoaded({required this.shipments});
+  BranchReportLoaded({
+    required this.shipments,
+    required this.summary,
+    this.branchName,
+  });
 }
 
 class BranchReportError extends BranchReportState {

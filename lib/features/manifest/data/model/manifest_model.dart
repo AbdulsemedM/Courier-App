@@ -121,11 +121,11 @@ class ManifestModel {
   });
 
   factory ManifestModel.fromJson(Map<String, dynamic> json) {
-    if (json.containsKey('awbList') || json.containsKey('date')) {
-      final awbList = (json['awbList'] as List?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [];
+    final isSimplified = !json.containsKey('manifestId') &&
+        (json.containsKey('date') || json.containsKey('branchId'));
+
+    if (isSimplified) {
+      final awbList = _parseAwbList(json);
       final id = json['id'] as int? ?? 0;
       final branchId = json['branchId'] as int? ?? 0;
       return ManifestModel(
@@ -153,14 +153,9 @@ class ManifestModel {
     return ManifestModel(
       id: json['id'] as int? ?? 0,
       manifestId: json['manifestId'] as String? ?? '',
-      branch: json['branch'] is Map<String, dynamic>
-          ? ManifestBranch.fromJson(json['branch'] as Map<String, dynamic>)
-          : const ManifestBranch(id: 0, name: '', code: ''),
+      branch: _parseBranch(json['branch']),
       senderBranch: json['senderBranch'] as int? ?? 0,
-      receiverBranch: json['receiverBranch'] is Map<String, dynamic>
-          ? ManifestBranch.fromJson(
-              json['receiverBranch'] as Map<String, dynamic>)
-          : const ManifestBranch(id: 0, name: '', code: ''),
+      receiverBranch: _parseBranch(json['receiverBranch']),
       createdBy: json['createdBy'] is Map<String, dynamic>
           ? ManifestUser.fromJson(json['createdBy'] as Map<String, dynamic>)
           : const ManifestUser(id: 0, fullName: '', email: ''),
@@ -183,10 +178,26 @@ class ManifestModel {
     );
   }
 
+  static ManifestBranch _parseBranch(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return ManifestBranch.fromJson(value);
+    }
+    if (value is int) {
+      return ManifestBranch(id: value, name: '', code: '');
+    }
+    return const ManifestBranch(id: 0, name: '', code: '');
+  }
+
   static List<String> _parseAwbList(Map<String, dynamic> json) {
     final raw = json['awbList'] ?? json['awbs'];
     if (raw is List) {
-      return raw.map((e) => e.toString()).toList();
+      return raw
+          .map((e) {
+            if (e is Map) return (e['awb'] ?? '').toString();
+            return e.toString();
+          })
+          .where((s) => s.isNotEmpty)
+          .toList();
     }
     return const [];
   }
