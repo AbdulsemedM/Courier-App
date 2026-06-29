@@ -16,6 +16,18 @@ class ManifestBranch {
       code: json['code'] as String? ?? '',
     );
   }
+
+  String get initials {
+    final trimmedCode = code.trim();
+    if (trimmedCode.isNotEmpty) {
+      return trimmedCode
+          .substring(0, trimmedCode.length.clamp(0, 2))
+          .toUpperCase();
+    }
+    final trimmedName = name.trim();
+    if (trimmedName.isEmpty) return '?';
+    return trimmedName.substring(0, 1).toUpperCase();
+  }
 }
 
 class ManifestUser {
@@ -167,14 +179,32 @@ class ManifestModel {
       totalValue: (json['totalValue'] as num?)?.toDouble() ?? 0,
       createdAt: json['createdAt'] as String? ?? '',
       updatedAt: json['updatedAt'] as String? ?? '',
-      awbList: const [],
+      awbList: _parseAwbList(json),
     );
+  }
+
+  static List<String> _parseAwbList(Map<String, dynamic> json) {
+    final raw = json['awbList'] ?? json['awbs'];
+    if (raw is List) {
+      return raw.map((e) => e.toString()).toList();
+    }
+    return const [];
   }
 
   String get routeLabel =>
       '${branch.name.trim()} → ${receiverBranch.name.trim()}';
 
   String get creatorLabel => createdBy.fullName;
+
+  String get creatorInitials {
+    final parts = createdBy.fullName.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return '?';
+    if (parts.length == 1) {
+      return parts.first.substring(0, 1).toUpperCase();
+    }
+    return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}'
+        .toUpperCase();
+  }
 
   String get displayDateTime => manifestDate.isNotEmpty ? manifestDate : createdAt;
 }

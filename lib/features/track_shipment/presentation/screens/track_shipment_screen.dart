@@ -245,10 +245,6 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
         );
   }
 
-  void _handleRefreshPaymentStatus(String awb) {
-    context.read<AddShipmentBloc>().add(CheckPaymentStatusEvent(awb: awb));
-  }
-
   void _handleDeliver(String awb) {
     final outerContext = context;
 
@@ -469,7 +465,6 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                               branches: branches,
                               onDeliver: _handleDeliver,
                               onPay: _handlePay,
-                              onRefreshPaymentStatus: _handleRefreshPaymentStatus,
                               isPaymentActionLoading: isPaymentActionLoading,
                             );
                           },

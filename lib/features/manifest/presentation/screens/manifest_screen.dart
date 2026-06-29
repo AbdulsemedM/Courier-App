@@ -8,6 +8,7 @@ import 'package:courier_app/features/manifest/presentation/widgets/manifest_tabl
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ManifestScreen extends StatefulWidget {
   const ManifestScreen({super.key});
@@ -212,6 +213,71 @@ class _ManifestScreenState extends State<ManifestScreen> {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  Future<void> _downloadManifest(ManifestModel manifest) async {
+    final url = manifest.downloadUrl;
+    if (url == null || url.isEmpty) {
+      displaySnack(context, 'Download link not available', Colors.orange);
+      return;
+    }
+
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      displaySnack(context, 'Invalid download link', Colors.red);
+      return;
+    }
+
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && mounted) {
+      displaySnack(context, 'Unable to open download link', Colors.red);
+    }
+  }
+
+  void _showManifestQr(ManifestModel manifest) {
+    final url = manifest.barcodeUrl;
+    if (url == null || url.isEmpty) {
+      displaySnack(context, 'QR code not available', Colors.orange);
+      return;
+    }
+
+    final palette = context.palette;
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: palette.surface,
+          title: Text(
+            'Manifest #${manifest.id}',
+            style: TextStyle(color: palette.textPrimary),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  url,
+                  height: 200,
+                  width: 200,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => Text(
+                    'Failed to load QR code',
+                    style: TextStyle(color: palette.textSecondary),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text('Close', style: TextStyle(color: palette.accent)),
+            ),
+          ],
         );
       },
     );
@@ -436,6 +502,8 @@ class _ManifestScreenState extends State<ManifestScreen> {
                               child: ManifestTable(
                                 manifests: pageItems,
                                 onManageAwbs: _openManageAwbs,
+                                onDownload: _downloadManifest,
+                                onShowQr: _showManifestQr,
                               ),
                             ),
                             _buildPagination(

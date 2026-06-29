@@ -103,24 +103,23 @@ class TrackShipmentWidgets {
     List<BranchesModel>? branches,
     Function(String awb)? onDeliver,
     Function(String awb)? onPay,
-    Function(String awb)? onRefreshPaymentStatus,
     bool isPaymentActionLoading = false,
   }) {
     final mainShipment = shipments.first;
     final latestShipment = _latestShipmentForActions(shipments);
     final paymentShipment = _shipmentWithPaymentDetails(shipments);
-    final canDeliver = ShipmentStatusHelper.shouldShowDeliverAction(
-      shipmentStatusCode: latestShipment.statusCode,
-      shipmentStatusLabel: latestShipment.statusDescription,
+    final canPay = ShipmentStatusHelper.shouldShowPayAction(
+      shipmentStatusCode: latestShipment.statusCode ?? '',
       paymentStatus: paymentShipment.paymentStatus,
       paymentMode: paymentShipment.method,
     );
-    final canPay = ShipmentStatusHelper.shouldShowPayBeforeDeliverAction(
-      shipmentStatusCode: latestShipment.statusCode,
-      shipmentStatusLabel: latestShipment.statusDescription,
-      paymentStatus: paymentShipment.paymentStatus,
-      paymentMode: paymentShipment.method,
-    );
+    final canDeliver = !canPay &&
+        ShipmentStatusHelper.shouldShowDeliverAction(
+          shipmentStatusCode: latestShipment.statusCode,
+          shipmentStatusLabel: latestShipment.statusDescription,
+          paymentStatus: paymentShipment.paymentStatus,
+          paymentMode: paymentShipment.method,
+        );
 
     return SingleChildScrollView(
       child: Padding(
@@ -143,21 +142,13 @@ class TrackShipmentWidgets {
                 onPay: onPay,
                 isLoading: isPaymentActionLoading,
               ),
-              const SizedBox(height: 12),
-              if (onRefreshPaymentStatus != null)
-                _buildRefreshStatusCta(
-                  isDarkMode: isDarkMode,
-                  shipment: mainShipment,
-                  onRefreshPaymentStatus: onRefreshPaymentStatus,
-                  isLoading: isPaymentActionLoading,
-                ),
               const SizedBox(height: 16),
             ],
             _buildHeaderCard(isDarkMode, mainShipment),
             const SizedBox(height: 16),
             _buildShipmentInfoCard(isDarkMode, mainShipment, branches),
             const SizedBox(height: 16),
-            _buildPaymentCard(isDarkMode, mainShipment),
+            _buildPaymentCard(isDarkMode, paymentShipment),
             const SizedBox(height: 16),
             if (mainShipment.barcodeUrl != null)
               _buildBarcodeCard(isDarkMode, mainShipment),
@@ -201,15 +192,22 @@ class TrackShipmentWidgets {
   static TrackShipmentModel _shipmentWithPaymentDetails(
     List<TrackShipmentModel> shipments,
   ) {
+    TrackShipmentModel? fallback;
+
     for (final shipment in shipments) {
       final hasPaymentStatus =
-          shipment.paymentStatus != null && shipment.paymentStatus!.trim().isNotEmpty;
-      final hasPaymentMode = shipment.method.trim().isNotEmpty;
-      if (hasPaymentStatus || hasPaymentMode) {
+          shipment.paymentStatus != null &&
+              shipment.paymentStatus!.trim().isNotEmpty;
+      if (hasPaymentStatus) {
         return shipment;
       }
+
+      if (fallback == null && shipment.method.trim().isNotEmpty) {
+        fallback = shipment;
+      }
     }
-    return shipments.first;
+
+    return fallback ?? shipments.first;
   }
 
   static String? _getBranchName(int? branchId, List<BranchesModel>? branches) {
@@ -896,49 +894,6 @@ class TrackShipmentWidgets {
             fontSize: 17,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.2,
-          ),
-        ),
-      ),
-    );
-  }
-
-  static Widget _buildRefreshStatusCta({
-    required bool isDarkMode,
-    required TrackShipmentModel shipment,
-    required Function(String awb) onRefreshPaymentStatus,
-    required bool isLoading,
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: isLoading ? null : () => onRefreshPaymentStatus(shipment.awb),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: isDarkMode ? Colors.orange.shade300 : Colors.orange.shade800,
-          side: BorderSide(
-            color: isDarkMode ? Colors.orange.shade400 : Colors.orange.shade700,
-          ),
-          minimumSize: const Size.fromHeight(48),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        icon: isLoading
-            ? SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    isDarkMode ? Colors.orange.shade300 : Colors.orange.shade800,
-                  ),
-                ),
-              )
-            : const Icon(Icons.refresh, size: 20),
-        label: const Text(
-          'Refresh Status',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
           ),
         ),
       ),

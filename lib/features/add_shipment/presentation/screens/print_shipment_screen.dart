@@ -346,16 +346,25 @@ class _PrintShipmentScreenState extends State<PrintShipmentScreen> {
   }
 
   String _formatPaymentBillLine(Map<String, dynamic> data) {
-    final paymentMode = _resolvePaymentModeField(data['paymentMode'])?.toUpperCase();
+    final paymentMode =
+        _resolvePaymentModeField(data['paymentMode'])?.toUpperCase();
     final paymentMethod =
         _resolvePaymentField(data['paymentMethod'])?.toUpperCase();
+    final label = _formatPaymentDisplayLabel(data);
+
+    if (label.isEmpty) return '';
 
     // Payment method is the actual tender used; prefer it over payment mode.
-    if (_isCodPayment(paymentMethod)) {
+    if (_isCodPayment(paymentMethod) && paymentMethod != 'CASH') {
       return 'BILL CASH ON DELIVERY';
     }
 
     if (paymentMethod == 'CASH') {
+      if (paymentMode != null &&
+          paymentMode.isNotEmpty &&
+          paymentMode != paymentMethod) {
+        return 'BILL ${label.toUpperCase()}';
+      }
       return 'BILL CASH';
     }
 

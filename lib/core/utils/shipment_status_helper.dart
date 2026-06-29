@@ -81,6 +81,17 @@ class ShipmentStatusHelper {
     return paymentStatus.trim().toUpperCase() != 'SUCCESS';
   }
 
+  static bool isCodPaymentMode(String? paymentMode) {
+    if (paymentMode == null || paymentMode.trim().isEmpty) {
+      return false;
+    }
+
+    final normalized = paymentMode.trim().toUpperCase();
+    return normalized == 'COD' ||
+        normalized.contains('CASH ON DELIVERY');
+  }
+
+  /// Legacy helper — payment **method** CASH is not the same as COD mode.
   static bool isCashPayment(String? paymentMode) {
     if (paymentMode == null || paymentMode.trim().isEmpty) {
       return false;
@@ -88,8 +99,7 @@ class ShipmentStatusHelper {
 
     final normalized = paymentMode.trim().toUpperCase();
     return normalized == 'CASH' ||
-        normalized == 'COD' ||
-        normalized.contains('CASH ON DELIVERY');
+        isCodPaymentMode(paymentMode);
   }
 
   /// Whether the shipments table should show the Pay action for a row.
@@ -98,7 +108,7 @@ class ShipmentStatusHelper {
     required String? paymentStatus,
     String? paymentMode,
   }) {
-    if (isCashPayment(paymentMode)) {
+    if (isPaymentFulfilled(paymentStatus)) {
       return false;
     }
 
@@ -199,10 +209,6 @@ class ShipmentStatusHelper {
       return false;
     }
 
-    if (isCashPayment(paymentMode)) {
-      return true;
-    }
-
     return isPaymentFulfilled(paymentStatus);
   }
 
@@ -212,7 +218,7 @@ class ShipmentStatusHelper {
     required String? paymentStatus,
     String? paymentMode,
   }) {
-    if (isCashPayment(paymentMode)) {
+    if (isPaymentFulfilled(paymentStatus)) {
       return false;
     }
 
