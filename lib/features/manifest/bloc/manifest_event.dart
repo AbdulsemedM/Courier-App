@@ -32,21 +32,25 @@ class CreateManifest extends ManifestEvent {
   List<Object> get props => [awbs, fileType, userId];
 }
 
-class AddAwbsToManifest extends ManifestEvent {
+class UpdateManifest extends ManifestEvent {
   final int manifestId;
   final List<String> awbs;
+  final String fileType;
+  final int userId;
   final int branchId;
   final String date;
 
-  const AddAwbsToManifest({
+  const UpdateManifest({
     required this.manifestId,
     required this.awbs,
+    required this.fileType,
+    required this.userId,
     required this.branchId,
     required this.date,
   });
 
   @override
-  List<Object> get props => [manifestId, awbs, branchId, date];
+  List<Object> get props => [manifestId, awbs, fileType, userId, branchId, date];
 }
 
 class RemoveAwbFromManifest extends ManifestEvent {

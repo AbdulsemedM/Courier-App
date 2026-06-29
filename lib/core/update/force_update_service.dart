@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:new_version_plus/new_version_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:urovo_scanner/urovo_scanner.dart';
 
 class ForceUpdateCheckResult {
   final bool shouldBlock;
@@ -17,7 +19,28 @@ class ForceUpdateCheckResult {
 }
 
 class ForceUpdateService {
+  static const _bypassVersionKey = 'force_update_bypass_local_version';
+
   const ForceUpdateService();
+
+  Future<bool> isUrovoDevice() async {
+    try {
+      return await UrovoScanner.isUrovoDevice ?? false;
+    } catch (error) {
+      debugPrint('[ForceUpdate] Urovo device check failed: $error');
+      return false;
+    }
+  }
+
+  Future<bool> hasBypassedForVersion(String localVersion) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_bypassVersionKey) == localVersion;
+  }
+
+  Future<void> saveBypassForVersion(String localVersion) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_bypassVersionKey, localVersion);
+  }
 
   Future<ForceUpdateCheckResult> checkForRequiredUpdate() async {
     try {

@@ -11,12 +11,51 @@ class ManifestBloc extends Bloc<ManifestEvent, ManifestState> {
 
   int? _lastBranchId;
   String? _lastDate;
+  final Map<int, List<String>> _awbCache = {};
 
   ManifestBloc({required this.manifestRepository}) : super(ManifestInitial()) {
     on<FetchManifests>(_onFetchManifests);
     on<CreateManifest>(_onCreateManifest);
-    on<AddAwbsToManifest>(_onAddAwbsToManifest);
+    on<UpdateManifest>(_onUpdateManifest);
     on<RemoveAwbFromManifest>(_onRemoveAwbFromManifest);
+  }
+
+  Future<List<String>> resolveManifestAwbs(ManifestModel manifest) async {
+    final cached = _awbCache[manifest.id];
+    if (cached != null && cached.isNotEmpty) {
+      return List<String>.from(cached);
+    }
+
+    if (manifest.awbList.isNotEmpty) {
+      _awbCache[manifest.id] = List<String>.from(manifest.awbList);
+      return manifest.awbList;
+    }
+
+    final awbs = await manifestRepository.resolveManifestAwbs(manifest);
+    if (awbs.isNotEmpty) {
+      _awbCache[manifest.id] = List<String>.from(awbs);
+    }
+    return awbs;
+  }
+
+  List<ManifestModel> _mergeAwbs(List<ManifestModel> manifests) {
+    return manifests
+        .map((manifest) {
+          final cached = _awbCache[manifest.id];
+          if (cached == null || cached.isEmpty || manifest.awbList.isNotEmpty) {
+            return manifest;
+          }
+          return manifest.copyWith(awbList: cached);
+        })
+        .toList();
+  }
+
+  void _cacheAwbs(int manifestId, List<String> awbs) {
+    if (awbs.isEmpty) {
+      _awbCache.remove(manifestId);
+      return;
+    }
+    _awbCache[manifestId] = List<String>.from(awbs);
   }
 
   Future<void> _onFetchManifests(
@@ -31,7 +70,7 @@ class ManifestBloc extends Bloc<ManifestEvent, ManifestState> {
         branchId: event.branchId,
         date: event.date,
       );
-      emit(FetchManifestsSuccess(manifests: manifests));
+      emit(FetchManifestsSuccess(manifests: _mergeAwbs(manifests)));
     } catch (e) {
       emit(FetchManifestsFailure(message: e.toString()));
     }
@@ -58,15 +97,22 @@ class ManifestBloc extends Bloc<ManifestEvent, ManifestState> {
     }
   }
 
-  Future<void> _onAddAwbsToManifest(
-    AddAwbsToManifest event,
+  Future<void> _onUpdateManifest(
+    UpdateManifest event,
     Emitter<ManifestState> emit,
   ) async {
     emit(ManifestAwbActionLoading());
     try {
-      final message = await manifestRepository.addAwbsToManifest(
+      final message = await manifestRepository.updateManifest(
         manifestId: event.manifestId,
         awbs: event.awbs,
+        fileType: event.fileType,
+        userId: event.userId,
+      );
+      final cached = _awbCache[event.manifestId] ?? const <String>[];
+      _cacheAwbs(
+        event.manifestId,
+        [...cached, ...event.awbs.where((awb) => !cached.contains(awb))],
       );
       emit(ManifestAwbActionSuccess(message: message));
       add(FetchManifests(branchId: event.branchId, date: event.date));
@@ -85,6 +131,13 @@ class ManifestBloc extends Bloc<ManifestEvent, ManifestState> {
         manifestId: event.manifestId,
         awb: event.awb,
       );
+      final cached = _awbCache[event.manifestId];
+      if (cached != null) {
+        _cacheAwbs(
+          event.manifestId,
+          cached.where((awb) => awb != event.awb).toList(),
+        );
+      }
       emit(ManifestAwbActionSuccess(message: message));
       add(FetchManifests(branchId: event.branchId, date: event.date));
     } catch (e) {

@@ -218,6 +218,33 @@ class ManifestModel {
   }
 
   String get displayDateTime => manifestDate.isNotEmpty ? manifestDate : createdAt;
+
+  ManifestModel copyWith({
+    List<String>? awbList,
+    String? downloadUrl,
+    int? totalShipments,
+  }) {
+    return ManifestModel(
+      id: id,
+      manifestId: manifestId,
+      branch: branch,
+      senderBranch: senderBranch,
+      receiverBranch: receiverBranch,
+      createdBy: createdBy,
+      fromStatus: fromStatus,
+      toStatus: toStatus,
+      manifestDate: manifestDate,
+      fileType: fileType,
+      downloadUrl: downloadUrl ?? this.downloadUrl,
+      barcodeUrl: barcodeUrl,
+      totalShipments: totalShipments ?? this.totalShipments,
+      totalWeight: totalWeight,
+      totalValue: totalValue,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      awbList: awbList ?? this.awbList,
+    );
+  }
 }
 
 class ManifestListResponse {

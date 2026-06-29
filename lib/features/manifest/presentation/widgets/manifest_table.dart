@@ -452,9 +452,12 @@ class ManifestTable extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        IconButton(
-          icon: Icon(Icons.edit_outlined, color: palette.accent, size: 20),
-          tooltip: 'Manage AWBs',
+        TextButton.icon(
+          icon: Icon(Icons.edit_outlined, color: palette.accent, size: 18),
+          label: Text(
+            'Edit',
+            style: TextStyle(color: palette.accent, fontSize: 13),
+          ),
           onPressed:
               onManageAwbs != null ? () => onManageAwbs!(manifest) : null,
         ),

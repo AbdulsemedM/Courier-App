@@ -15,6 +15,7 @@ class _ForceUpdateGateState extends State<ForceUpdateGate> {
   final ForceUpdateService _service = const ForceUpdateService();
 
   bool _isLoading = true;
+  bool _isUrovoDevice = false;
   ForceUpdateCheckResult _result =
       const ForceUpdateCheckResult(shouldBlock: false);
 
@@ -26,10 +27,47 @@ class _ForceUpdateGateState extends State<ForceUpdateGate> {
 
   Future<void> _checkUpdate() async {
     final result = await _service.checkForRequiredUpdate();
+    var shouldBlock = result.shouldBlock;
+    var isUrovo = false;
+
+    if (shouldBlock) {
+      isUrovo = await _service.isUrovoDevice();
+      final localVersion = result.localVersion;
+      if (isUrovo && localVersion != null) {
+        final bypassed = await _service.hasBypassedForVersion(localVersion);
+        if (bypassed) {
+          shouldBlock = false;
+        }
+      }
+    }
+
     if (!mounted) return;
     setState(() {
-      _result = result;
+      _result = ForceUpdateCheckResult(
+        shouldBlock: shouldBlock,
+        localVersion: result.localVersion,
+        storeVersion: result.storeVersion,
+        storeUrl: result.storeUrl,
+      );
+      _isUrovoDevice = isUrovo && shouldBlock;
       _isLoading = false;
+    });
+  }
+
+  Future<void> _bypassUpdate() async {
+    final localVersion = _result.localVersion;
+    if (localVersion == null) return;
+
+    await _service.saveBypassForVersion(localVersion);
+    if (!mounted) return;
+    setState(() {
+      _result = ForceUpdateCheckResult(
+        shouldBlock: false,
+        localVersion: _result.localVersion,
+        storeVersion: _result.storeVersion,
+        storeUrl: _result.storeUrl,
+      );
+      _isUrovoDevice = false;
     });
   }
 
@@ -100,6 +138,16 @@ class _ForceUpdateGateState extends State<ForceUpdateGate> {
                       child: const Text('Update now'),
                     ),
                   ),
+                  if (_isUrovoDevice) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        onPressed: _bypassUpdate,
+                        child: const Text('Continue without updating'),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

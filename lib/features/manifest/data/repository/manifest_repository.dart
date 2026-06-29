@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:courier_app/core/utils/api_json_decoder.dart';
 import 'package:courier_app/features/manifest/data/data_provider/manifest_data_provider.dart';
+import 'package:courier_app/features/manifest/data/manifest_awb_loader.dart';
 import 'package:courier_app/features/manifest/data/model/manifest_model.dart';
 
 class ManifestRepository {
@@ -28,6 +29,23 @@ class ManifestRepository {
     }
   }
 
+  Future<List<String>> resolveManifestAwbs(ManifestModel manifest) async {
+    if (manifest.awbList.isNotEmpty) {
+      return manifest.awbList;
+    }
+
+    final downloadUrl = manifest.downloadUrl;
+    if (downloadUrl == null || downloadUrl.isEmpty) {
+      return const [];
+    }
+
+    try {
+      return await ManifestAwbLoader.loadFromDownloadUrl(downloadUrl);
+    } catch (_) {
+      return const [];
+    }
+  }
+
   Future<String> createManifest({
     required List<String> awbs,
     required String fileType,
@@ -49,20 +67,24 @@ class ManifestRepository {
     }
   }
 
-  Future<String> addAwbsToManifest({
+  Future<String> updateManifest({
     required int manifestId,
     required List<String> awbs,
+    required String fileType,
+    required int userId,
   }) async {
     try {
-      final response = await manifestDataProvider.addAwbsToManifest(
+      final response = await manifestDataProvider.updateManifest(
         manifestId: manifestId,
         awbs: awbs,
+        fileType: fileType,
+        userId: userId,
       );
       final data = decodeApiMap(response);
       if (data['status'] != 200) {
-        throw data['message'] ?? 'Failed to add AWBs to manifest';
+        throw data['message'] ?? 'Failed to update manifest';
       }
-      return data['message']?.toString() ?? 'AWBs added to manifest successfully';
+      return data['message']?.toString() ?? 'Manifest updated successfully';
     } catch (e) {
       throw e.toString();
     }

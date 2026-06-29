@@ -549,6 +549,7 @@ class _ManageManifestAwbsSheet extends StatefulWidget {
 }
 
 class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
+  final AuthService _authService = AuthService();
   final TextEditingController _addController = TextEditingController();
   final FocusNode _awbFocusNode = FocusNode();
   final ScannerService _scannerService = ScannerService();
@@ -556,12 +557,32 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
   ScannerType? _scannerType;
   bool _isHardwareScanner = false;
   bool _handlingHidScan = false;
-  final List<String> _pendingAwbs = [];
+  final List<String> _incomingAwbs = [];
+  List<String> _loadedAwbs = [];
+  bool _loadingAwbs = true;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
+    _loadedAwbs = List<String>.from(widget.manifest.awbList);
+    _loadExistingAwbs();
     _initializeScanner();
+  }
+
+  Future<void> _loadExistingAwbs() async {
+    final awbs =
+        await context.read<ManifestBloc>().resolveManifestAwbs(widget.manifest);
+    if (!mounted) return;
+    setState(() {
+      _loadedAwbs = awbs;
+      _loadingAwbs = false;
+    });
+  }
+
+  List<String> _currentAwbs(ManifestModel manifest) {
+    if (_loadedAwbs.isNotEmpty) return _loadedAwbs;
+    return manifest.awbList;
   }
 
   @override
@@ -591,9 +612,10 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
         final stream = _scannerService.initializeScanner();
         _barcodeStreamSubscription = stream.listen(
           (barcode) {
-            if (barcode.isNotEmpty && mounted) {
-              _queueAwb(barcode);
-            }
+            if (barcode.isEmpty || !mounted) return;
+            final state = context.read<ManifestBloc>().state;
+            final currentAwbs = _currentAwbs(_manifestFromState(state));
+            _queueIncomingAwb(barcode, currentAwbs);
           },
           onError: (error) {
             print('Edit manifest scanner error: $error');
@@ -642,200 +664,445 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
     );
     _handlingHidScan = false;
 
-    if (cleaned.isNotEmpty) {
-      _queueAwb(cleaned);
+    if (cleaned.isNotEmpty && mounted) {
+      final currentAwbs = _currentAwbs(
+        _manifestFromState(context.read<ManifestBloc>().state),
+      );
+      _queueIncomingAwb(cleaned, currentAwbs);
     }
   }
 
-  void _queueAwb(String raw) {
+  ManifestModel _manifestFromState(ManifestState state) {
+    if (state is FetchManifestsSuccess) {
+      for (final manifest in state.manifests) {
+        if (manifest.id == widget.manifest.id) return manifest;
+      }
+    }
+    return widget.manifest;
+  }
+
+  bool _isDuplicateAwb(String awb, List<String> currentAwbs) {
+    return currentAwbs.contains(awb) || _incomingAwbs.contains(awb);
+  }
+
+  void _queueIncomingAwb(String raw, List<String> currentAwbs) {
     final awb = raw.replaceAll(' ', '').toUpperCase();
     if (awb.isEmpty) return;
 
-    if (widget.manifest.awbList.contains(awb) ||
-        _pendingAwbs.contains(awb)) {
-      displaySnack(context, 'AWB already on manifest', Colors.orange);
+    if (_isDuplicateAwb(awb, currentAwbs)) {
+      displaySnack(
+        context,
+        'AWB already on manifest or in incoming list',
+        Colors.orange,
+      );
       return;
     }
 
-    setState(() => _pendingAwbs.add(awb));
+    setState(() => _incomingAwbs.add(awb));
   }
 
-  void _removePendingAwb(String awb) {
-    setState(() => _pendingAwbs.remove(awb));
-  }
-
-  void _submitAwbs() {
-    final manualAwbs = _addController.text
+  void _addAwbsFromField(List<String> currentAwbs) {
+    final values = _addController.text
         .split(',')
         .map((s) => s.trim().toUpperCase())
-        .where((s) => s.isNotEmpty);
+        .where((s) => s.isNotEmpty)
+        .toList();
 
-    final awbs = {
-      ..._pendingAwbs,
-      ...manualAwbs,
-    }.toList();
+    if (values.isEmpty) {
+      displaySnack(context, 'Enter an AWB number', Colors.orange);
+      return;
+    }
 
-    if (awbs.isEmpty) return;
+    var added = 0;
+    for (final awb in values) {
+      if (!_isDuplicateAwb(awb, currentAwbs)) {
+        _incomingAwbs.add(awb);
+        added++;
+      }
+    }
 
+    setState(() {});
+    _addController.clear();
+
+    if (added == 0) {
+      displaySnack(
+        context,
+        'AWB already on manifest or in incoming list',
+        Colors.orange,
+      );
+    }
+  }
+
+  void _removeIncomingAwb(String awb) {
+    setState(() => _incomingAwbs.remove(awb));
+  }
+
+  Future<void> _editManifest(List<String> currentAwbs) async {
+    if (_incomingAwbs.isEmpty) {
+      displaySnack(
+        context,
+        'Add at least one new AWB before updating the manifest',
+        Colors.orange,
+      );
+      return;
+    }
+
+    final newAwbs = _incomingAwbs
+        .where((awb) => !currentAwbs.contains(awb))
+        .toList();
+
+    if (newAwbs.isEmpty) {
+      displaySnack(context, 'No new AWBs to add', Colors.orange);
+      return;
+    }
+
+    final userIdRaw = await _authService.getUserId();
+    final userId = int.tryParse(userIdRaw ?? '');
+    if (!mounted) return;
+    if (userId == null) {
+      displaySnack(context, 'User not found. Please log in again.', Colors.red);
+      return;
+    }
+
+    final fileType = widget.manifest.fileType.isNotEmpty
+        ? widget.manifest.fileType
+        : 'EXCEL';
+
+    setState(() => _isSubmitting = true);
     context.read<ManifestBloc>().add(
-          AddAwbsToManifest(
+          UpdateManifest(
             manifestId: widget.manifest.id,
-            awbs: awbs,
+            awbs: newAwbs,
+            fileType: fileType,
+            userId: userId,
             branchId: widget.branchId,
             date: widget.date,
           ),
         );
-
-    setState(() {
-      _pendingAwbs.clear();
-      _addController.clear();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.8,
-      ),
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-      ),
-      decoration: BoxDecoration(
-        color: palette.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Manifest #${widget.manifest.id} AWBs',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: palette.textPrimary,
+    return BlocListener<ManifestBloc, ManifestState>(
+      listenWhen: (previous, current) =>
+          current is ManifestAwbActionSuccess ||
+          current is ManifestAwbActionFailure,
+      listener: (context, state) {
+        if (state is ManifestAwbActionSuccess) {
+          setState(() {
+            _isSubmitting = false;
+            _loadedAwbs = [
+              ..._loadedAwbs,
+              ..._incomingAwbs.where((awb) => !_loadedAwbs.contains(awb)),
+            ];
+            _incomingAwbs.clear();
+            _addController.clear();
+          });
+        } else if (state is ManifestAwbActionFailure) {
+          setState(() => _isSubmitting = false);
+        }
+      },
+      child: BlocBuilder<ManifestBloc, ManifestState>(
+        builder: (context, state) {
+          final manifest = _manifestFromState(state);
+          final currentAwbs = _currentAwbs(manifest);
+
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
             ),
-          ),
-          if (_isHardwareScanner) ...[
-            const SizedBox(height: 8),
-            Row(
+            decoration: BoxDecoration(
+              color: palette.surface,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Icon(
-                  _scannerType == ScannerType.sunmi
-                      ? Icons.qr_code_scanner
-                      : Icons.scanner,
-                  size: 18,
-                  color: palette.textSecondary,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit_outlined,
+                          color: palette.accent, size: 22),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Edit Manifest',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: palette.textPrimary,
+                              ),
+                            ),
+                            Text(
+                              widget.manifest.manifestId.isNotEmpty
+                                  ? widget.manifest.manifestId
+                                  : '#${widget.manifest.id}',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: palette.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  'Scanner ready — scan to add AWBs',
-                  style: TextStyle(
-                    color: palette.textSecondary,
-                    fontSize: 13,
+                if (_isHardwareScanner)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _scannerType == ScannerType.sunmi
+                              ? Icons.qr_code_scanner
+                              : Icons.scanner,
+                          size: 18,
+                          color: palette.textSecondary,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'Scanner ready — scan to queue new AWBs',
+                            style: TextStyle(
+                              color: palette.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      12,
+                      20,
+                      20 + MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Current AWBs',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: palette.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        if (_loadingAwbs)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            child: Center(
+                              child: SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ),
+                          )
+                        else if (currentAwbs.isEmpty)
+                          Text(
+                            'No AWBs on this manifest yet',
+                            style: TextStyle(color: palette.textSecondary),
+                          )
+                        else
+                          ...currentAwbs.map(
+                            (awb) => ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(
+                                awb,
+                                style: TextStyle(color: palette.textPrimary),
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  setState(() => _loadedAwbs.remove(awb));
+                                  context.read<ManifestBloc>().add(
+                                        RemoveAwbFromManifest(
+                                          manifestId: manifest.id,
+                                          awb: awb,
+                                          branchId: widget.branchId,
+                                          date: widget.date,
+                                        ),
+                                      );
+                                },
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Text(
+                              'New incoming AWBs',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: palette.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: palette.accent.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${_incomingAwbs.length}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: palette.accent,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (_incomingAwbs.isEmpty)
+                          Text(
+                            'Scan or enter AWBs below, then tap Add AWB',
+                            style: TextStyle(
+                              color: palette.textSecondary,
+                              fontSize: 13,
+                            ),
+                          )
+                        else
+                          ..._incomingAwbs.map(
+                            (awb) => ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Icon(
+                                Icons.fiber_new_rounded,
+                                color: palette.accent,
+                                size: 20,
+                              ),
+                              title: Text(
+                                awb,
+                                style: TextStyle(
+                                  color: palette.textPrimary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.red,
+                                  size: 20,
+                                ),
+                                onPressed: () => _removeIncomingAwb(awb),
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Add AWB',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: palette.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _addController,
+                          focusNode: _awbFocusNode,
+                          textCapitalization: TextCapitalization.characters,
+                          style: TextStyle(color: palette.textPrimary),
+                          decoration: InputDecoration(
+                            hintText: _isHardwareScanner
+                                ? 'Scan or type AWB (comma-separated)'
+                                : 'Enter AWB (comma-separated)',
+                            hintStyle: TextStyle(color: palette.textSecondary),
+                            filled: true,
+                            fillColor: palette.surfaceMuted,
+                            suffixIcon: _isHardwareScanner
+                                ? Icon(
+                                    _scannerType == ScannerType.sunmi
+                                        ? Icons.qr_code_scanner
+                                        : Icons.scanner,
+                                    color: palette.textSecondary,
+                                  )
+                                : null,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          onSubmitted: (_) => _addAwbsFromField(currentAwbs),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _isSubmitting
+                                    ? null
+                                    : () => _addAwbsFromField(currentAwbs),
+                                icon: const Icon(Icons.add),
+                                label: const Text('Add AWB'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: palette.accent,
+                                  side: BorderSide(color: palette.accent),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: _isSubmitting
+                                    ? null
+                                    : () => _editManifest(currentAwbs),
+                                icon: _isSubmitting
+                                    ? const SizedBox(
+                                        height: 18,
+                                        width: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Icon(Icons.edit_outlined),
+                                label: const Text('Edit Manifest'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: palette.accent,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
-          ],
-          const SizedBox(height: 12),
-          if (widget.manifest.awbList.isEmpty)
-            Text(
-              'No AWBs on this manifest yet',
-              style: TextStyle(color: palette.textSecondary),
-            )
-          else
-            Flexible(
-              child: ListView(
-                shrinkWrap: true,
-                children: widget.manifest.awbList
-                    .map(
-                      (awb) => ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          awb,
-                          style: TextStyle(color: palette.textPrimary),
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            context.read<ManifestBloc>().add(
-                                  RemoveAwbFromManifest(
-                                    manifestId: widget.manifest.id,
-                                    awb: awb,
-                                    branchId: widget.branchId,
-                                    date: widget.date,
-                                  ),
-                                );
-                          },
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          if (_pendingAwbs.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _pendingAwbs
-                  .map(
-                    (awb) => Chip(
-                      label: Text(awb),
-                      deleteIcon: const Icon(Icons.close, size: 16),
-                      onDeleted: () => _removePendingAwb(awb),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ],
-          const SizedBox(height: 12),
-          TextField(
-            controller: _addController,
-            focusNode: _awbFocusNode,
-            textCapitalization: TextCapitalization.characters,
-            style: TextStyle(color: palette.textPrimary),
-            decoration: InputDecoration(
-              labelText: _isHardwareScanner
-                  ? 'Enter or scan AWBs (comma-separated)'
-                  : 'Add AWBs (comma-separated)',
-              filled: true,
-              fillColor: palette.surfaceMuted,
-              suffixIcon: _isHardwareScanner
-                  ? Icon(
-                      _scannerType == ScannerType.sunmi
-                          ? Icons.qr_code_scanner
-                          : Icons.scanner,
-                      color: palette.textSecondary,
-                    )
-                  : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            onSubmitted: _queueAwb,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _submitAwbs,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: palette.accent,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Add AWBs'),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

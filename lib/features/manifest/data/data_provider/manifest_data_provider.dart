@@ -42,15 +42,21 @@ class ManifestDataProvider {
     }
   }
 
-  Future<String> addAwbsToManifest({
+  Future<String> updateManifest({
     required int manifestId,
     required List<String> awbs,
+    required String fileType,
+    required int userId,
   }) async {
     try {
       final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
-      final response = await apiProvider.patchRequest(
-        '/api/v1/manifest/$manifestId/awb',
-        {'awbs': awbs},
+      final response = await apiProvider.putRequest(
+        '/api/v1/manifest-shipment/$manifestId',
+        {
+          'awbs': awbs,
+          'fileType': fileType,
+          'userId': userId,
+        },
       );
       return response.body;
     } catch (e) {
