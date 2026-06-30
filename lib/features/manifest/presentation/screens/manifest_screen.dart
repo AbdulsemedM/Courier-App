@@ -756,6 +756,11 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
       return;
     }
 
+    final allAwbs = <String>[
+      ...currentAwbs,
+      ...newAwbs.where((awb) => !currentAwbs.contains(awb)),
+    ];
+
     final userIdRaw = await _authService.getUserId();
     final userId = int.tryParse(userIdRaw ?? '');
     if (!mounted) return;
@@ -772,7 +777,7 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
     context.read<ManifestBloc>().add(
           UpdateManifest(
             manifestId: widget.manifest.id,
-            awbs: newAwbs,
+            awbs: allAwbs,
             fileType: fileType,
             userId: userId,
             branchId: widget.branchId,
