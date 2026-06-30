@@ -100,6 +100,34 @@ class BranchShipmentReportSummary {
       totalFee: totalFee,
     );
   }
+
+  factory BranchShipmentReportSummary.fromShipmentsByPaymentMode(
+    List<BranchShipmentModel> shipments,
+  ) {
+    var cash = 0;
+    var cod = 0;
+    var totalFee = 0.0;
+
+    for (final shipment in shipments) {
+      final mode = shipment.paymentModeCode;
+      switch (mode) {
+        case 'CASH':
+          cash++;
+        case 'COD':
+          cod++;
+      }
+      totalFee += shipment.feeAmount;
+    }
+
+    return BranchShipmentReportSummary(
+      totalShipments: shipments.length,
+      cash: cash,
+      cod: cod,
+      ebirr: 0,
+      sahay: 0,
+      totalFee: totalFee,
+    );
+  }
 }
 
 class BranchShipmentReportResult {

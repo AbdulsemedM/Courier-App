@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/core/utils/role_display_helper.dart';
 import 'package:courier_app/features/branch_report/presentation/screens/branch_report_screen.dart';
 import 'package:courier_app/features/branch_report/bloc/branch_report_bloc.dart';
 import 'package:courier_app/features/branch_report/data/repository/branch_report_repository.dart';
 import 'package:courier_app/features/branch_report/data/data_provider/branch_report_data_provider.dart';
+import 'package:courier_app/features/branch_report_net/presentation/screens/branch_report_net_screen.dart';
+import 'package:courier_app/features/branch_report_net/bloc/branch_report_net_bloc.dart';
+import 'package:courier_app/features/branch_report_net/data/repository/branch_report_net_repository.dart';
+import 'package:courier_app/features/branch_report_net/data/data_provider/branch_report_net_data_provider.dart';
 import 'package:courier_app/features/admin_report/presentation/screens/admin_report_screen.dart';
 import 'package:courier_app/features/admin_report/bloc/admin_report_bloc.dart';
 import 'package:courier_app/features/admin_report/data/repository/admin_report_repository.dart';
@@ -29,6 +34,25 @@ class ReportsScreen extends StatefulWidget {
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
+  bool _hasBranchReportNetAccess = false;
+  bool _roleLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRole();
+  }
+
+  Future<void> _loadRole() async {
+    final roleInfo = await RoleDisplayHelper.loadRoleDisplayInfo();
+    if (!mounted) return;
+    setState(() {
+      _hasBranchReportNetAccess =
+          RoleDisplayHelper.hasBranchReportNetAccess(roleInfo.primaryRole);
+      _roleLoaded = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.isDarkMode;
@@ -136,6 +160,41 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 crossAxisSpacing: 16,
                 childAspectRatio: 1.1,
                 children: [
+                  if (_roleLoaded && _hasBranchReportNetAccess)
+                    _buildReportCard(
+                      icon: Icons.summarize_outlined,
+                      title: 'Branch Report Net',
+                      description: 'Branch net fee shipments',
+                      isDarkMode: isDarkMode,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MultiBlocProvider(
+                              providers: [
+                                BlocProvider(
+                                  create: (context) => BranchReportNetBloc(
+                                    repository: BranchReportNetRepository(
+                                      dataProvider:
+                                          BranchReportNetDataProvider(),
+                                    ),
+                                  ),
+                                ),
+                                BlocProvider(
+                                  create: (context) => BranchesBloc(
+                                    BranchesRepository(
+                                      branchesDataProvider:
+                                          BranchesDataProvider(),
+                                    ),
+                                  )..add(FetchBranches()),
+                                ),
+                              ],
+                              child: const BranchReportNetScreen(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   _buildReportCard(
                     icon: Icons.business,
                     title: 'Branch Report',

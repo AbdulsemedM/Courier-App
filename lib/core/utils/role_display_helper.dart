@@ -35,6 +35,12 @@ class RoleDisplayHelper {
     return role == 'admin' || role == 'teller' || role == 'branch manager';
   }
 
+  static bool hasBranchReportNetAccess(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return false;
+    final role = normalizeRole(raw);
+    return role == 'admin' || role == 'branch manager';
+  }
+
   static String resolvePrimaryRole(List<String> roles) {
     if (roles.isEmpty) return 'user';
 

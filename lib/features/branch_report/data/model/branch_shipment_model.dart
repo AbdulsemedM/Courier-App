@@ -305,6 +305,9 @@ class BranchShipmentModel {
     return method.toUpperCase();
   }
 
+  String get paymentModeCode =>
+      (paymentMode?.code ?? paymentMode?.description ?? '').toUpperCase();
+
   String get statusCode =>
       reportStatus ?? shipmentStatus?.code ?? 'N/A';
 

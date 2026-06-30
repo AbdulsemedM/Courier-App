@@ -1088,7 +1088,7 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
                                         ),
                                       )
                                     : const Icon(Icons.edit_outlined),
-                                label: const Text('Edit Manifest'),
+                                label: const Text('Update Manifest'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: palette.accent,
                                   foregroundColor: Colors.white,
