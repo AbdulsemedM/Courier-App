@@ -86,6 +86,7 @@ class ManifestBloc extends Bloc<ManifestEvent, ManifestState> {
         awbs: event.awbs,
         fileType: event.fileType,
         userId: event.userId,
+        masterAwbAirline: event.masterAwbAirline,
       );
       emit(CreateManifestSuccess(message: message));
 

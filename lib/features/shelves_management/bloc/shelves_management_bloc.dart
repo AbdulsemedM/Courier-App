@@ -13,7 +13,8 @@ class ShelvesManagementBloc
   ShelvesManagementBloc({required this.shelvesRepository})
       : super(ShelvesManagementInitial()) {
     on<FetchShelvesEvent>(_onFetchShelvesEvent);
-    //on<AddShelvesEvent>(_onAddShelvesEvent);
+    on<TransferShelfEvent>(_onTransferShelfEvent);
+    on<RestoreShelvesStateEvent>(_onRestoreShelvesStateEvent);
   }
 
   // void _onAddShelvesEvent(AddShelvesEvent event, Emitter<ShelvesManagementState> emit) async {
@@ -35,5 +36,30 @@ class ShelvesManagementBloc
     } catch (e) {
       emit(FetchShelvesFailure(message: e.toString()));
     }
+  }
+
+  Future<void> _onTransferShelfEvent(
+    TransferShelfEvent event,
+    Emitter<ShelvesManagementState> emit,
+  ) async {
+    final previous = state;
+    emit(TransferShelfLoading(previous: previous));
+    try {
+      final message = await shelvesRepository.transferShelf(
+        awbNumber: event.awbNumber,
+        toShelfId: event.toShelfId,
+        reason: event.reason,
+      );
+      emit(TransferShelfSuccess(message: message, previous: previous));
+    } catch (e) {
+      emit(TransferShelfFailure(message: e.toString(), previous: previous));
+    }
+  }
+
+  void _onRestoreShelvesStateEvent(
+    RestoreShelvesStateEvent event,
+    Emitter<ShelvesManagementState> emit,
+  ) {
+    emit(event.state);
   }
 }

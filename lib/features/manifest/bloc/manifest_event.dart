@@ -21,15 +21,17 @@ class CreateManifest extends ManifestEvent {
   final List<String> awbs;
   final String fileType;
   final int userId;
+  final String? masterAwbAirline;
 
   const CreateManifest({
     required this.awbs,
     required this.fileType,
     required this.userId,
+    this.masterAwbAirline,
   });
 
   @override
-  List<Object> get props => [awbs, fileType, userId];
+  List<Object> get props => [awbs, fileType, userId, masterAwbAirline ?? ''];
 }
 
 class UpdateManifest extends ManifestEvent {

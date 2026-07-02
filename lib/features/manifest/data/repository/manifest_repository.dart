@@ -50,12 +50,14 @@ class ManifestRepository {
     required List<String> awbs,
     required String fileType,
     required int userId,
+    String? masterAwbAirline,
   }) async {
     try {
       final response = await manifestDataProvider.createManifest(
         awbs: awbs,
         fileType: fileType,
         userId: userId,
+        masterAwbAirline: masterAwbAirline,
       );
       final data = jsonDecode(response) as Map<String, dynamic>;
       if (data['status'] != 200) {

@@ -10,6 +10,7 @@ import 'package:courier_app/features/manifest/presentation/screens/manifest_scre
 import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
 // import 'package:courier_app/features/roles/presentation/screen/roles_screen.dart';
 import 'package:courier_app/features/shelves_management/presentation/screen/shelves_screen.dart';
+import 'package:courier_app/features/shelves_management/presentation/screen/shelf_transfer_screen.dart';
 import 'package:courier_app/features/shelves_management/bloc/shelves_management_bloc.dart';
 import 'package:courier_app/features/shelves_management/data/repository/shelves_repository.dart';
 import 'package:courier_app/features/shelves_management/data/data_provider/shelves_data_provider.dart';
@@ -99,6 +100,20 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
                 ),
               ],
               child: const ShelvesScreen(),
+            ),
+          ),
+        );
+      } else if (screen is ShelfTransferScreen) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (context) => ShelvesManagementBloc(
+                shelvesRepository: ShelvesRepository(
+                  shelvesDataProvider: ShelvesDataProvider(),
+                ),
+              ),
+              child: const ShelfTransferScreen(),
             ),
           ),
         );
@@ -217,6 +232,9 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
             permission = 'manage_extra_fee';
             errorMessage = 'You do not have permission to manage extra fees';
           } else if (screen is ShelvesScreen) {
+            permission = 'Shelves_management';
+            errorMessage = 'You do not have permission to manage shelves';
+          } else if (screen is ShelfTransferScreen) {
             permission = 'Shelves_management';
             errorMessage = 'You do not have permission to manage shelves';
           } else if (screen is ManifestScreen) {

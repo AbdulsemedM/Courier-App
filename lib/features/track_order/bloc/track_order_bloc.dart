@@ -45,7 +45,10 @@ class TrackOrderBloc extends Bloc<TrackOrderEvent, TrackOrderState> {
     emit(ChangeStatusLoading());
     try {
       final message = await trackOrderRepository.changeStatus(
-          event.shipmentIds, event.status);
+        event.shipmentIds,
+        event.status,
+        shelfId: event.shelfId,
+      );
       emit(ChangeStatusSuccess(message: message));
     } catch (e) {
       emit(ChangeStatusFailure(errorMessage: e.toString()));

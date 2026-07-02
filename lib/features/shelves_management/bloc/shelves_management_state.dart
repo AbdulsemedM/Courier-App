@@ -22,3 +22,38 @@ final class FetchShelvesFailure extends ShelvesManagementState {
 
   FetchShelvesFailure({required this.message});
 }
+
+final class TransferShelfLoading extends ShelvesManagementState {
+  final ShelvesManagementState previous;
+
+  const TransferShelfLoading({required this.previous});
+
+  @override
+  List<Object> get props => [previous];
+}
+
+final class TransferShelfSuccess extends ShelvesManagementState {
+  final String message;
+  final ShelvesManagementState previous;
+
+  const TransferShelfSuccess({
+    required this.message,
+    required this.previous,
+  });
+
+  @override
+  List<Object> get props => [message, previous];
+}
+
+final class TransferShelfFailure extends ShelvesManagementState {
+  final String message;
+  final ShelvesManagementState previous;
+
+  const TransferShelfFailure({
+    required this.message,
+    required this.previous,
+  });
+
+  @override
+  List<Object> get props => [message, previous];
+}

@@ -8,6 +8,10 @@ final class BarcodeReaderInitialEvent extends BarcodeReaderEvent {}
 final class BarcodeReaderChangeStatusEvent extends BarcodeReaderEvent {
   final List<String> shipmentIds;
   final String status;
-  BarcodeReaderChangeStatusEvent(
-      {required this.shipmentIds, required this.status});
+  final int? shelfId;
+  BarcodeReaderChangeStatusEvent({
+    required this.shipmentIds,
+    required this.status,
+    this.shelfId,
+  });
 }

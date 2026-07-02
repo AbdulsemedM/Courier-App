@@ -4,6 +4,7 @@ import 'package:courier_app/features/shelves_management/bloc/shelves_management_
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
 import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:courier_app/features/shelves_management/presentation/widgets/shelves_widgets.dart';
+import 'package:courier_app/features/shelves_management/presentation/screen/shelf_transfer_screen.dart';
 
 class ShelvesScreen extends StatefulWidget {
   const ShelvesScreen({Key? key}) : super(key: key);
@@ -34,6 +35,20 @@ class _ShelvesScreenState extends State<ShelvesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shelves Management'),
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ShelfTransferScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.swap_horiz),
+            label: const Text('Transfer'),
+          ),
+        ],
       ),
       body: Column(
         children: [

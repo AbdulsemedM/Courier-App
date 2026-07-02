@@ -10,8 +10,13 @@ class FetchStatuses extends TrackOrderEvent {}
 class ChangeStatus extends TrackOrderEvent {
   final List<String> shipmentIds;
   final String status;
+  final int? shelfId;
 
-  ChangeStatus({required this.shipmentIds, required this.status});
+  ChangeStatus({
+    required this.shipmentIds,
+    required this.status,
+    this.shelfId,
+  });
 }
 
 class ClearShipments extends TrackOrderEvent {}

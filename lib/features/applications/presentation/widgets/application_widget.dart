@@ -5,6 +5,7 @@ import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
 // import 'package:courier_app/features/roles/presentation/screen/roles_screen.dart';
 import 'package:courier_app/features/shelves_management/presentation/screen/shelves_screen.dart';
+import 'package:courier_app/features/shelves_management/presentation/screen/shelf_transfer_screen.dart';
 import 'package:courier_app/features/shipment/presentation/screens/shipments_screen.dart';
 import 'package:courier_app/features/shipment_invoice/presentation/screens/shipment_invoice_screen.dart';
 import 'package:courier_app/features/home_delivery/presentation/screens/home_deliveries_screen.dart';
@@ -482,6 +483,15 @@ final List<MenuOption> defaultMenuOptions = [
     gradientStart: const Color(0xFFF0F9FF),
     gradientEnd: const Color(0xFFE0F2FE),
     screen: const ShelvesScreen(),
+  ),
+  MenuOption(
+    title: 'Shelf Transfer',
+    subtitle: 'Move parcel to another shelf',
+    icon: Icons.swap_horiz_rounded,
+    color: const Color(0xFF0E7490),
+    gradientStart: const Color(0xFFECFEFF),
+    gradientEnd: const Color(0xFFCFFAFE),
+    screen: const ShelfTransferScreen(),
   ),
   // Miles Configuration, Roles, Other Settings — hidden per product request
 ];

@@ -25,6 +25,7 @@ class ManifestDataProvider {
     required List<String> awbs,
     required String fileType,
     required int userId,
+    String? masterAwbAirline,
   }) async {
     try {
       final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
@@ -34,6 +35,8 @@ class ManifestDataProvider {
           'awbs': awbs,
           'fileType': fileType,
           'userId': userId,
+          if (masterAwbAirline != null && masterAwbAirline.isNotEmpty)
+            'masterAwbAirline': masterAwbAirline,
         },
       );
       return response.body;

@@ -2,9 +2,17 @@ import 'package:courier_app/configuration/api_constants.dart';
 import 'package:courier_app/providers/provider_setup.dart';
 
 class BarcodeDataProvider {
-  Future<String> changeStatus(List<String> shipmentIds, String status) async {
+  Future<String> changeStatus(
+    List<String> shipmentIds,
+    String status, {
+    int? shelfId,
+  }) async {
     try {
-      final body = {"awbList": shipmentIds, "toStatus": status};
+      final body = {
+        "awbList": shipmentIds,
+        "toStatus": status,
+        if (shelfId != null) "shelfId": shelfId,
+      };
       final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
       final response =
           await apiProvider.putRequest("/api/v1/shipment-status-change", body);

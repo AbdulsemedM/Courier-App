@@ -74,10 +74,17 @@ class TrackOrderRepository {
     }
   }
 
-  Future<String> changeStatus(List<String> shipmentIds, String status) async {
+  Future<String> changeStatus(
+    List<String> shipmentIds,
+    String status, {
+    int? shelfId,
+  }) async {
     try {
-      final response =
-          await trackOrderDataProvider.changeStatus(shipmentIds, status);
+      final response = await trackOrderDataProvider.changeStatus(
+        shipmentIds,
+        status,
+        shelfId: shelfId,
+      );
       final data = jsonDecode(response);
       if (data['status'] != 200) {
         throw data['message'];

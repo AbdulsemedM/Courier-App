@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:courier_app/core/utils/shipment_status_helper.dart';
 import 'package:courier_app/features/barcode_reader/bloc/barcode_reader_bloc.dart';
+import 'package:courier_app/features/shelves_management/presentation/widgets/shelf_picker.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:courier_app/features/track_order/presentation/screens/track_order_screen.dart';
@@ -35,6 +37,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   DateTime? _lastScannerInput; // Track timing of scanner input
   List<StatusModel> statuses = [];
   String? selectedStatus;
+  int? selectedShelfId;
   StreamSubscription<String>? _barcodeStreamSubscription;
   final ScannerService _scannerService = ScannerService();
   ScannerType? _scannerType;
@@ -428,6 +431,38 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //   );
   // }
 
+  void _submitStatusChange(List<String> shipmentIds) {
+    if (selectedStatus == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a status first'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final isArr =
+        selectedStatus!.toUpperCase() == ShipmentStatusHelper.arrivedStatusCode;
+    if (isArr && selectedShelfId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a shelf'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    context.read<BarcodeReaderBloc>().add(
+          BarcodeReaderChangeStatusEvent(
+            shipmentIds: shipmentIds,
+            status: selectedStatus!,
+            shelfId: isArr ? selectedShelfId : null,
+          ),
+        );
+  }
+
   Widget _buildScannedList(bool isDarkMode) {
     if (_scannedBarcodesList.isEmpty) return const SizedBox.shrink();
 
@@ -465,23 +500,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                 children: [
                   if (_scannedBarcodesList.isNotEmpty)
                     ElevatedButton.icon(
-                      onPressed: () {
-                        if (selectedStatus == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please select a status first'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
-                        context.read<BarcodeReaderBloc>().add(
-                              BarcodeReaderChangeStatusEvent(
-                                shipmentIds: _scannedBarcodesList,
-                                status: selectedStatus!,
-                              ),
-                            );
-                      },
+                      onPressed: () => _submitStatusChange(_scannedBarcodesList),
                       icon: const Icon(Icons.update, size: 18),
                       label: const Text('Update'),
                       style: ElevatedButton.styleFrom(
@@ -627,13 +646,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       return;
     }
 
-    // Now we can be sure value is a List<String>
-    context.read<BarcodeReaderBloc>().add(
-          BarcodeReaderChangeStatusEvent(
-            shipmentIds: value,
-            status: selectedStatus!,
-          ),
-        );
+    _submitStatusChange(value);
   }
 
   void _toggleScanMode() {
@@ -688,6 +701,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
               _trackingController.clear();
               setState(() {
                 selectedStatus = null;
+                selectedShelfId = null;
                 // Clear all scanned barcodes from UI
                 _scannedBarcodes.clear();
                 _scannedBarcodesList.clear();
@@ -764,9 +778,24 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                 onChanged: (value) {
                   setState(() {
                     selectedStatus = value;
+                    if (value?.toUpperCase() !=
+                        ShipmentStatusHelper.arrivedStatusCode) {
+                      selectedShelfId = null;
+                    }
                   });
                 },
               ),
+              if (selectedStatus?.toUpperCase() ==
+                  ShipmentStatusHelper.arrivedStatusCode)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: ShelfPicker(
+                    selectedShelfId: selectedShelfId,
+                    onChanged: (shelfId) {
+                      setState(() => selectedShelfId = shelfId);
+                    },
+                  ),
+                ),
               if (_error != null)
                 BarcodeReaderWidgets.buildErrorMessage(_error!, isDarkMode),
               // Always show the scanned list if there are barcodes

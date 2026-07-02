@@ -11,4 +11,33 @@ class ShelvesDataProvider {
       throw e.toString();
     }
   }
+
+  Future<String> fetchShelvesByBranch(int branchId) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response =
+          await apiProvider.getRequest("/api/v1/shelves/branch/$branchId");
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<String> transferShelf({
+    required String awbNumber,
+    required int toShelfId,
+    required String reason,
+  }) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider.postRequest('/api/v1/shelf/transfer', {
+        'awbNumber': awbNumber,
+        'toShelfId': toShelfId,
+        'reason': reason,
+      });
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }

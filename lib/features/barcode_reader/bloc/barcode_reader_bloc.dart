@@ -11,7 +11,10 @@ class BarcodeReaderBloc extends Bloc<BarcodeReaderEvent, BarcodeReaderState> {
       emit(BarcodeReaderLoading());
       try {
         final result = await barcodeRepository.changeStatus(
-            event.shipmentIds, event.status);
+          event.shipmentIds,
+          event.status,
+          shelfId: event.shelfId,
+        );
         emit(BarcodeReaderSuccess(result));
       } catch (e) {
         emit(BarcodeReaderError(e.toString()));

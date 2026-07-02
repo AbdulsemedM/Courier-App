@@ -1,3 +1,5 @@
+import 'package:courier_app/core/utils/shipment_status_helper.dart';
+import 'package:courier_app/features/shelves_management/presentation/widgets/shelf_picker.dart';
 import 'package:courier_app/features/track_order/bloc/track_order_bloc.dart';
 import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:flutter/material.dart';
@@ -56,99 +58,147 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
   }
 
   Future<void> _showStatusChangeDialog() async {
-    final isDarkMode = context.isDarkMode;
+    String? dialogStatus;
+    int? dialogShelfId;
 
-    final String? newStatus = await showDialog<String>(
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: context.palette.surface,
-        title: Text(
-          'Change Status',
-          style: TextStyle(
-            color: context.palette.textPrimary,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '${selectedShipments.length} shipments selected',
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final isArr = dialogStatus?.toUpperCase() ==
+              ShipmentStatusHelper.arrivedStatusCode;
+
+          return AlertDialog(
+            backgroundColor: context.palette.surface,
+            title: Text(
+              'Change Status',
               style: TextStyle(
-                color: context.palette.textSecondary,
+                color: context.palette.textPrimary,
               ),
             ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: context.palette.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: context.palette.border,
-                ),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  hint: Text(
-                    'Select new status',
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    '${selectedShipments.length} shipments selected',
                     style: TextStyle(
                       color: context.palette.textSecondary,
                     ),
                   ),
-                  dropdownColor: context.palette.surface,
-                  items: statuses
-                      .map((status) => DropdownMenuItem<String>(
-                            value: status.code,
-                            child: Text(
-                              '${status.code} - ${status.description}',
-                              style: TextStyle(
-                                color:
-                                    context.palette.textPrimary,
-                              ),
-                            ),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    Navigator.pop(context);
-                    context.read<TrackOrderBloc>().add(ChangeStatus(
-                          shipmentIds: selectedShipments
-                              .map((s) => s.awb.toString())
-                              .toList(),
-                          status: value!,
-                        ));
-                    setState(() {
-                      selectedShipments.clear();
-                      isSelectionMode = false;
-                    });
-                  },
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: context.palette.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: context.palette.border,
+                      ),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: dialogStatus,
+                        isExpanded: true,
+                        hint: Text(
+                          'Select new status',
+                          style: TextStyle(
+                            color: context.palette.textSecondary,
+                          ),
+                        ),
+                        dropdownColor: context.palette.surface,
+                        items: statuses
+                            .map((status) => DropdownMenuItem<String>(
+                                  value: status.code,
+                                  child: Text(
+                                    '${status.code} - ${status.description}',
+                                    style: TextStyle(
+                                      color: context.palette.textPrimary,
+                                    ),
+                                  ),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setDialogState(() {
+                            dialogStatus = value;
+                            if (value?.toUpperCase() !=
+                                ShipmentStatusHelper.arrivedStatusCode) {
+                              dialogShelfId = null;
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  if (isArr) ...[
+                    const SizedBox(height: 16),
+                    ShelfPicker(
+                      selectedShelfId: dialogShelfId,
+                      onChanged: (shelfId) {
+                        setDialogState(() => dialogShelfId = shelfId);
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: context.palette.textSecondary,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                color: context.palette.textSecondary,
+              TextButton(
+                onPressed: () {
+                  if (dialogStatus == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please select a status'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+                  if (isArr && dialogShelfId == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please select a shelf'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+                  Navigator.pop(context, true);
+                },
+                child: Text(
+                  'Confirm',
+                  style: TextStyle(
+                    color: context.palette.accent,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
 
-    if (newStatus != null) {
-      // Update status for selected shipments
-      // context.read<TrackOrderBloc>().add(
-      //       UpdateShipmentStatus(
-      //         shipmentIds: selectedShipments.map((s) => s.id).toList(),
-      //         newStatus: newStatus,
-      //       ),
-      //     );
+    if (confirmed == true && dialogStatus != null && mounted) {
+      context.read<TrackOrderBloc>().add(ChangeStatus(
+            shipmentIds:
+                selectedShipments.map((s) => s.awb.toString()).toList(),
+            status: dialogStatus!,
+            shelfId: dialogStatus!.toUpperCase() ==
+                    ShipmentStatusHelper.arrivedStatusCode
+                ? dialogShelfId
+                : null,
+          ));
       setState(() {
         selectedShipments.clear();
         isSelectionMode = false;

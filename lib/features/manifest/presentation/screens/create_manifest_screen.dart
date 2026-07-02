@@ -27,6 +27,8 @@ class CreateManifestScreen extends StatefulWidget {
 class _CreateManifestScreenState extends State<CreateManifestScreen> {
   final AuthService _authService = AuthService();
   final TextEditingController _awbController = TextEditingController();
+  final TextEditingController _masterAwbAirlineController =
+      TextEditingController();
   final FocusNode _awbFocusNode = FocusNode();
   final ScannerService _scannerService = ScannerService();
   StreamSubscription<String>? _barcodeStreamSubscription;
@@ -67,6 +69,7 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
   void dispose() {
     _awbController.removeListener(_onAwbControllerChanged);
     _awbController.dispose();
+    _masterAwbAirlineController.dispose();
     _awbFocusNode.dispose();
     _barcodeStreamSubscription?.cancel();
     _scannerService.release();
@@ -170,6 +173,8 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
       return;
     }
 
+    final masterAwbAirline = _masterAwbAirlineController.text.trim();
+
     final userIdRaw = await _authService.getUserId();
     final userId = int.tryParse(userIdRaw ?? '');
     if (!mounted) return;
@@ -182,6 +187,8 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
             awbs: List<String>.from(_awbs),
             fileType: _fileType,
             userId: userId,
+            masterAwbAirline:
+                masterAwbAirline.isEmpty ? null : masterAwbAirline,
           ),
         );
   }
@@ -314,6 +321,22 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
                       ),
                     ],
                     const SizedBox(height: 24),
+                    TextField(
+                      controller: _masterAwbAirlineController,
+                      textCapitalization: TextCapitalization.characters,
+                      style: TextStyle(color: palette.textPrimary),
+                      decoration: InputDecoration(
+                        labelText: 'Master Airline AWB (optional)',
+                        hintText: 'ET-12349567890',
+                        hintStyle: TextStyle(color: palette.textSecondary),
+                        filled: true,
+                        fillColor: palette.surface,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       value: _fileType,
                       decoration: InputDecoration(
