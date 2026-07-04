@@ -66,6 +66,7 @@ class TrackShipmentModel {
   final String? statusDescription;
   final String? addedByFirstName;
   final String? addedByLastName;
+  final int? addedByBranchId;
   TrackShipmentModel({
     required this.awb,
     required this.senderName,
@@ -98,6 +99,7 @@ class TrackShipmentModel {
     this.statusDescription,
     this.addedByFirstName,
     this.addedByLastName,
+    this.addedByBranchId,
   });
 
   TrackShipmentModel copyWith({
@@ -132,6 +134,7 @@ class TrackShipmentModel {
     String? statusDescription,
     String? addedByFirstName,
     String? addedByLastName,
+    int? addedByBranchId,
   }) {
     return TrackShipmentModel(
       awb: awb ?? this.awb,
@@ -166,6 +169,7 @@ class TrackShipmentModel {
       statusDescription: statusDescription ?? this.statusDescription,
       addedByFirstName: addedByFirstName ?? this.addedByFirstName,
       addedByLastName: addedByLastName ?? this.addedByLastName,
+      addedByBranchId: addedByBranchId ?? this.addedByBranchId,
     );
   }
 
@@ -202,6 +206,7 @@ class TrackShipmentModel {
       'statusDescription': statusDescription,
       'addedByFirstName': addedByFirstName,
       'addedByLastName': addedByLastName,
+      'addedByBranchId': addedByBranchId,
     };
   }
 
@@ -294,13 +299,31 @@ class TrackShipmentModel {
       statusDescription = shipmentStatus['description'] as String?;
     }
 
-    // Extract addedBy information
-    final addedBy = shipment['addedBy'];
+    // Prefer history-item addedBy (who changed status), then shipment creator
+    final addedBy = map['addedBy'] is Map<String, dynamic>
+        ? map['addedBy'] as Map<String, dynamic>
+        : (shipment['addedBy'] is Map<String, dynamic>
+            ? shipment['addedBy'] as Map<String, dynamic>
+            : null);
     String? addedByFirstName;
     String? addedByLastName;
-    if (addedBy is Map<String, dynamic>) {
+    int? addedByBranchId;
+    if (addedBy != null) {
       addedByFirstName = addedBy['firstName'] as String?;
       addedByLastName = addedBy['lastName'] as String?;
+      final branch = addedBy['branch'];
+      if (branch is int) {
+        addedByBranchId = branch;
+      } else if (branch is num) {
+        addedByBranchId = branch.toInt();
+      } else if (branch is Map<String, dynamic>) {
+        final id = branch['id'];
+        if (id is int) {
+          addedByBranchId = id;
+        } else if (id is num) {
+          addedByBranchId = id.toInt();
+        }
+      }
     }
 
     // Extract description - prefer status description, then shipment status description
@@ -358,6 +381,7 @@ class TrackShipmentModel {
       statusDescription: statusDescription,
       addedByFirstName: addedByFirstName,
       addedByLastName: addedByLastName,
+      addedByBranchId: addedByBranchId,
     );
   }
 
@@ -405,7 +429,8 @@ class TrackShipmentModel {
         other.statusCode == statusCode &&
         other.statusDescription == statusDescription &&
         other.addedByFirstName == addedByFirstName &&
-        other.addedByLastName == addedByLastName;
+        other.addedByLastName == addedByLastName &&
+        other.addedByBranchId == addedByBranchId;
   }
 
   @override
@@ -440,6 +465,7 @@ class TrackShipmentModel {
         statusCode.hashCode ^
         statusDescription.hashCode ^
         addedByFirstName.hashCode ^
-        addedByLastName.hashCode;
+        addedByLastName.hashCode ^
+        addedByBranchId.hashCode;
   }
 }

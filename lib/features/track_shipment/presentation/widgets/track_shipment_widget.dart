@@ -153,7 +153,7 @@ class TrackShipmentWidgets {
             if (mainShipment.barcodeUrl != null)
               _buildBarcodeCard(isDarkMode, mainShipment),
             if (mainShipment.barcodeUrl != null) const SizedBox(height: 16),
-            _buildTimelineCard(isDarkMode, shipments),
+            _buildTimelineCard(isDarkMode, shipments, branches),
           ],
         ),
       ),
@@ -734,7 +734,10 @@ class TrackShipmentWidgets {
   }
 
   static Widget _buildTimelineCard(
-      bool isDarkMode, List<TrackShipmentModel> shipments) {
+    bool isDarkMode,
+    List<TrackShipmentModel> shipments,
+    List<BranchesModel>? branches,
+  ) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
@@ -780,6 +783,10 @@ class TrackShipmentWidgets {
                       ? '${shipment.addedByFirstName} ${shipment.addedByLastName ?? ''}'
                           .trim()
                       : shipment.updatedBy,
+                  branchName: _getBranchName(
+                    shipment.addedByBranchId,
+                    branches,
+                  ),
                   isLast: index == shipments.length - 1,
                   statusCode: shipment.statusCode,
                 );
@@ -905,6 +912,7 @@ class TrackShipmentWidgets {
     required String description,
     required String time,
     required String user,
+    String? branchName,
     required bool isLast,
     String? statusCode,
   }) {
@@ -1002,6 +1010,21 @@ class TrackShipmentWidgets {
                         ),
                         Text(
                           'user: $user',
+                          style: TextStyle(
+                            color: Colors.grey[600]!,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                      if (branchName != null && branchName.isNotEmpty) ...[
+                        Icon(
+                          Icons.store,
+                          size: 14,
+                          color: Colors.grey[600]!,
+                        ),
+                        Text(
+                          'branch: $branchName',
                           style: TextStyle(
                             color: Colors.grey[600]!,
                             fontSize: 12,
