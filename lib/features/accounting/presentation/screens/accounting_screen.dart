@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:courier_app/configuration/phone_number_manager.dart';
+import 'package:courier_app/core/utils/app_permissions.dart';
 import 'accounting_create_screen.dart';
 import '../../../accounts/presentation/screens/accounts_screen.dart';
 import '../../../balance_sheet/presentation/screens/balance_sheet_screen.dart';
@@ -41,77 +43,120 @@ class AccountingScreen extends StatefulWidget {
 }
 
 class _AccountingScreenState extends State<AccountingScreen> {
-  final List<Map<String, dynamic>> _accountingFeatures = [
+  List<String> _permissions = [];
+  bool _loaded = false;
+
+  static const List<Map<String, dynamic>> _allFeatures = [
     {
       'title': 'Create',
       'icon': Icons.add_circle_outline,
       'color': Colors.blue,
+      'permission': AppPermissions.manageAccounting,
     },
     {
       'title': 'Accounts',
       'icon': Icons.account_balance_wallet,
       'color': Colors.green,
+      'permission': AppPermissions.accountsList,
     },
     {
       'title': 'Balance Sheet',
       'icon': Icons.description,
       'color': Colors.purple,
+      'permission': AppPermissions.balanceSheet,
     },
     {
       'title': 'Income Statement',
       'icon': Icons.assessment,
       'color': Colors.orange,
+      'permission': AppPermissions.incomeStatement,
     },
     {
       'title': 'Pending Closeout',
       'icon': Icons.pending_actions,
       'color': Colors.amber,
+      'permission': AppPermissions.pendingCloseout,
     },
     {
       'title': 'Teller Account',
       'icon': Icons.account_circle,
       'color': Colors.teal,
+      'anyOf': AppPermissions.tellerAccountAny,
     },
     {
       'title': 'Teller By Branch',
       'icon': Icons.business,
       'color': Colors.indigo,
+      'permission': AppPermissions.tellerByBranch,
     },
     {
       'title': 'Teller By Branch Admin',
       'icon': Icons.admin_panel_settings,
       'color': Colors.deepPurple,
+      'permission': AppPermissions.tellerByBranchAdmin,
     },
     {
       'title': 'Teller Liability',
       'icon': Icons.account_balance,
       'color': Colors.red,
+      'permission': AppPermissions.tellerLiabilityHq,
     },
     {
       'title': 'Teller Liability Branch',
       'icon': Icons.business_center,
       'color': Colors.pink,
+      'permission': AppPermissions.tellerLiabilityBranch,
     },
     {
       'title': 'Transaction HQto Branch',
       'icon': Icons.swap_horiz,
       'color': Colors.cyan,
+      'permission': AppPermissions.transactionHqBranch,
     },
     {
       'title': 'Transaction Branch to HQ',
       'icon': Icons.swap_vert,
       'color': Colors.lightBlue,
+      'permission': AppPermissions.transactionsBranchHq,
     },
     {
       'title': 'Closeout Transaction',
       'icon': Icons.check_circle_outline,
       'color': Colors.lime,
+      'permission': AppPermissions.closeOutTransactions,
     },
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadPermissions();
+  }
+
+  Future<void> _loadPermissions() async {
+    final permissions = await PermissionManager().getPermissionList();
+    if (!mounted) return;
+    setState(() {
+      _permissions = permissions;
+      _loaded = true;
+    });
+  }
+
+  List<Map<String, dynamic>> get _visibleFeatures {
+    return _allFeatures.where((feature) {
+      final anyOf = feature['anyOf'] as List<String>?;
+      if (anyOf != null && anyOf.isNotEmpty) {
+        return PermissionGuard.hasAny(_permissions, anyOf);
+      }
+      final permission = feature['permission'] as String? ?? '';
+      return PermissionGuard.has(_permissions, permission);
+    }).toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDarkMode = context.isDarkMode;
+    final features = _visibleFeatures;
 
     return Scaffold(
       backgroundColor:
@@ -159,14 +204,25 @@ class _AccountingScreenState extends State<AccountingScreen> {
 
               // Main Content
               Expanded(
-                child: Padding(
+                child: !_loaded
+                    ? const Center(child: CircularProgressIndicator())
+                    : features.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No accounting features available for your role',
+                              style: TextStyle(
+                                color: context.palette.textSecondary,
+                              ),
+                            ),
+                          )
+                        : Padding(
                   padding: const EdgeInsets.all(16),
                   child: GridView.count(
                     crossAxisCount: 2,
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
                     childAspectRatio: 1.1,
-                    children: _accountingFeatures.map((feature) {
+                    children: features.map((feature) {
                       return _buildAccountingCard(
                         context: context,
                         icon: feature['icon'] as IconData,

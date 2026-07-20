@@ -62,16 +62,37 @@ class UserModel {
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
+    final branch = map['branch'];
+    String? branchName;
+    String? branchCode;
+
+    if (branch is Map) {
+      branchName = branch['name']?.toString();
+      branchCode = branch['code']?.toString() ?? branch['id']?.toString();
+    } else if (branch != null) {
+      // API currently returns branch as a numeric id.
+      branchCode = branch.toString();
+      branchName = 'Branch $branch';
+    }
+
+    final role = map['role'];
+    String? roleName;
+    if (role is Map) {
+      roleName = role['role']?.toString() ?? role['roleName']?.toString();
+    } else if (role != null) {
+      roleName = role.toString();
+    }
+
     return UserModel(
       id: map['id'] as int? ?? 0,
-      firstName: map['firstName'] as String? ?? null,
-      lastName: map['lastName'] as String? ?? null,
-      phone: map['phone'] as String? ?? null,
-      email: map['email'] as String? ?? null,
-      branchName: map['branch']?['name'] as String? ?? null,
-      branchCode: map['branch']?['code'] as String? ?? null,
-      role: map['role']?['role'] as String? ?? null,
-      createdAt: map['createdAt'] as String? ?? null,
+      firstName: map['firstName'] as String? ?? map['fullName'] as String?,
+      lastName: map['lastName'] as String?,
+      phone: map['phone'] as String?,
+      email: map['email'] as String?,
+      branchName: branchName,
+      branchCode: branchCode,
+      role: roleName,
+      createdAt: map['createdAt'] as String?,
     );
   }
 

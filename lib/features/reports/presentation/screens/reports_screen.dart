@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:courier_app/configuration/phone_number_manager.dart';
+import 'package:courier_app/core/utils/app_permissions.dart';
 import 'package:courier_app/core/utils/role_display_helper.dart';
 import 'package:courier_app/features/branch_report/presentation/screens/branch_report_screen.dart';
 import 'package:courier_app/features/branch_report/bloc/branch_report_bloc.dart';
@@ -34,32 +36,174 @@ class ReportsScreen extends StatefulWidget {
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
-  bool _hasBranchReportNetAccess = false;
-  bool _roleLoaded = false;
+  List<String> _permissions = [];
+  bool _hasBranchReportNetRole = false;
+  bool _loaded = false;
 
   @override
   void initState() {
     super.initState();
-    _loadRole();
+    _loadAccess();
   }
 
-  Future<void> _loadRole() async {
+  Future<void> _loadAccess() async {
+    final permissions = await PermissionManager().getPermissionList();
     final roleInfo = await RoleDisplayHelper.loadRoleDisplayInfo();
     if (!mounted) return;
     setState(() {
-      _hasBranchReportNetAccess =
+      _permissions = permissions;
+      _hasBranchReportNetRole =
           RoleDisplayHelper.hasBranchReportNetAccess(roleInfo.primaryRole);
-      _roleLoaded = true;
+      _loaded = true;
     });
   }
+
+  bool _can(String permission) =>
+      PermissionGuard.has(_permissions, permission);
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.isDarkMode;
 
+    final reportCards = <Widget>[
+      if (_loaded &&
+          _can(AppPermissions.branchReport) &&
+          _hasBranchReportNetRole)
+        _buildReportCard(
+          icon: Icons.summarize_outlined,
+          title: 'Branch Report Net',
+          description: 'Branch net fee shipments',
+          isDarkMode: isDarkMode,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (context) => BranchReportNetBloc(
+                        repository: BranchReportNetRepository(
+                          dataProvider: BranchReportNetDataProvider(),
+                        ),
+                      ),
+                    ),
+                    BlocProvider(
+                      create: (context) => BranchesBloc(
+                        BranchesRepository(
+                          branchesDataProvider: BranchesDataProvider(),
+                        ),
+                      )..add(FetchBranches()),
+                    ),
+                  ],
+                  child: const BranchReportNetScreen(),
+                ),
+              ),
+            );
+          },
+        ),
+      if (_loaded && _can(AppPermissions.branchReport))
+        _buildReportCard(
+          icon: Icons.business,
+          title: 'Branch Report',
+          description: 'View branch reports',
+          isDarkMode: isDarkMode,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => BranchReportBloc(
+                    repository: BranchReportRepository(
+                      dataProvider: BranchReportDataProvider(),
+                    ),
+                  ),
+                  child: const BranchReportScreen(),
+                ),
+              ),
+            );
+          },
+        ),
+      if (_loaded && _can(AppPermissions.adminBranchReport))
+        _buildReportCard(
+          icon: Icons.admin_panel_settings,
+          title: 'Admin Report',
+          description: 'View admin reports',
+          isDarkMode: isDarkMode,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => AdminReportBloc(
+                    repository: AdminReportRepository(
+                      dataProvider: AdminReportDataProvider(),
+                    ),
+                  ),
+                  child: const AdminReportScreen(),
+                ),
+              ),
+            );
+          },
+        ),
+      if (_loaded && _can(AppPermissions.branchExpenses))
+        _buildReportCard(
+          icon: Icons.receipt_long,
+          title: 'Branch Expense',
+          description: 'View branch expenses',
+          isDarkMode: isDarkMode,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => BranchExpensesBloc(
+                    repository: BranchExpensesRepository(
+                      dataProvider: BranchExpensesDataProvider(),
+                    ),
+                  ),
+                  child: const BranchExpensesScreen(),
+                ),
+              ),
+            );
+          },
+        ),
+      if (_loaded && _can(AppPermissions.adminExpense))
+        _buildReportCard(
+          icon: Icons.account_balance_wallet,
+          title: 'Admin Expense',
+          description: 'View admin expenses',
+          isDarkMode: isDarkMode,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (context) => AdminExpensesBloc(
+                        repository: AdminExpensesRepository(
+                          dataProvider: AdminExpensesDataProvider(),
+                        ),
+                      ),
+                    ),
+                    BlocProvider(
+                      create: (context) => BranchesBloc(
+                        BranchesRepository(
+                          branchesDataProvider: BranchesDataProvider(),
+                        ),
+                      )..add(FetchBranches()),
+                    ),
+                  ],
+                  child: const AdminExpensesScreen(),
+                ),
+              ),
+            );
+          },
+        ),
+    ];
+
     return Scaffold(
-      backgroundColor:
-          context.palette.background,
+      backgroundColor: context.palette.background,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: context.palette.appBarBackground,
@@ -97,7 +241,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Coming Soon Card
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(40),
@@ -129,7 +272,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       color: Colors.white.withOpacity(0.9),
                     ),
                     const SizedBox(height: 20),
-                    Text(
+                    const Text(
                       'Reports Feature',
                       style: TextStyle(
                         fontSize: 28,
@@ -141,7 +284,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              // Available Reports
               Text(
                 'Available Reports',
                 style: TextStyle(
@@ -151,147 +293,26 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Report Cards
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 1.1,
-                children: [
-                  if (_roleLoaded && _hasBranchReportNetAccess)
-                    _buildReportCard(
-                      icon: Icons.summarize_outlined,
-                      title: 'Branch Report Net',
-                      description: 'Branch net fee shipments',
-                      isDarkMode: isDarkMode,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MultiBlocProvider(
-                              providers: [
-                                BlocProvider(
-                                  create: (context) => BranchReportNetBloc(
-                                    repository: BranchReportNetRepository(
-                                      dataProvider:
-                                          BranchReportNetDataProvider(),
-                                    ),
-                                  ),
-                                ),
-                                BlocProvider(
-                                  create: (context) => BranchesBloc(
-                                    BranchesRepository(
-                                      branchesDataProvider:
-                                          BranchesDataProvider(),
-                                    ),
-                                  )..add(FetchBranches()),
-                                ),
-                              ],
-                              child: const BranchReportNetScreen(),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  _buildReportCard(
-                    icon: Icons.business,
-                    title: 'Branch Report',
-                    description: 'View branch reports',
-                    isDarkMode: isDarkMode,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BlocProvider(
-                            create: (context) => BranchReportBloc(
-                              repository: BranchReportRepository(
-                                dataProvider: BranchReportDataProvider(),
-                              ),
-                            ),
-                            child: const BranchReportScreen(),
-                          ),
-                        ),
-                      );
-                    },
+              if (!_loaded)
+                const Center(child: CircularProgressIndicator())
+              else if (reportCards.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Text(
+                    'No reports available for your role',
+                    style: TextStyle(color: context.palette.textSecondary),
                   ),
-                  _buildReportCard(
-                    icon: Icons.admin_panel_settings,
-                    title: 'Admin Report',
-                    description: 'View admin reports',
-                    isDarkMode: isDarkMode,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BlocProvider(
-                            create: (context) => AdminReportBloc(
-                              repository: AdminReportRepository(
-                                dataProvider: AdminReportDataProvider(),
-                              ),
-                            ),
-                            child: const AdminReportScreen(),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildReportCard(
-                    icon: Icons.receipt_long,
-                    title: 'Branch Expense',
-                    description: 'View branch expenses',
-                    isDarkMode: isDarkMode,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BlocProvider(
-                            create: (context) => BranchExpensesBloc(
-                              repository: BranchExpensesRepository(
-                                dataProvider: BranchExpensesDataProvider(),
-                              ),
-                            ),
-                            child: const BranchExpensesScreen(),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildReportCard(
-                    icon: Icons.account_balance_wallet,
-                    title: 'Admin Expense',
-                    description: 'View admin expenses',
-                    isDarkMode: isDarkMode,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MultiBlocProvider(
-                            providers: [
-                              BlocProvider(
-                                create: (context) => AdminExpensesBloc(
-                                  repository: AdminExpensesRepository(
-                                    dataProvider: AdminExpensesDataProvider(),
-                                  ),
-                                ),
-                              ),
-                              BlocProvider(
-                                create: (context) => BranchesBloc(
-                                  BranchesRepository(
-                                    branchesDataProvider: BranchesDataProvider(),
-                                  ),
-                                )..add(FetchBranches()),
-                              ),
-                            ],
-                            child: const AdminExpensesScreen(),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                )
+              else
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 1.1,
+                  children: reportCards,
+                ),
             ],
           ),
         ),

@@ -1,5 +1,6 @@
 // import 'package:courier_app/features/add_shipment/presentation/screens/payment_screen.dart';
 import 'package:courier_app/app/utils/responsive_helper.dart';
+import 'package:courier_app/core/utils/app_permissions.dart';
 import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 // import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
 import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
@@ -19,7 +20,7 @@ class ApplicationWidgets {
     required BuildContext context,
     required bool isDarkMode,
     required List<MenuOption> options,
-    required Function(Widget) onOptionSelected,
+    required Function(MenuOption) onOptionSelected,
   }) {
     final palette = context.palette;
 
@@ -108,7 +109,7 @@ class ApplicationWidgets {
                   return _ApplicationMenuCard(
                     option: option,
                     isDarkMode: isDarkMode,
-                    onTap: () => onOptionSelected(option.screen),
+                    onTap: () => onOptionSelected(option),
                   );
                 },
                 childCount: options.length,
@@ -125,7 +126,7 @@ class ApplicationWidgets {
     required BuildContext context,
     required bool isDarkMode,
     required List<MenuOption> options,
-    required Function(Widget) onOptionSelected,
+    required Function(MenuOption) onOptionSelected,
   }) {
     return buildApplicationsBody(
       context: context,
@@ -392,6 +393,10 @@ class MenuOption {
   final Color gradientStart;
   final Color gradientEnd;
   final Widget screen;
+  /// Primary permission name, or leave empty and use [anyOf].
+  final String permission;
+  /// If non-empty, user needs any of these permissions.
+  final List<String> anyOf;
 
   const MenuOption({
     required this.title,
@@ -401,8 +406,18 @@ class MenuOption {
     Color? gradientStart,
     Color? gradientEnd,
     required this.screen,
+    this.permission = '',
+    this.anyOf = const [],
   })  : gradientStart = gradientStart ?? color,
         gradientEnd = gradientEnd ?? color;
+
+  bool isAllowed(List<String> permissions) {
+    if (anyOf.isNotEmpty) {
+      return PermissionGuard.hasAny(permissions, anyOf);
+    }
+    if (permission.isEmpty) return false;
+    return PermissionGuard.has(permissions, permission);
+  }
 
   MenuOption copyWithGradients({
     required Color gradientStart,
@@ -416,6 +431,8 @@ class MenuOption {
       gradientStart: gradientStart,
       gradientEnd: gradientEnd,
       screen: screen,
+      permission: permission,
+      anyOf: anyOf,
     );
   }
 }
@@ -429,6 +446,7 @@ final List<MenuOption> defaultMenuOptions = [
     gradientStart: const Color(0xFFEFF6FF),
     gradientEnd: const Color(0xFFDBEAFE),
     screen: const PayByAwbScreen(),
+    permission: AppPermissions.payByAwb,
   ),
   MenuOption(
     title: 'Shipment Invoice',
@@ -438,6 +456,7 @@ final List<MenuOption> defaultMenuOptions = [
     gradientStart: const Color(0xFFF5F3FF),
     gradientEnd: const Color(0xFFEDE9FE),
     screen: const ShipmentInvoiceScreen(),
+    permission: AppPermissions.shipmentInvoice,
   ),
   MenuOption(
     title: 'All Shipments',
@@ -447,6 +466,7 @@ final List<MenuOption> defaultMenuOptions = [
     gradientStart: const Color(0xFFFFF7ED),
     gradientEnd: const Color(0xFFFFEDD5),
     screen: const ShipmentsScreen(),
+    permission: AppPermissions.manageShipments,
   ),
   MenuOption(
     title: 'Manifest',
@@ -456,6 +476,7 @@ final List<MenuOption> defaultMenuOptions = [
     gradientStart: const Color(0xFFEEF2FF),
     gradientEnd: const Color(0xFFE0E7FF),
     screen: const ManifestScreen(),
+    anyOf: AppPermissions.manifestAny,
   ),
   MenuOption(
     title: 'Home Deliveries',
@@ -465,6 +486,7 @@ final List<MenuOption> defaultMenuOptions = [
     gradientStart: const Color(0xFFFDF2F8),
     gradientEnd: const Color(0xFFFCE7F3),
     screen: const HomeDeliveriesScreen(),
+    permission: AppPermissions.manageHomeDelivery,
   ),
   MenuOption(
     title: 'Add Extra Fee',
@@ -474,6 +496,7 @@ final List<MenuOption> defaultMenuOptions = [
     gradientStart: const Color(0xFFF0FDFA),
     gradientEnd: const Color(0xFFCCFBF1),
     screen: const ComingSoonScreen(),
+    permission: AppPermissions.manageExtraFee,
   ),
   MenuOption(
     title: 'Shelves',
@@ -483,6 +506,7 @@ final List<MenuOption> defaultMenuOptions = [
     gradientStart: const Color(0xFFF0F9FF),
     gradientEnd: const Color(0xFFE0F2FE),
     screen: const ShelvesScreen(),
+    permission: AppPermissions.shelvesManagement,
   ),
   MenuOption(
     title: 'Shelf Transfer',
@@ -492,6 +516,7 @@ final List<MenuOption> defaultMenuOptions = [
     gradientStart: const Color(0xFFECFEFF),
     gradientEnd: const Color(0xFFCFFAFE),
     screen: const ShelfTransferScreen(),
+    permission: AppPermissions.shelvesManagement,
   ),
   // Miles Configuration, Roles, Other Settings — hidden per product request
 ];

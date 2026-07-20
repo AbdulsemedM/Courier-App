@@ -1,5 +1,5 @@
-import 'package:courier_app/app/utils/dialog_utils.dart';
 import 'package:courier_app/configuration/phone_number_manager.dart';
+import 'package:courier_app/core/utils/app_permissions.dart';
 import 'package:courier_app/features/branches/presentation/screen/branches_screen.dart';
 import 'package:courier_app/features/countries/presentation/screen/countries_screen.dart';
 import 'package:courier_app/features/currency/presentation/screen/currency_screen.dart';
@@ -33,58 +33,156 @@ class _OptionsScreenState extends State<OptionsScreen> {
   }
 
   void fetchPermissions() async {
-    final permissions = await PermissionManager().getPermission();
-    if (permissions != null) {
-      setState(() {
-        this.permissions = permissions;
-      });
-    }
+    final permissions = await PermissionManager().getPermissionList();
+    if (!mounted) return;
+    setState(() {
+      this.permissions = permissions;
+    });
   }
+
+  bool _can(String permission) =>
+      PermissionGuard.has(permissions, permission);
+
+  bool _canAny(List<String> required) =>
+      PermissionGuard.hasAny(permissions, required);
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.isDarkMode;
+
+    final gridOptions = <Widget>[
+      if (_can(AppPermissions.manageBranches))
+        OptionCard(
+          icon: Icons.account_tree_outlined,
+          title: 'Branches',
+          subtitle: 'Manage branches',
+          color: Colors.blue,
+          isDarkMode: isDarkMode,
+          onTap: () => _handleOptionTap(context, 'Branches'),
+        ),
+      if (_can(AppPermissions.manageCountries))
+        OptionCard(
+          icon: Icons.public,
+          title: 'Countries',
+          subtitle: 'Manage locations',
+          color: Colors.green,
+          isDarkMode: isDarkMode,
+          onTap: () => _handleOptionTap(context, 'Countries'),
+        ),
+      if (_can(AppPermissions.managePaymentMethods))
+        OptionCard(
+          icon: Icons.payment,
+          title: 'Payment Methods',
+          subtitle: 'Configure options',
+          color: Colors.orange,
+          isDarkMode: isDarkMode,
+          onTap: () => _handleOptionTap(context, 'Payment methods'),
+        ),
+      if (_can(AppPermissions.manageShipmentTypes))
+        OptionCard(
+          icon: Icons.local_shipping_outlined,
+          title: 'Shipment Types',
+          subtitle: 'Manage types',
+          color: Colors.purple,
+          isDarkMode: isDarkMode,
+          onTap: () => _handleOptionTap(context, 'Shipment types'),
+        ),
+      if (_can(AppPermissions.servicesModes))
+        OptionCard(
+          icon: Icons.miscellaneous_services_outlined,
+          title: 'Services Modes',
+          subtitle: 'Configure services',
+          color: Colors.teal,
+          isDarkMode: isDarkMode,
+          onTap: () => _handleOptionTap(context, 'Services modes'),
+        ),
+      if (_can(AppPermissions.manageCurrencies))
+        OptionCard(
+          icon: Icons.currency_exchange,
+          title: 'Currency',
+          subtitle: 'Set currency options',
+          color: Colors.indigo,
+          isDarkMode: isDarkMode,
+          onTap: () => _handleOptionTap(context, 'Currency'),
+        ),
+    ];
+
+    final listOptions = <Widget>[
+      if (_can(AppPermissions.manageTransportModes))
+        ListOptionCard(
+          icon: Icons.directions_bus_filled_outlined,
+          title: 'Transport Modes',
+          subtitle: 'Configure transportation options',
+          color: Colors.amber,
+          isDarkMode: isDarkMode,
+          onTap: () => _handleOptionTap(context, 'Transport modes'),
+        ),
+      if (_can(AppPermissions.manageExchangeRates))
+        ListOptionCard(
+          icon: Icons.currency_exchange,
+          title: 'Exchange Rates',
+          subtitle: 'Configure exchange rates',
+          color: Colors.deepPurpleAccent,
+          isDarkMode: isDarkMode,
+          onTap: () => _handleOptionTap(context, 'Exchange rates'),
+        ),
+      if (_can(AppPermissions.manageAccounting))
+        ListOptionCard(
+          icon: Icons.people_outline,
+          title: 'Accounts Management',
+          subtitle: 'Manage accounts',
+          color: Colors.deepOrange,
+          isDarkMode: isDarkMode,
+          onTap: () => _handleOptionTap(context, 'Account management'),
+        ),
+      if (_canAny(AppPermissions.manageUsersAny))
+        ListOptionCard(
+          icon: Icons.people_outline,
+          title: 'User Management',
+          subtitle: 'Manage user access and permissions',
+          color: Colors.cyan,
+          isDarkMode: isDarkMode,
+          onTap: () => _handleOptionTap(context, 'User management'),
+        ),
+    ];
 
     return Scaffold(
       backgroundColor: context.isDarkMode
           ? const Color(0xFF5B3895)
           : context.palette.background,
       body: SafeArea(
-          child: Column(
-            children: [
-              // Custom App Bar
-              Container(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: context.palette.textPrimary,
-                      ),
-                      onPressed: () => Navigator.pop(context),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: context.palette.textPrimary,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Options',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: context.palette.textPrimary,
-                      ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Options',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: context.palette.textPrimary,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-
-              // Main Content
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Main Options Grid
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (gridOptions.isNotEmpty)
                       GridView.count(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -92,95 +190,10 @@ class _OptionsScreenState extends State<OptionsScreen> {
                         mainAxisSpacing: 16,
                         crossAxisSpacing: 16,
                         childAspectRatio: 1.1,
-                        children: [
-                          OptionCard(
-                            icon: Icons.account_tree_outlined,
-                            title: 'Branches',
-                            subtitle: 'Manage branches',
-                            color: Colors.blue,
-                            isDarkMode: isDarkMode,
-                            onTap: () => permissions.contains('manage_branches')
-                                ? _handleOptionTap(context, 'Branches')
-                                : displaySnack(
-                                    context,
-                                    'You do not have permission to manage branches',
-                                    Colors.red),
-                          ),
-                          OptionCard(
-                            icon: Icons.public,
-                            title: 'Countries',
-                            subtitle: 'Manage locations',
-                            color: Colors.green,
-                            isDarkMode: isDarkMode,
-                            onTap: () => permissions
-                                    .contains('manage_countries')
-                                ? _handleOptionTap(context, 'Countries')
-                                : displaySnack(
-                                    context,
-                                    'You do not have permission to manage countries',
-                                    Colors.red),
-                          ),
-                          OptionCard(
-                            icon: Icons.payment,
-                            title: 'Payment Methods',
-                            subtitle: 'Configure options',
-                            color: Colors.orange,
-                            isDarkMode: isDarkMode,
-                            onTap: () => permissions
-                                    .contains('manage_payment_methods')
-                                ? _handleOptionTap(context, 'Payment methods')
-                                : displaySnack(
-                                    context,
-                                    'You do not have permission to manage payment methods',
-                                    Colors.red),
-                          ),
-                          OptionCard(
-                            icon: Icons.local_shipping_outlined,
-                            title: 'Shipment Types',
-                            subtitle: 'Manage types',
-                            color: Colors.purple,
-                            isDarkMode: isDarkMode,
-                            onTap: () => permissions
-                                    .contains('manage_shipment_types')
-                                ? _handleOptionTap(context, 'Shipment types')
-                                : displaySnack(
-                                    context,
-                                    'You do not have permission to manage shipment types',
-                                    Colors.red),
-                          ),
-                          OptionCard(
-                            icon: Icons.miscellaneous_services_outlined,
-                            title: 'Services Modes',
-                            subtitle: 'Configure services',
-                            color: Colors.teal,
-                            isDarkMode: isDarkMode,
-                            onTap: () => permissions.contains('Services_modes')
-                                ? _handleOptionTap(context, 'Services modes')
-                                : displaySnack(
-                                    context,
-                                    'You do not have permission to manage services modes',
-                                    Colors.red),
-                          ),
-                          OptionCard(
-                            icon: Icons.currency_exchange,
-                            title: 'Currency',
-                            subtitle: 'Set currency options',
-                            color: Colors.indigo,
-                            isDarkMode: isDarkMode,
-                            onTap: () => permissions
-                                    .contains('manage_currencies')
-                                ? _handleOptionTap(context, 'Currency')
-                                : displaySnack(
-                                    context,
-                                    'You do not have permission to manage currency',
-                                    Colors.red),
-                          ),
-                        ],
+                        children: gridOptions,
                       ),
-
+                    if (listOptions.isNotEmpty) ...[
                       const SizedBox(height: 24),
-
-                      // Additional Settings Section
                       Text(
                         'Additional Settings',
                         style: TextStyle(
@@ -190,67 +203,27 @@ class _OptionsScreenState extends State<OptionsScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      ListOptionCard(
-                        icon: Icons.directions_bus_filled_outlined,
-                        title: 'Transport Modes',
-                        subtitle: 'Configure transportation options',
-                        color: Colors.amber,
-                        isDarkMode: isDarkMode,
-                        onTap: () => permissions
-                                .contains('manage_transport_modes')
-                            ? _handleOptionTap(context, 'Transport modes')
-                            : displaySnack(
-                                context,
-                                'You do not have permission to manage transport modes',
-                                Colors.red),
-                      ),
-                      ListOptionCard(
-                        icon: Icons.currency_exchange,
-                        title: 'Exchange Rates',
-                        subtitle: 'Configure exchange rates',
-                        color: Colors.deepPurpleAccent,
-                        isDarkMode: isDarkMode,
-                        onTap: () => permissions
-                                .contains('manage_exchange_rates')
-                            ? _handleOptionTap(context, 'Exchange rates')
-                            : displaySnack(
-                                context,
-                                'You do not have permission to manage exchange rates',
-                                Colors.red),
-                      ),
-                      ListOptionCard(
-                        icon: Icons.people_outline,
-                        title: 'Accounts Management',
-                        subtitle: 'Manage accounts',
-                        color: Colors.deepOrange,
-                        isDarkMode: isDarkMode,
-                        onTap: () => permissions.contains('manage_accounting')
-                            ? _handleOptionTap(context, 'Account management')
-                            : displaySnack(
-                                context,
-                                'You do not have permission to manage accounts',
-                                Colors.red),
-                      ),
-                      ListOptionCard(
-                        icon: Icons.people_outline,
-                        title: 'User Management',
-                        subtitle: 'Manage user access and permissions',
-                        color: Colors.cyan,
-                        isDarkMode: isDarkMode,
-                        onTap: () => permissions.contains('manage_users')
-                            ? _handleOptionTap(context, 'User management')
-                            : displaySnack(
-                                context,
-                                'You do not have permission to manage users',
-                                Colors.red),
-                      ),
+                      ...listOptions,
                     ],
-                  ),
+                    if (gridOptions.isEmpty && listOptions.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 40),
+                        child: Center(
+                          child: Text(
+                            'No settings available for your role',
+                            style: TextStyle(
+                              color: context.palette.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
     );
   }
 
@@ -290,10 +263,63 @@ class _OptionsScreenState extends State<OptionsScreen> {
     } else if (option == 'User management') {
       showModalBottomSheet(
         context: context,
-        backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
+        backgroundColor: context.isDarkMode
+            ? const Color.fromARGB(255, 75, 23, 160)
+            : context.palette.appBarBackground,
         isScrollControlled: true,
         builder: (context) {
           final isDarkMode = context.isDarkMode;
+          final userOptions = <Widget>[
+            if (_canAny(AppPermissions.manageUsersAny))
+              _buildUserOption(
+                context: context,
+                icon: Icons.admin_panel_settings,
+                title: 'Manage Users',
+                subtitle: 'Staff & Admins',
+                color: Colors.blue,
+                gradient: const LinearGradient(
+                  colors: [Colors.blue, Colors.blueAccent],
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const ManageUserScreen()));
+                },
+              ),
+            if (_can(AppPermissions.manageCustomers))
+              _buildUserOption(
+                context: context,
+                icon: Icons.people,
+                title: 'Manage Customer',
+                subtitle: 'Client Accounts',
+                color: Colors.purple,
+                gradient: const LinearGradient(
+                  colors: [Colors.purple, Colors.purpleAccent],
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const ManageCustomersScreen()));
+                },
+              ),
+            if (_can(AppPermissions.manageAgents))
+              _buildUserOption(
+                context: context,
+                icon: Icons.support_agent,
+                title: 'Manage Agents',
+                subtitle: 'Field Staff',
+                color: Colors.orange,
+                gradient: const LinearGradient(
+                  colors: [Colors.orange, Colors.deepOrange],
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const ManageAgentScreen()));
+                },
+              ),
+          ];
+
           return Container(
             height: MediaQuery.of(context).size.height * 0.5,
             decoration: BoxDecoration(
@@ -315,7 +341,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
             ),
             child: Column(
               children: [
-                // Handle bar
                 Container(
                   margin: const EdgeInsets.only(top: 12),
                   width: 40,
@@ -326,7 +351,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Title
                 Text(
                   'User Management',
                   style: TextStyle(
@@ -344,88 +368,11 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                // Options Grid
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildUserOption(
-                        context: context,
-                        icon: Icons.admin_panel_settings,
-                        title: 'Manage Users',
-                        subtitle: 'Staff & Admins',
-                        color: Colors.blue,
-                        gradient: const LinearGradient(
-                          colors: [Colors.blue, Colors.blueAccent],
-                        ),
-                        onTap: () {
-                          if (permissions.contains('manag_users')) {
-                            Navigator.pop(context);
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const ManageUserScreen()));
-                          } else {
-                            Navigator.pop(context);
-                            displaySnack(
-                                context,
-                                'You do not have permission to manage users',
-                                Colors.red);
-                          }
-                          // Navigate to user management screen
-                        },
-                      ),
-                      _buildUserOption(
-                        context: context,
-                        icon: Icons.people,
-                        title: 'Manage Customer',
-                        subtitle: 'Client Accounts',
-                        color: Colors.purple,
-                        gradient: const LinearGradient(
-                          colors: [Colors.purple, Colors.purpleAccent],
-                        ),
-                        onTap: () {
-                          if (permissions.contains('manage_customers')) {
-                            Navigator.pop(context);
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const ManageCustomersScreen()));
-                          } else {
-                            Navigator.pop(context);
-                            displaySnack(
-                                context,
-                                'You do not have permission to manage customers',
-                                Colors.red);
-                          }
-                          // Navigate to customer management screen
-                        },
-                      ),
-                      _buildUserOption(
-                        context: context,
-                        icon: Icons.support_agent,
-                        title: 'Manage Agents',
-                        subtitle: 'Field Staff',
-                        color: Colors.orange,
-                        gradient: const LinearGradient(
-                          colors: [Colors.orange, Colors.deepOrange],
-                        ),
-                        onTap: () {
-                          if (permissions.contains('manage_agents')) {
-                            Navigator.pop(context);
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const ManageAgentScreen()));
-                          } else {
-                            Navigator.pop(context);
-                            displaySnack(
-                                context,
-                                'You do not have permission to manage agents',
-                                Colors.red);
-                          }
-                          // Navigate to agent management screen
-                        },
-                      ),
-                    ],
+                    children: userOptions,
                   ),
                 ),
               ],
@@ -436,141 +383,150 @@ class _OptionsScreenState extends State<OptionsScreen> {
     } else if (option == 'Account management') {
       showModalBottomSheet(
         context: context,
-        backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
+        backgroundColor: context.isDarkMode
+            ? const Color.fromARGB(255, 75, 23, 160)
+            : context.palette.appBarBackground,
         isScrollControlled: true,
         builder: (context) {
           final isDarkMode = context.isDarkMode;
+          final tiles = <Widget>[
+            if (_canAny(AppPermissions.tellerAccountAny)) ...[
+              _buildManagementTile(
+                context: context,
+                icon: Icons.admin_panel_settings,
+                title: 'Teller List',
+                subtitle: 'Staff & Admins',
+                color: Colors.blue,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const TellerScreen(),
+                  ));
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
+            if (_can(AppPermissions.tellersListAssign)) ...[
+              _buildManagementTile(
+                context: context,
+                icon: Icons.people,
+                title: 'Assign Tellers',
+                subtitle: 'Client Accounts',
+                color: Colors.purple,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ManageCustomersScreen(),
+                  ));
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
+            if (_can(AppPermissions.accountsList)) ...[
+              _buildManagementTile(
+                context: context,
+                icon: Icons.account_box_outlined,
+                title: 'Accounts',
+                subtitle: 'Field Staff',
+                color: Colors.orange,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ManageAgentScreen(),
+                  ));
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
+            if (_can(AppPermissions.tellerByBranch)) ...[
+              _buildManagementTile(
+                context: context,
+                icon: Icons.filter_list,
+                title: 'Filter by Branch',
+                subtitle: 'Field Staff',
+                color: Colors.red,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ManageAgentScreen(),
+                  ));
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
+            if (_can('Teller_By_Status'))
+              _buildManagementTile(
+                context: context,
+                icon: Icons.filter,
+                title: 'Filter by Status',
+                subtitle: 'Field Staff',
+                color: Colors.green,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ManageAgentScreen(),
+                  ));
+                },
+              ),
+          ];
+
           return SingleChildScrollView(
-              child: Container(
-            height: MediaQuery.of(context).size.height * 0.8,
-            decoration: BoxDecoration(
-              color: isDarkMode
-                  ? const Color.fromARGB(255, 75, 23, 160)
-                  : context.palette.surface,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(24)),
-              border: isDarkMode
-                  ? null
-                  : Border.all(color: context.palette.border),
-              boxShadow: [
-                BoxShadow(
-                  color: context.palette.cardShadow,
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.8,
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? const Color.fromARGB(255, 75, 23, 160)
+                    : context.palette.surface,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+                border: isDarkMode
+                    ? null
+                    : Border.all(color: context.palette.border),
+                boxShadow: [
+                  BoxShadow(
+                    color: context.palette.cardShadow,
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: context.palette.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Account Management',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: context.palette.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Select a category to manage',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: context.palette.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(children: tiles),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              children: [
-                // Handle bar
-                Container(
-                  margin: const EdgeInsets.only(top: 12),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: context.palette.border,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Title
-                Text(
-                  'Account Management',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: context.palette.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Select a category to manage',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: context.palette.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // List Tiles
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: [
-                      _buildManagementTile(
-                        context: context,
-                        icon: Icons.admin_panel_settings,
-                        title: 'Teller List',
-                        subtitle: 'Staff & Admins',
-                        color: Colors.blue,
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const TellerScreen(),
-                          ));
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _buildManagementTile(
-                        context: context,
-                        icon: Icons.people,
-                        title: 'Assign Tellers',
-                        subtitle: 'Client Accounts',
-                        color: Colors.purple,
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const ManageCustomersScreen(),
-                          ));
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _buildManagementTile(
-                        context: context,
-                        icon: Icons.account_box_outlined,
-                        title: 'Accounts',
-                        subtitle: 'Field Staff',
-                        color: Colors.orange,
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const ManageAgentScreen(),
-                          ));
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _buildManagementTile(
-                        context: context,
-                        icon: Icons.filter_list,
-                        title: 'Filter by Branch',
-                        subtitle: 'Field Staff',
-                        color: Colors.red,
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const ManageAgentScreen(),
-                          ));
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _buildManagementTile(
-                        context: context,
-                        icon: Icons.filter,
-                        title: 'Filter by Status',
-                        subtitle: 'Field Staff',
-                        color: Colors.green,
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const ManageAgentScreen(),
-                          ));
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ));
+          );
         },
       );
     }
@@ -585,8 +541,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
     required Gradient gradient,
     required VoidCallback onTap,
   }) {
-    // final isDarkMode = context.isDarkMode;
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -651,8 +605,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    final isDarkMode = context.isDarkMode;
-
     return Container(
       decoration: BoxDecoration(
         color: context.palette.surface,

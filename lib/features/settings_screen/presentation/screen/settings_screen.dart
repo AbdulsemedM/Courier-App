@@ -85,6 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await _authService.deleteToken();
       await _authService.deleteUserId();
       await _authService.deleteBranch();
+      await _authService.deleteRoleId();
       await _authService.deleteRoleName();
       await _authService.deleteRoleNames();
       await PermissionManager().setPermission([]);
