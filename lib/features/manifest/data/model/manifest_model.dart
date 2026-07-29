@@ -154,7 +154,7 @@ class ManifestModel {
       id: json['id'] as int? ?? 0,
       manifestId: json['manifestId'] as String? ?? '',
       branch: _parseBranch(json['branch']),
-      senderBranch: json['senderBranch'] as int? ?? 0,
+      senderBranch: _parseBranchId(json['senderBranch']),
       receiverBranch: _parseBranch(json['receiverBranch']),
       createdBy: json['createdBy'] is Map<String, dynamic>
           ? ManifestUser.fromJson(json['createdBy'] as Map<String, dynamic>)
@@ -178,12 +178,17 @@ class ManifestModel {
     );
   }
 
+  static int _parseBranchId(dynamic value) => _parseBranch(value).id;
+
   static ManifestBranch _parseBranch(dynamic value) {
     if (value is Map<String, dynamic>) {
       return ManifestBranch.fromJson(value);
     }
     if (value is int) {
       return ManifestBranch(id: value, name: '', code: '');
+    }
+    if (value is num) {
+      return ManifestBranch(id: value.toInt(), name: '', code: '');
     }
     return const ManifestBranch(id: 0, name: '', code: '');
   }
