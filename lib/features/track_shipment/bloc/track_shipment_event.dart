@@ -5,5 +5,7 @@ sealed class TrackShipmentEvent {}
 
 class TrackShipment extends TrackShipmentEvent {
   final String awb;
-  TrackShipment(this.awb);
+  final bool preservePreviousData;
+
+  TrackShipment(this.awb, {this.preservePreviousData = false});
 }

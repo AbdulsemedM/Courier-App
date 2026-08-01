@@ -238,9 +238,11 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     context.read<TrackShipmentBloc>().add(TrackShipment(awb));
   }
 
-  void _refreshTrackingForAwb(String awb) {
+  void _refreshTrackingForAwb(String awb, {bool preservePreviousData = false}) {
     if (!mounted) return;
-    context.read<TrackShipmentBloc>().add(TrackShipment(awb));
+    context.read<TrackShipmentBloc>().add(
+          TrackShipment(awb, preservePreviousData: preservePreviousData),
+        );
   }
 
   String get _currentAwb => _searchController.text.trim();
@@ -278,41 +280,77 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
           String? deliveredToName,
           String? deliveredToPhone,
         }) async {
-          try {
-            Navigator.pop(modalContext);
+          Navigator.pop(modalContext);
 
-            if (!mounted) return;
+          if (!mounted) return;
+
+          var dialogOpen = false;
+          String? successMessage;
+          Object? error;
+
+          try {
             showDialog(
               context: outerContext,
               barrierDismissible: false,
+              useRootNavigator: true,
               builder: (_) => const Center(
                 child: CircularProgressIndicator(),
               ),
             );
+            dialogOpen = true;
 
             final repository = DeliverShipmentRepository(
               deliverShipmentDataProvider: DeliverShipmentDataProvider(),
             );
 
-            final message = await repository.deliverShipment(
+            successMessage = await repository.deliverShipment(
               awb: awb,
               isSelf: isSelf,
               customerIdFile: customerIdFile,
               deliveredToName: deliveredToName,
               deliveredToPhone: deliveredToPhone,
             );
-
-            if (!mounted) return;
-            Navigator.pop(outerContext);
-            displaySnack(outerContext, message, Colors.green);
-            _refreshTrackingForAwb(awb);
-          } catch (error) {
-            if (mounted) {
+          } catch (e) {
+            error = e;
+          } finally {
+            if (dialogOpen && mounted) {
               try {
-                Navigator.pop(outerContext);
+                final navigator =
+                    Navigator.of(outerContext, rootNavigator: true);
+                if (navigator.canPop()) {
+                  navigator.pop();
+                }
               } catch (_) {}
-              displaySnack(outerContext, error.toString(), Colors.red);
             }
+          }
+
+          if (!mounted) return;
+
+          if (successMessage != null) {
+            displaySnack(
+              outerContext,
+              successMessage,
+              Colors.green,
+              duration: const Duration(seconds: 4),
+            );
+            _refreshTrackingForAwb(awb, preservePreviousData: true);
+          } else if (error != null) {
+            if (DeliverShipmentRepository.isTimeoutError(error)) {
+              final recovered = await DeliverShipmentRepository(
+                deliverShipmentDataProvider: DeliverShipmentDataProvider(),
+              ).verifyDeliveredAfterTimeout(awb);
+              if (recovered != null) {
+                displaySnack(
+                  outerContext,
+                  recovered,
+                  Colors.green,
+                  duration: const Duration(seconds: 4),
+                );
+                _refreshTrackingForAwb(awb, preservePreviousData: true);
+                return;
+              }
+            }
+            displaySnack(outerContext, error.toString(), Colors.red);
           }
         },
       ),

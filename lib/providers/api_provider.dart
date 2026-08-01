@@ -15,6 +15,7 @@ class ApiProvider {
   final ErrorInterceptor errorInterceptor;
   final LoggingInterceptor loggingInterceptor;
   final Duration timeout;
+  static const Duration defaultMultipartTimeout = Duration(seconds: 30);
 
   ApiProvider({
     // required this.baseUrl,
@@ -168,13 +169,35 @@ class ApiProvider {
   }
 
   Future<http.Response> postMultipartRequest(
-      String endpoint, Map<String, String> fields, File? file, String fileFieldName) async {
+    String endpoint,
+    Map<String, String> fields,
+    File? file,
+    String fileFieldName, {
+    Duration? timeout,
+  }) async {
+    final requestTimeout = timeout ?? defaultMultipartTimeout;
     final url = Uri.parse('${ApiConstants.baseUrl}$endpoint');
     final headers = await _headersFor(endpoint);
     
     // Remove Content-Type from headers as multipart will set it
     final multipartHeaders = Map<String, String>.from(headers);
     multipartHeaders.remove('Content-Type');
+
+    int? fileLength;
+    if (file != null && await file.exists()) {
+      fileLength = await file.length();
+    }
+
+    loggingInterceptor.logRequest(
+      url.toString(),
+      'POST (multipart)',
+      multipartHeaders,
+      {
+        ...fields,
+        if (fileLength != null) 'fileSizeBytes': fileLength,
+        if (file != null) 'fileField': fileFieldName,
+      },
+    );
 
     try {
       var request = http.MultipartRequest('POST', url);
@@ -186,26 +209,35 @@ class ApiProvider {
       // Add file if provided
       if (file != null && await file.exists()) {
         final fileStream = http.ByteStream(file.openRead());
-        final fileLength = await file.length();
+        final length = fileLength ?? await file.length();
         final multipartFile = http.MultipartFile(
           fileFieldName,
           fileStream,
-          fileLength,
-          filename: file.path.split('/').last,
+          length,
+          filename: file.path.split(Platform.pathSeparator).last,
           contentType: MediaType('image', 'jpeg'),
         );
         request.files.add(multipartFile);
       }
 
       final streamedResponse = await request.send().timeout(
-        timeout,
+        requestTimeout,
         onTimeout: () {
-          throw TimeoutException('Request timed out');
+          throw TimeoutException(
+            'Upload timed out. Check your connection and try again.',
+          );
         },
       );
       
-      final response = await http.Response.fromStream(streamedResponse);
-      loggingInterceptor.logRequest(url.toString(), 'POST', multipartHeaders, fields);
+      final response = await http.Response.fromStream(streamedResponse).timeout(
+        requestTimeout,
+        onTimeout: () {
+          throw TimeoutException(
+            'Server took too long to respond. The delivery may still have '
+            'completed — refresh tracking to confirm.',
+          );
+        },
+      );
       loggingInterceptor.logResponse(response);
       errorInterceptor.checkError(response);
       return response;
