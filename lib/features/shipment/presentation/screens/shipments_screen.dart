@@ -119,60 +119,86 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
           String? deliveredToName,
           String? deliveredToPhone,
         }) async {
+          Navigator.pop(modalContext);
+
+          if (!mounted) return;
+
+          var dialogOpen = false;
+          String? successMessage;
+          Object? error;
+
           try {
-            // Close the modal
-            Navigator.pop(modalContext);
-            
-            // Show loading using outer context
-            if (!mounted) return;
             showDialog(
               context: outerContext,
               barrierDismissible: false,
-              builder: (dialogContext) => const Center(
+              useRootNavigator: true,
+              builder: (_) => const Center(
                 child: CircularProgressIndicator(),
               ),
             );
+            dialogOpen = true;
 
-            // Call the deliver API
             final repository = DeliverShipmentRepository(
               deliverShipmentDataProvider: DeliverShipmentDataProvider(),
             );
-            
-            final message = await repository.deliverShipment(
+
+            successMessage = await repository.deliverShipment(
               awb: awb,
               isSelf: isSelf,
               customerIdFile: customerIdFile,
               deliveredToName: deliveredToName,
               deliveredToPhone: deliveredToPhone,
             );
+          } catch (e) {
+            error = e;
+          } finally {
+            if (dialogOpen && mounted) {
+              try {
+                final navigator =
+                    Navigator.of(outerContext, rootNavigator: true);
+                if (navigator.canPop()) {
+                  navigator.pop();
+                }
+              } catch (_) {}
+            }
+          }
 
-            // Close loading dialog
-            if (!mounted) return;
-            Navigator.pop(outerContext);
+          if (!mounted) return;
 
-            // Show success message
-            if (!mounted) return;
-            displaySnack(outerContext, message, Colors.green);
+          if (successMessage != null) {
+            displaySnack(
+              outerContext,
+              successMessage,
+              Colors.green,
+              duration: const Duration(seconds: 4),
+            );
 
-            // Refresh shipments
-            if (!mounted) return;
             if (_selectedStatus != null) {
               outerContext.read<ShipmentsBloc>().add(
-                FetchShipments(status: _selectedStatus),
-              );
+                    FetchShipments(status: _selectedStatus),
+                  );
             }
-          } catch (e) {
-            // Close loading dialog if still open
-            if (mounted) {
-              try {
-                Navigator.pop(outerContext);
-              } catch (_) {
-                // Dialog might already be closed
+          } else if (error != null) {
+            if (DeliverShipmentRepository.isTimeoutError(error)) {
+              final recovered = await DeliverShipmentRepository(
+                deliverShipmentDataProvider: DeliverShipmentDataProvider(),
+              ).verifyDeliveredAfterTimeout(awb);
+              if (recovered != null) {
+                displaySnack(
+                  outerContext,
+                  recovered,
+                  Colors.green,
+                  duration: const Duration(seconds: 4),
+                );
+                if (_selectedStatus != null) {
+                  outerContext.read<ShipmentsBloc>().add(
+                        FetchShipments(status: _selectedStatus),
+                      );
+                }
+                return;
               }
-              
-              // Show error message
-              displaySnack(outerContext, e.toString(), Colors.red);
             }
+            displaySnack(outerContext, error.toString(), Colors.red);
           }
         },
       ),

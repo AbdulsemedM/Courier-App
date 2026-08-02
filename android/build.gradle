@@ -12,15 +12,23 @@ rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
     
-    // Apply ProGuard rules and desugaring to all Android subprojects (including plugins)
+    // Apply ProGuard rules, JVM 17, and desugaring to all Android subprojects (including plugins)
     afterEvaluate { subProject ->
         if (subProject.hasProperty('android')) {
             def proguardRules = rootProject.file('app/proguard-rules.pro')
             
             subProject.android {
-                // Enable desugaring for all modules
                 compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_17
+                    targetCompatibility = JavaVersion.VERSION_17
                     coreLibraryDesugaringEnabled true
+                }
+
+                // Align Kotlin with Java for plugins that don't set jvmTarget themselves.
+                if (subProject.android.hasProperty('kotlinOptions')) {
+                    subProject.android.kotlinOptions {
+                        jvmTarget = JavaVersion.VERSION_17.toString()
+                    }
                 }
                 
                 // Enable multidex (required for desugaring)
@@ -51,6 +59,7 @@ subprojects {
 subprojects { subProject ->
     subProject.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
         kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_17.toString()
             // Some third-party plugins emit deprecation warnings that can fail builds
             // when warnings are treated as errors in their own Gradle config.
             allWarningsAsErrors = false

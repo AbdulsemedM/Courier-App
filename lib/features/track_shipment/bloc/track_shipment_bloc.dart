@@ -10,12 +10,21 @@ class TrackShipmentBloc extends Bloc<TrackShipmentEvent, TrackShipmentState> {
   TrackShipmentBloc(this.trackShipmentRepository)
       : super(TrackShipmentInitial()) {
     on<TrackShipment>((event, emit) async {
-      emit(TrackShipmentLoading());
+      final previousSuccess =
+          state is TrackShipmentSuccess ? state as TrackShipmentSuccess : null;
+
+      if (!event.preservePreviousData) {
+        emit(TrackShipmentLoading());
+      }
+
       try {
         final result =
             await trackShipmentRepository.getTrackShipment(event.awb);
         emit(TrackShipmentSuccess(result));
       } catch (e) {
+        if (event.preservePreviousData && previousSuccess != null) {
+          return;
+        }
         emit(TrackShipmentFailure(e.toString()));
       }
     });

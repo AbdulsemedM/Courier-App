@@ -10,6 +10,7 @@ class DeliverShipmentDataProvider {
     File? customerIdFile,
     String? deliveredToName,
     String? deliveredToPhone,
+    Duration? timeout,
   }) async {
     try {
       final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
@@ -41,6 +42,7 @@ class DeliverShipmentDataProvider {
         fields,
         uploadFile,
         'customerIdFile',
+        timeout: timeout,
       );
 
       return response.body;

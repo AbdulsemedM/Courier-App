@@ -1,0 +1,103 @@
+name: Shorebird Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Target platform
+        required: true
+        type: choice
+        options:
+          - android
+          - ios
+        default: android
+      flutter_version:
+        description: Optional Flutter version (e.g. 3.35.7). Leave empty for Shorebird default.
+        required: false
+        type: string
+        default: ""
+
+env:
+  SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+
+jobs:
+  release-android:
+    if: inputs.platform == 'android'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+        with:
+          cache: true
+
+      - name: Decode Android keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${KEYSTORE_BASE64}" || -z "${KEY_PROPERTIES}" ]]; then
+            echo "Missing KEYSTORE_BASE64 or KEY_PROPERTIES secrets required for Android release signing."
+            exit 1
+          fi
+          echo "${KEYSTORE_BASE64}" | base64 -d > android/app/upload-keystore.jks
+          printf '%s\n' "${KEY_PROPERTIES}" > android/key.properties
+          if ! grep -q 'storeFile=' android/key.properties; then
+            echo "storeFile=upload-keystore.jks" >> android/key.properties
+          fi
+
+      - name: Shorebird Release (Android)
+        if: inputs.flutter_version == ''
+        uses: shorebirdtech/shorebird-release@v1
+        with:
+          platform: android
+
+      - name: Shorebird Release (Android, pinned Flutter)
+        if: inputs.flutter_version != ''
+        uses: shorebirdtech/shorebird-release@v1
+        with:
+          platform: android
+          args: --flutter-version=${{ inputs.flutter_version }}
+
+  release-ios:
+    if: inputs.platform == 'ios'
+    runs-on: macos-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+        with:
+          cache: true
+
+      # iOS code signing must be configured for your org before this job can succeed.
+      # Typical options: Apple certificates + provisioning profiles via secrets,
+      # or a tool like Fastlane Match. See docs/ota-updates.md.
+      - name: Shorebird Release (iOS)
+        if: inputs.flutter_version == ''
+        uses: shorebirdtech/shorebird-release@v1
+        with:
+          platform: ios
+
+      - name: Shorebird Release (iOS, pinned Flutter)
+        if: inputs.flutter_version != ''
+        uses: shorebirdtech/shorebird-release@v1
+        with:
+          platform: ios
+          args: --flutter-version=${{ inputs.flutter_version }}
