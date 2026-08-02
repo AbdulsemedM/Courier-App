@@ -161,13 +161,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: 'Cards and payment options',
                   onTap: _openComingSoon,
                 ),
-                SettingsWidgets.buildNavRow(
-                  title: 'Address Book',
-                  icon: Icons.location_on_outlined,
-                  accentColor: const Color(0xFFEA580C),
-                  subtitle: 'Saved delivery addresses',
-                  onTap: _openComingSoon,
-                ),
               ],
             ),
             SettingsWidgets.buildSectionLabel('PREFERENCES'),
