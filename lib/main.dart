@@ -98,15 +98,30 @@ import 'package:courier_app/features/transaction_hq_to_branch/bloc/transaction_h
 import 'package:courier_app/features/transaction_hq_to_branch/data/data_provider/transaction_hq_to_branch_data_provider.dart';
 import 'package:courier_app/features/transaction_hq_to_branch/data/repository/transaction_hq_to_branch_repository.dart';
 import 'package:courier_app/providers/provider_setup.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'core/update/app_lifecycle_ota_host.dart';
 import 'core/update/force_update_gate.dart';
+import 'core/update/remote_config_service.dart';
 import 'core/theme/theme_provider.dart';
 import 'package:courier_app/configuration/payment_service.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Required for SharedPreferences
+final RemoteConfigService remoteConfigService = RemoteConfigService();
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+
   runApp(
     MultiProvider(
       providers: [
@@ -249,8 +264,12 @@ class MyApp extends StatelessWidget {
           title: 'Courier App',
           debugShowCheckedModeBanner: false,
           theme: themeProvider.currentTheme,
-          home: const ForceUpdateGate(
-            child: LoginScreen(),
+          home: ForceUpdateGate(
+            remoteConfigService: remoteConfigService,
+            child: AppLifecycleOtaHost(
+              remoteConfigService: remoteConfigService,
+              child: const LoginScreen(),
+            ),
           ),
         );
       },

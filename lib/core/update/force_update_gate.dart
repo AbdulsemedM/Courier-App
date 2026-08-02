@@ -1,18 +1,24 @@
 import 'package:courier_app/core/update/force_update_service.dart';
+import 'package:courier_app/core/update/remote_config_service.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ForceUpdateGate extends StatefulWidget {
   final Widget child;
+  final RemoteConfigService? remoteConfigService;
 
-  const ForceUpdateGate({super.key, required this.child});
+  const ForceUpdateGate({
+    super.key,
+    required this.child,
+    this.remoteConfigService,
+  });
 
   @override
   State<ForceUpdateGate> createState() => _ForceUpdateGateState();
 }
 
 class _ForceUpdateGateState extends State<ForceUpdateGate> {
-  final ForceUpdateService _service = const ForceUpdateService();
+  late final ForceUpdateService _service;
 
   bool _isLoading = true;
   bool _isUrovoDevice = false;
@@ -22,6 +28,9 @@ class _ForceUpdateGateState extends State<ForceUpdateGate> {
   @override
   void initState() {
     super.initState();
+    _service = ForceUpdateService(
+      remoteConfigService: widget.remoteConfigService,
+    );
     _checkUpdate();
   }
 
@@ -48,6 +57,7 @@ class _ForceUpdateGateState extends State<ForceUpdateGate> {
         localVersion: result.localVersion,
         storeVersion: result.storeVersion,
         storeUrl: result.storeUrl,
+        minimumSupportedVersion: result.minimumSupportedVersion,
       );
       _isUrovoDevice = isUrovo && shouldBlock;
       _isLoading = false;
@@ -66,6 +76,7 @@ class _ForceUpdateGateState extends State<ForceUpdateGate> {
         localVersion: _result.localVersion,
         storeVersion: _result.storeVersion,
         storeUrl: _result.storeUrl,
+        minimumSupportedVersion: _result.minimumSupportedVersion,
       );
       _isUrovoDevice = false;
     });
@@ -126,6 +137,15 @@ class _ForceUpdateGateState extends State<ForceUpdateGate> {
                     const SizedBox(height: 12),
                     Text(
                       'Installed: ${_result.localVersion}  |  Latest: ${_result.storeVersion}',
+                      style: TextStyle(color: Colors.grey.shade600),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                  if (_result.minimumSupportedVersion != null &&
+                      _result.minimumSupportedVersion != '0.0.0') ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Minimum required: ${_result.minimumSupportedVersion}',
                       style: TextStyle(color: Colors.grey.shade600),
                       textAlign: TextAlign.center,
                     ),

@@ -1,0 +1,110 @@
+name: Shorebird Patch
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Target platform
+        required: true
+        type: choice
+        options:
+          - android
+          - ios
+        default: android
+      release_version:
+        description: Existing Shorebird release version to patch (e.g. 1.0.21+36). Required.
+        required: true
+        type: string
+      track:
+        description: Shorebird track for staged rollout
+        required: true
+        type: choice
+        options:
+          - beta
+          - stable
+        default: beta
+
+env:
+  SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require release version
+        run: |
+          set -euo pipefail
+          if [[ -z "${{ inputs.release_version }}" ]]; then
+            echo "release_version is required. Patches must target an existing live release."
+            exit 1
+          fi
+          echo "Patching release ${{ inputs.release_version }} on track ${{ inputs.track }} (${{ inputs.platform }})"
+
+  patch-android:
+    needs: validate
+    if: inputs.platform == 'android'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+        with:
+          cache: true
+
+      - name: Decode Android keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${KEYSTORE_BASE64}" || -z "${KEY_PROPERTIES}" ]]; then
+            echo "Missing KEYSTORE_BASE64 or KEY_PROPERTIES secrets required for Android patch builds."
+            exit 1
+          fi
+          echo "${KEYSTORE_BASE64}" | base64 -d > android/app/upload-keystore.jks
+          printf '%s\n' "${KEY_PROPERTIES}" > android/key.properties
+          if ! grep -q 'storeFile=' android/key.properties; then
+            echo "storeFile=upload-keystore.jks" >> android/key.properties
+          fi
+
+      - name: Shorebird Patch (Android)
+        uses: shorebirdtech/shorebird-patch@v1
+        with:
+          platform: android
+          release-version: ${{ inputs.release_version }}
+          args: --track=${{ inputs.track }}
+
+  patch-ios:
+    needs: validate
+    if: inputs.platform == 'ios'
+    runs-on: macos-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+        with:
+          cache: true
+
+      # iOS signing must be configured for your org. See docs/ota-updates.md.
+      - name: Shorebird Patch (iOS)
+        uses: shorebirdtech/shorebird-patch@v1
+        with:
+          platform: ios
+          release-version: ${{ inputs.release_version }}
+          args: --track=${{ inputs.track }}

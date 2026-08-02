@@ -1,16 +1,18 @@
 # courier_app
 
-A new Flutter project.
+HudHud Express courier Flutter app (Android & iOS).
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a Flutter application. See the [Flutter documentation](https://docs.flutter.dev/) for toolchain setup.
 
-A few resources to get you started if this is your first Flutter project:
+## OTA updates
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Store-bound releases and over-the-air Dart patches are managed with Shorebird and Firebase Remote Config.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+See **[docs/ota-updates.md](docs/ota-updates.md)** for:
+
+- What qualifies as a Shorebird patch vs a store release
+- CLI commands for `shorebird release` / `shorebird patch`
+- Staged rollout, kill switch, and force-update Remote Config keys
+- GitHub Actions secrets and manual QA checklist

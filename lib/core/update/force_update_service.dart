@@ -1,3 +1,4 @@
+import 'package:courier_app/core/update/remote_config_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:new_version_plus/new_version_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -9,19 +10,25 @@ class ForceUpdateCheckResult {
   final String? localVersion;
   final String? storeVersion;
   final String? storeUrl;
+  final String? minimumSupportedVersion;
 
   const ForceUpdateCheckResult({
     required this.shouldBlock,
     this.localVersion,
     this.storeVersion,
     this.storeUrl,
+    this.minimumSupportedVersion,
   });
 }
 
 class ForceUpdateService {
   static const _bypassVersionKey = 'force_update_bypass_local_version';
 
-  const ForceUpdateService();
+  const ForceUpdateService({
+    this.remoteConfigService,
+  });
+
+  final RemoteConfigService? remoteConfigService;
 
   Future<bool> isUrovoDevice() async {
     try {
@@ -45,29 +52,56 @@ class ForceUpdateService {
   Future<ForceUpdateCheckResult> checkForRequiredUpdate() async {
     try {
       final packageInfo = await PackageInfo.fromPlatform();
-      final newVersion = NewVersionPlus(androidId: packageInfo.packageName);
-      final status = await newVersion.getVersionStatus();
+      final localVersion = packageInfo.version;
 
-      if (status == null) {
+      final rc = remoteConfigService;
+      if (rc != null) {
+        await rc.ensureInitialized();
+        final minimum = rc.minimumSupportedVersion;
+        final latestRc = rc.latestStoreVersion;
+        debugPrint('[ForceUpdate] RC minimum_supported_version: $minimum');
         debugPrint(
-          '[ForceUpdate] Store version check returned no data for package: ${packageInfo.packageName}',
+          '[ForceUpdate] RC latest_store_version '
+          '(${defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android'}): '
+          '$latestRc',
         );
-        return const ForceUpdateCheckResult(shouldBlock: false);
+
+        if (_isVersionHigher(minimum, localVersion)) {
+          debugPrint(
+            '[ForceUpdate] Below Remote Config minimum — blocking update',
+          );
+          final storeResult = await _lookupStoreStatus(packageInfo);
+          return ForceUpdateCheckResult(
+            shouldBlock: true,
+            localVersion: localVersion,
+            storeVersion: storeResult?.storeVersion ?? latestRc,
+            storeUrl: storeResult?.storeUrl,
+            minimumSupportedVersion: minimum,
+          );
+        }
       }
 
-      final local = status.localVersion;
-      final store = status.storeVersion;
-      final requiresUpdate = status.canUpdate || _isStoreVersionHigher(local, store);
-      debugPrint('[ForceUpdate] Installed version on device: $local');
-      debugPrint('[ForceUpdate] Latest version on store: $store');
-      debugPrint('[ForceUpdate] Store URL: ${status.appStoreLink}');
+      final storeResult = await _lookupStoreStatus(packageInfo);
+      if (storeResult == null) {
+        return ForceUpdateCheckResult(
+          shouldBlock: false,
+          localVersion: localVersion,
+          minimumSupportedVersion: rc?.minimumSupportedVersion,
+        );
+      }
+
+      final requiresUpdate = storeResult.shouldBlock;
+      debugPrint('[ForceUpdate] Installed version on device: $localVersion');
+      debugPrint('[ForceUpdate] Latest version on store: ${storeResult.storeVersion}');
+      debugPrint('[ForceUpdate] Store URL: ${storeResult.storeUrl}');
       debugPrint('[ForceUpdate] Update required: $requiresUpdate');
 
       return ForceUpdateCheckResult(
         shouldBlock: requiresUpdate,
-        localVersion: local,
-        storeVersion: store,
-        storeUrl: status.appStoreLink,
+        localVersion: localVersion,
+        storeVersion: storeResult.storeVersion,
+        storeUrl: storeResult.storeUrl,
+        minimumSupportedVersion: rc?.minimumSupportedVersion,
       );
     } catch (error) {
       debugPrint('[ForceUpdate] Store version check failed: $error');
@@ -76,18 +110,50 @@ class ForceUpdateService {
     }
   }
 
-  bool _isStoreVersionHigher(String localVersion, String storeVersion) {
-    final localParts = _normalizeVersion(localVersion);
-    final storeParts = _normalizeVersion(storeVersion);
-    final maxLen = localParts.length > storeParts.length
-        ? localParts.length
-        : storeParts.length;
+  Future<ForceUpdateCheckResult?> _lookupStoreStatus(
+    PackageInfo packageInfo,
+  ) async {
+    try {
+      final newVersion = NewVersionPlus(androidId: packageInfo.packageName);
+      final status = await newVersion.getVersionStatus();
+
+      if (status == null) {
+        debugPrint(
+          '[ForceUpdate] Store version check returned no data for package: ${packageInfo.packageName}',
+        );
+        return null;
+      }
+
+      final local = status.localVersion;
+      final store = status.storeVersion;
+      final requiresUpdate =
+          status.canUpdate || _isVersionHigher(store, local);
+
+      return ForceUpdateCheckResult(
+        shouldBlock: requiresUpdate,
+        localVersion: local,
+        storeVersion: store,
+        storeUrl: status.appStoreLink,
+      );
+    } catch (error) {
+      debugPrint('[ForceUpdate] Store lookup error: $error');
+      return null;
+    }
+  }
+
+  /// Returns true when [candidate] is strictly greater than [baseline].
+  bool _isVersionHigher(String candidate, String baseline) {
+    final candidateParts = _normalizeVersion(candidate);
+    final baselineParts = _normalizeVersion(baseline);
+    final maxLen = candidateParts.length > baselineParts.length
+        ? candidateParts.length
+        : baselineParts.length;
 
     for (var i = 0; i < maxLen; i++) {
-      final local = i < localParts.length ? localParts[i] : 0;
-      final store = i < storeParts.length ? storeParts[i] : 0;
-      if (store > local) return true;
-      if (store < local) return false;
+      final c = i < candidateParts.length ? candidateParts[i] : 0;
+      final b = i < baselineParts.length ? baselineParts[i] : 0;
+      if (c > b) return true;
+      if (c < b) return false;
     }
 
     return false;
