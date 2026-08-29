@@ -29,6 +29,9 @@ class RoleDisplayHelper {
   static bool isAdminRole(String? raw) =>
       raw != null && normalizeRole(raw) == 'admin';
 
+  static bool isTellerRole(String? raw) =>
+      raw != null && normalizeRole(raw) == 'teller';
+
   static bool hasAccountingAccess(String? raw) {
     if (raw == null || raw.trim().isEmpty) return false;
     final role = normalizeRole(raw);

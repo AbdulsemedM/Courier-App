@@ -67,6 +67,8 @@ class TrackShipmentModel {
   final String? addedByFirstName;
   final String? addedByLastName;
   final int? addedByBranchId;
+  final String? shelfCode;
+  final String? binCode;
   TrackShipmentModel({
     required this.awb,
     required this.senderName,
@@ -100,7 +102,19 @@ class TrackShipmentModel {
     this.addedByFirstName,
     this.addedByLastName,
     this.addedByBranchId,
+    this.shelfCode,
+    this.binCode,
   });
+
+  /// Prefer bin code as shelf number; append shelf code when both exist.
+  String? get shelfLabel {
+    final bin = binCode?.trim() ?? '';
+    final code = shelfCode?.trim() ?? '';
+    if (bin.isNotEmpty && code.isNotEmpty) return '$bin — $code';
+    if (bin.isNotEmpty) return bin;
+    if (code.isNotEmpty) return code;
+    return null;
+  }
 
   TrackShipmentModel copyWith({
     String? awb,
@@ -135,6 +149,8 @@ class TrackShipmentModel {
     String? addedByFirstName,
     String? addedByLastName,
     int? addedByBranchId,
+    String? shelfCode,
+    String? binCode,
   }) {
     return TrackShipmentModel(
       awb: awb ?? this.awb,
@@ -170,6 +186,8 @@ class TrackShipmentModel {
       addedByFirstName: addedByFirstName ?? this.addedByFirstName,
       addedByLastName: addedByLastName ?? this.addedByLastName,
       addedByBranchId: addedByBranchId ?? this.addedByBranchId,
+      shelfCode: shelfCode ?? this.shelfCode,
+      binCode: binCode ?? this.binCode,
     );
   }
 
@@ -207,6 +225,8 @@ class TrackShipmentModel {
       'addedByFirstName': addedByFirstName,
       'addedByLastName': addedByLastName,
       'addedByBranchId': addedByBranchId,
+      'shelfCode': shelfCode,
+      'binCode': binCode,
     };
   }
 
@@ -336,6 +356,19 @@ class TrackShipmentModel {
       description = shipment['shipmentStatus']['description'] as String? ?? '';
     }
 
+    // Extract shelf (nested under shipment when present)
+    String? shelfCode;
+    String? binCode;
+    final shelfObj = shipment['shelf'];
+    if (shelfObj is Map<String, dynamic>) {
+      final rawShelfCode = shelfObj['shelfCode']?.toString().trim();
+      final rawBinCode = shelfObj['binCode']?.toString().trim();
+      shelfCode =
+          (rawShelfCode != null && rawShelfCode.isNotEmpty) ? rawShelfCode : null;
+      binCode =
+          (rawBinCode != null && rawBinCode.isNotEmpty) ? rawBinCode : null;
+    }
+
     return TrackShipmentModel(
       awb: shipment['awb'] as String? ?? '',
       senderName: shipment['senderName'] as String? ?? '',
@@ -382,6 +415,8 @@ class TrackShipmentModel {
       addedByFirstName: addedByFirstName,
       addedByLastName: addedByLastName,
       addedByBranchId: addedByBranchId,
+      shelfCode: shelfCode,
+      binCode: binCode,
     );
   }
 
@@ -430,7 +465,9 @@ class TrackShipmentModel {
         other.statusDescription == statusDescription &&
         other.addedByFirstName == addedByFirstName &&
         other.addedByLastName == addedByLastName &&
-        other.addedByBranchId == addedByBranchId;
+        other.addedByBranchId == addedByBranchId &&
+        other.shelfCode == shelfCode &&
+        other.binCode == binCode;
   }
 
   @override
@@ -466,6 +503,8 @@ class TrackShipmentModel {
         statusDescription.hashCode ^
         addedByFirstName.hashCode ^
         addedByLastName.hashCode ^
-        addedByBranchId.hashCode;
+        addedByBranchId.hashCode ^
+        shelfCode.hashCode ^
+        binCode.hashCode;
   }
 }

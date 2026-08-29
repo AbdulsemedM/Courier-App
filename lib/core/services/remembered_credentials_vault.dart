@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:courier_app/core/services/device_binding_id.dart';
+import 'package:courier_app/core/services/secure_storage_helper.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -33,14 +34,14 @@ class RememberedCredentialsVault {
   final FlutterSecureStorage _storage;
 
   Future<Uint8List> _getOrCreateInstallSecret() async {
-    final existing = await _storage.read(key: _kInstallSecret);
+    final existing = await safeRead(_storage, _kInstallSecret);
     if (existing != null && existing.isNotEmpty) {
       return Uint8List.fromList(base64Decode(existing));
     }
     final bytes = Uint8List.fromList(
       List<int>.generate(32, (_) => Random.secure().nextInt(256)),
     );
-    await _storage.write(key: _kInstallSecret, value: base64Encode(bytes));
+    await safeWrite(_storage, _kInstallSecret, base64Encode(bytes));
     return bytes;
   }
 
@@ -78,15 +79,15 @@ class RememberedCredentialsVault {
       'pbkdf2_salt': base64Encode(pbkdf2Salt),
       'box': base64Encode(box.concatenation()),
     };
-    await _storage.write(key: _kPayload, value: jsonEncode(wrapped));
+    await safeWrite(_storage, _kPayload, jsonEncode(wrapped));
   }
 
   /// Returns decrypted credentials, or null if none stored or binding fails.
   Future<RememberedCredentials?> load() async {
-    final raw = await _storage.read(key: _kPayload);
+    final raw = await safeRead(_storage, _kPayload);
     if (raw == null || raw.isEmpty) return null;
 
-    final installSecretB64 = await _storage.read(key: _kInstallSecret);
+    final installSecretB64 = await safeRead(_storage, _kInstallSecret);
     if (installSecretB64 == null || installSecretB64.isEmpty) return null;
 
     final installSecret = Uint8List.fromList(base64Decode(installSecretB64));
@@ -127,6 +128,7 @@ class RememberedCredentialsVault {
   }
 
   Future<void> clear() async {
-    await _storage.delete(key: _kPayload);
+    await safeDelete(_storage, _kPayload);
+    await safeDelete(_storage, _kInstallSecret);
   }
 }

@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
   bool _isLoadingRole = true;
   String _displayRole = '...';
+  bool _isTeller = false;
 
   @override
   void initState() {
@@ -49,9 +50,13 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) return;
     setState(() {
       _displayRole = roleInfo.formattedRole;
+      _isTeller = RoleDisplayHelper.isTellerRole(roleInfo.primaryRole);
       _isLoadingRole = false;
     });
   }
+
+  bool get _showOtherSettings =>
+      !_isTeller && _canAny(AppPermissions.optionsEntryAny);
 
   bool _can(String permission) =>
       PermissionGuard.has(permissions, permission);
@@ -195,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                   if (_canAny(AppPermissions.reportEntryAny) ||
-                      _canAny(AppPermissions.optionsEntryAny) ||
+                      _showOtherSettings ||
                       _can(AppPermissions.manageAccounting)) ...[
                     HomeWidgets.buildSectionHeader(
                       context: context,
@@ -220,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 10),
                   ],
-                  if (_canAny(AppPermissions.optionsEntryAny)) ...[
+                  if (_showOtherSettings) ...[
                     HomeWidgets.buildFeatureTile(
                       context: context,
                       icon: Icons.tune_rounded,

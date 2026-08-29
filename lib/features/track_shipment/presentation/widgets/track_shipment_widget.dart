@@ -394,6 +394,15 @@ class TrackShipmentWidgets {
               origin: originBranch,
               destination: destinationBranch,
             ),
+            if (shipment.shelfLabel != null) ...[
+              const SizedBox(height: 12),
+              _buildShelfBadge(
+                isDarkMode: isDarkMode,
+                binCode: shipment.binCode,
+                shelfCode: shipment.shelfCode,
+                shelfLabel: shipment.shelfLabel!,
+              ),
+            ],
             const SizedBox(height: 20),
             // Sender Section
             Container(
@@ -1166,6 +1175,143 @@ class TrackShipmentWidgets {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _buildShelfBadge({
+    required bool isDarkMode,
+    required String? binCode,
+    required String? shelfCode,
+    required String shelfLabel,
+  }) {
+    final palette = AppPalette.forMode(isDarkMode);
+    final bin = binCode?.trim() ?? '';
+    final code = shelfCode?.trim() ?? '';
+    final hasSplit = bin.isNotEmpty && code.isNotEmpty;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDarkMode
+              ? [
+                  const Color(0xFF0F766E).withValues(alpha: 0.35),
+                  const Color(0xFF0369A1).withValues(alpha: 0.25),
+                ]
+              : [
+                  const Color(0xFFECFDF5),
+                  const Color(0xFFEFF6FF),
+                ],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDarkMode
+              ? const Color(0xFF14B8A6).withValues(alpha: 0.45)
+              : const Color(0xFF99F6E4),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: isDarkMode
+                  ? const Color(0xFF14B8A6).withValues(alpha: 0.2)
+                  : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDarkMode
+                    ? const Color(0xFF14B8A6).withValues(alpha: 0.35)
+                    : const Color(0xFF99F6E4),
+              ),
+            ),
+            child: Icon(
+              Icons.grid_view_rounded,
+              color: isDarkMode
+                  ? const Color(0xFF5EEAD4)
+                  : const Color(0xFF0F766E),
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Shelf location',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
+                    color: palette.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (hasSplit) ...[
+                  Text(
+                    bin,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.4,
+                      color: isDarkMode
+                          ? const Color(0xFF5EEAD4)
+                          : const Color(0xFF0F766E),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    code,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: palette.textSecondary,
+                    ),
+                  ),
+                ] else
+                  Text(
+                    shelfLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.3,
+                      color: isDarkMode
+                          ? const Color(0xFF5EEAD4)
+                          : const Color(0xFF0F766E),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: isDarkMode
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.white.withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'BIN',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8,
+                color: isDarkMode
+                    ? const Color(0xFF5EEAD4)
+                    : const Color(0xFF0F766E),
+              ),
             ),
           ),
         ],
