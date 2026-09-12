@@ -17,11 +17,10 @@ class LoginDataProvider {
     
   }
 
-  Future<Permissions> getPermissions(int roleId) async {
+  Future<Permissions> getPermissions() async {
     try {
       final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
-      final response =
-          await apiProvider.getRequest("/api/v1/permission/role/$roleId");
+      final response = await apiProvider.getRequest("/api/v1/me/role");
       final json = jsonDecode(response.body);
       return Permissions.fromMap(json['data']);
     } catch (e) {

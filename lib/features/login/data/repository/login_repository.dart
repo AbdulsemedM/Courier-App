@@ -39,8 +39,7 @@ class LoginRepository {
       Map<String, dynamic> decodedToken = JwtDecoder.decode(data['token']);
       await authService.storeBranch(decodedToken['user']['branch'].toString());
       await authService.storeRoleId(decodedToken['user']['role']);
-      final permissions =
-          await loginDataProvider.getPermissions(decodedToken['user']['role']);
+      final permissions = await loginDataProvider.getPermissions();
       if (permissions.roleName != null) {
         await authService.storeRoleName(permissions.roleName!);
       }
