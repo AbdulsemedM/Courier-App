@@ -186,17 +186,23 @@ class ShipmentInvoiceModel {
 
   static String _paymentMethodNameFrom(dynamic paymentMethod) {
     if (paymentMethod == null) return 'N/A';
-    if (paymentMethod is Map<String, dynamic>) {
-      return paymentMethod['method'] as String? ?? 'N/A';
+    if (paymentMethod is Map) {
+      final map = Map<String, dynamic>.from(paymentMethod);
+      return map['method']?.toString() ??
+          map['code']?.toString() ??
+          map['description']?.toString() ??
+          'N/A';
     }
     return paymentMethod.toString();
   }
 
   static String _paymentModeNameFrom(dynamic paymentMode) {
     if (paymentMode == null) return 'N/A';
-    if (paymentMode is Map<String, dynamic>) {
-      return paymentMode['code'] as String? ??
-          paymentMode['method'] as String? ??
+    if (paymentMode is Map) {
+      final map = Map<String, dynamic>.from(paymentMode);
+      return map['code']?.toString() ??
+          map['method']?.toString() ??
+          map['description']?.toString() ??
           'N/A';
     }
     return paymentMode.toString();
@@ -204,9 +210,10 @@ class ShipmentInvoiceModel {
 
   static String _serviceModeNameFrom(dynamic serviceMode) {
     if (serviceMode == null) return 'COURIER';
-    if (serviceMode is Map<String, dynamic>) {
-      return serviceMode['description'] as String? ??
-          serviceMode['code'] as String? ??
+    if (serviceMode is Map) {
+      final map = Map<String, dynamic>.from(serviceMode);
+      return map['description']?.toString() ??
+          map['code']?.toString() ??
           'COURIER';
     }
     return serviceMode.toString();
@@ -215,30 +222,30 @@ class ShipmentInvoiceModel {
   factory ShipmentInvoiceModel.fromMap(Map<String, dynamic> map) {
     final netFee = (map['netFee'] as num?)?.toDouble() ?? 0.0;
     return ShipmentInvoiceModel(
-      awb: map['awb'] as String,
-      senderName: map['senderName'] as String,
-      senderMobile: map['senderMobile'] as String,
+      awb: map['awb']?.toString() ?? '',
+      senderName: map['senderName']?.toString() ?? '',
+      senderMobile: map['senderMobile']?.toString() ?? '',
       senderbranchName: _branchNameFrom(map, 'senderBranch'),
       senderBranchId: _branchIdFrom(map, 'senderBranch'),
-      receiverName: map['receiverName'] as String,
-      receiverMobile: map['receiverMobile'] as String,
+      receiverName: map['receiverName']?.toString() ?? '',
+      receiverMobile: map['receiverMobile']?.toString() ?? '',
       receiverBranchName: _branchNameFrom(map, 'receiverBranch'),
       receiverBranchId: _branchIdFrom(map, 'receiverBranch'),
       paymentMethodName: _paymentMethodNameFrom(map['paymentMethod']),
       paymentModeName: _paymentModeNameFrom(map['paymentMode']),
-      shipmentDate: map['createdAt'] as String,
-      invoiceDate: map['updatedAt'] as String,
-      shipmentDescription: map['shipmentDescription'] as String,
+      shipmentDate: map['createdAt']?.toString() ?? '',
+      invoiceDate: map['updatedAt']?.toString() ?? '',
+      shipmentDescription: map['shipmentDescription']?.toString() ?? '',
       netFee: netFee,
       qty: (map['qty'] as num?)?.toInt() ?? 1,
-      unit: map['unit'] as String? ?? 'kg',
+      unit: map['unit']?.toString() ?? 'kg',
       numPcs: (map['numPcs'] as num?)?.toInt() ?? 0,
       serviceModeName: _serviceModeNameFrom(map['serviceMode']),
       totalAmount: (map['totalAmount'] as num?)?.toDouble() ?? netFee,
       vatAmount: (map['vatAmount'] as num?)?.toDouble() ?? 0.0,
       vatRate: (map['vatRate'] as num?)?.toDouble() ??
-          (map['vatConfig'] is Map<String, dynamic>
-              ? (map['vatConfig']['vatRate'] as num?)?.toDouble()
+          (map['vatConfig'] is Map
+              ? ((map['vatConfig'] as Map)['vatRate'] as num?)?.toDouble()
               : null) ??
           0.0,
     );

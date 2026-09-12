@@ -34,6 +34,30 @@ String _resolvePaymentMode(Map<String, dynamic> shipment) {
   return _paymentMethodLabel(shipment['paymentMethod']);
 }
 
+String _asString(dynamic value, [String fallback = '']) {
+  if (value == null) return fallback;
+  final text = value.toString().trim();
+  return text.isEmpty ? fallback : text;
+}
+
+String? _asNullableString(dynamic value) {
+  if (value == null) return null;
+  final text = value.toString().trim();
+  return text.isEmpty ? null : text;
+}
+
+Map<String, dynamic>? _asStringKeyMap(dynamic value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return Map<String, dynamic>.from(value);
+  return null;
+}
+
+num? _asNum(dynamic value) {
+  if (value is num) return value;
+  if (value is String) return num.tryParse(value);
+  return null;
+}
+
 class TrackShipmentModel {
   final String awb;
   final String senderName;
@@ -67,6 +91,7 @@ class TrackShipmentModel {
   final String? addedByFirstName;
   final String? addedByLastName;
   final int? addedByBranchId;
+  final String? addedByBranchName;
   final String? shelfCode;
   final String? binCode;
   TrackShipmentModel({
@@ -102,6 +127,7 @@ class TrackShipmentModel {
     this.addedByFirstName,
     this.addedByLastName,
     this.addedByBranchId,
+    this.addedByBranchName,
     this.shelfCode,
     this.binCode,
   });
@@ -149,6 +175,7 @@ class TrackShipmentModel {
     String? addedByFirstName,
     String? addedByLastName,
     int? addedByBranchId,
+    String? addedByBranchName,
     String? shelfCode,
     String? binCode,
   }) {
@@ -186,6 +213,7 @@ class TrackShipmentModel {
       addedByFirstName: addedByFirstName ?? this.addedByFirstName,
       addedByLastName: addedByLastName ?? this.addedByLastName,
       addedByBranchId: addedByBranchId ?? this.addedByBranchId,
+      addedByBranchName: addedByBranchName ?? this.addedByBranchName,
       shelfCode: shelfCode ?? this.shelfCode,
       binCode: binCode ?? this.binCode,
     );
@@ -225,6 +253,7 @@ class TrackShipmentModel {
       'addedByFirstName': addedByFirstName,
       'addedByLastName': addedByLastName,
       'addedByBranchId': addedByBranchId,
+      'addedByBranchName': addedByBranchName,
       'shelfCode': shelfCode,
       'binCode': binCode,
     };
@@ -232,21 +261,13 @@ class TrackShipmentModel {
 
   factory TrackShipmentModel.fromMap(Map<String, dynamic> map) {
     // Extract shipment - handle different response structures
-    dynamic shipmentData = map['shipment'];
-    Map<String, dynamic> shipment;
-    
-    if (shipmentData == null) {
-      // If no 'shipment' key, assume the map itself is the shipment data
-      shipment = map;
-    } else if (shipmentData is Map<String, dynamic>) {
-      // Normal case: shipment is a Map
-      shipment = shipmentData;
-    } else {
-      // If shipment is not a Map (e.g., it's an int ID), use the map itself
-      shipment = map;
-    }
-    
-    final status = map['status'] ?? (shipment['shipmentStatus'] is Map ? shipment['shipmentStatus'] : null);
+    final shipmentData = map['shipment'];
+    final shipmentMap = _asStringKeyMap(shipmentData);
+    // History events often omit nested shipment details; use the event itself.
+    final shipment = shipmentMap ?? map;
+
+    final status = _asStringKeyMap(map['status']) ??
+        _asStringKeyMap(shipment['shipmentStatus']);
 
     // Handle senderBranch - can be int (ID) or Map
     final senderBranch = shipment['senderBranch'];
@@ -254,9 +275,14 @@ class TrackShipmentModel {
     String? senderBranchName;
     if (senderBranch is int) {
       senderBranchId = senderBranch;
-    } else if (senderBranch is Map<String, dynamic>) {
-      senderBranchId = senderBranch['id'] as int?;
-      senderBranchName = senderBranch['name'] as String?;
+    } else if (senderBranch is num) {
+      senderBranchId = senderBranch.toInt();
+    } else {
+      final senderBranchMap = _asStringKeyMap(senderBranch);
+      if (senderBranchMap != null) {
+        senderBranchId = _asNum(senderBranchMap['id'])?.toInt();
+        senderBranchName = _asNullableString(senderBranchMap['name']);
+      }
     }
 
     // Handle receiverBranch (destination) - can be int (ID) or Map
@@ -265,156 +291,144 @@ class TrackShipmentModel {
     String? receiverBranchName;
     if (receiverBranch is int) {
       receiverBranchId = receiverBranch;
-    } else if (receiverBranch is Map<String, dynamic>) {
-      receiverBranchId = receiverBranch['id'] as int?;
-      receiverBranchName = receiverBranch['name'] as String?;
+    } else if (receiverBranch is num) {
+      receiverBranchId = receiverBranch.toInt();
+    } else {
+      final receiverBranchMap = _asStringKeyMap(receiverBranch);
+      if (receiverBranchMap != null) {
+        receiverBranchId = _asNum(receiverBranchMap['id'])?.toInt();
+        receiverBranchName = _asNullableString(receiverBranchMap['name']);
+      }
     }
 
     // Fallback keys some APIs use for destination
-    receiverBranchName ??= shipment['destinationBranchName'] as String? ??
-        shipment['destination'] as String? ??
-        (shipment['destinationBranch'] is Map<String, dynamic>
-            ? (shipment['destinationBranch'] as Map<String, dynamic>)['name']
-                as String?
-            : null);
-    senderBranchName ??= shipment['originBranchName'] as String? ??
-        (shipment['originBranch'] is Map<String, dynamic>
-            ? (shipment['originBranch'] as Map<String, dynamic>)['name']
-                as String?
-            : null);
+    receiverBranchName ??= _asNullableString(shipment['destinationBranchName']) ??
+        _asNullableString(shipment['destination']) ??
+        _asNullableString(
+          _asStringKeyMap(shipment['destinationBranch'])?['name'],
+        );
+    senderBranchName ??= _asNullableString(shipment['originBranchName']) ??
+        _asNullableString(_asStringKeyMap(shipment['originBranch'])?['name']);
 
     // Extract delivery type
-    final deliveryTypeObj = shipment['deliveryType'];
+    final deliveryTypeObj = _asStringKeyMap(shipment['deliveryType']);
     String? deliveryType;
-    if (deliveryTypeObj is Map<String, dynamic>) {
-      deliveryType = deliveryTypeObj['description'] as String? ??
-          deliveryTypeObj['type'] as String?;
+    if (deliveryTypeObj != null) {
+      deliveryType = _asNullableString(deliveryTypeObj['description']) ??
+          _asNullableString(deliveryTypeObj['type']);
     }
 
     // Extract transport mode
-    final transportModeObj = shipment['transportMode'];
+    final transportModeObj = _asStringKeyMap(shipment['transportMode']);
     String? transportMode;
-    if (transportModeObj is Map<String, dynamic>) {
-      transportMode = transportModeObj['description'] as String? ??
-          transportModeObj['mode'] as String?;
+    if (transportModeObj != null) {
+      transportMode = _asNullableString(transportModeObj['description']) ??
+          _asNullableString(transportModeObj['mode']);
     }
 
     // Extract shipment type
-    final shipmentTypeObj = shipment['shipmentType'];
+    final shipmentTypeObj = _asStringKeyMap(shipment['shipmentType']);
     String? shipmentType;
-    if (shipmentTypeObj is Map<String, dynamic>) {
-      shipmentType = shipmentTypeObj['type'] as String? ??
-          shipmentTypeObj['description'] as String?;
+    if (shipmentTypeObj != null) {
+      shipmentType = _asNullableString(shipmentTypeObj['type']) ??
+          _asNullableString(shipmentTypeObj['description']);
     }
 
     // Extract status information
     String? statusCode;
     String? statusDescription;
-    if (status != null && status is Map<String, dynamic>) {
-      statusCode = status['code'] as String?;
-      statusDescription = status['description'] as String?;
-    } else if (shipment['shipmentStatus'] is Map<String, dynamic>) {
-      final shipmentStatus = shipment['shipmentStatus'] as Map<String, dynamic>;
-      statusCode = shipmentStatus['code'] as String?;
-      statusDescription = shipmentStatus['description'] as String?;
+    if (status != null) {
+      statusCode = _asNullableString(status['code']);
+      statusDescription = _asNullableString(status['description']);
     }
 
-    // Prefer history-item addedBy (who changed status), then shipment creator
-    final addedBy = map['addedBy'] is Map<String, dynamic>
-        ? map['addedBy'] as Map<String, dynamic>
-        : (shipment['addedBy'] is Map<String, dynamic>
-            ? shipment['addedBy'] as Map<String, dynamic>
-            : null);
+    // Prefer nested addedBy user object, then flat history fields (actionBy)
+    final addedBy = _asStringKeyMap(map['addedBy']) ??
+        _asStringKeyMap(shipment['addedBy']);
     String? addedByFirstName;
     String? addedByLastName;
     int? addedByBranchId;
+    String? addedByBranchName;
     if (addedBy != null) {
-      addedByFirstName = addedBy['firstName'] as String?;
-      addedByLastName = addedBy['lastName'] as String?;
+      addedByFirstName = _asNullableString(addedBy['firstName']);
+      addedByLastName = _asNullableString(addedBy['lastName']);
       final branch = addedBy['branch'];
       if (branch is int) {
         addedByBranchId = branch;
       } else if (branch is num) {
         addedByBranchId = branch.toInt();
-      } else if (branch is Map<String, dynamic>) {
-        final id = branch['id'];
-        if (id is int) {
-          addedByBranchId = id;
-        } else if (id is num) {
-          addedByBranchId = id.toInt();
+      } else {
+        final branchMap = _asStringKeyMap(branch);
+        if (branchMap != null) {
+          addedByBranchId = _asNum(branchMap['id'])?.toInt();
+          addedByBranchName = _asNullableString(branchMap['name']);
         }
       }
     }
 
+    // /shipment-tracking history payload uses actionBy / actionByBranchName
+    addedByFirstName ??= _asNullableString(map['actionBy']) ??
+        _asNullableString(map['createdByName']);
+    addedByBranchName ??= _asNullableString(map['actionByBranchName']) ??
+        _asNullableString(map['createdByBranchName']);
+
     // Extract description - prefer status description, then shipment status description
-    String description = '';
-    if (map['description'] != null) {
-      description = map['description'].toString();
-    } else if (statusDescription != null) {
+    String description = _asString(map['description']);
+    if (description.isEmpty && statusDescription != null) {
       description = statusDescription;
-    } else if (shipment['shipmentStatus'] is Map<String, dynamic>) {
-      description = shipment['shipmentStatus']['description'] as String? ?? '';
+    } else if (description.isEmpty) {
+      description =
+          _asString(_asStringKeyMap(shipment['shipmentStatus'])?['description']);
     }
 
     // Extract shelf (nested under shipment when present)
     String? shelfCode;
     String? binCode;
-    final shelfObj = shipment['shelf'];
-    if (shelfObj is Map<String, dynamic>) {
-      final rawShelfCode = shelfObj['shelfCode']?.toString().trim();
-      final rawBinCode = shelfObj['binCode']?.toString().trim();
-      shelfCode =
-          (rawShelfCode != null && rawShelfCode.isNotEmpty) ? rawShelfCode : null;
-      binCode =
-          (rawBinCode != null && rawBinCode.isNotEmpty) ? rawBinCode : null;
+    final shelfObj = _asStringKeyMap(shipment['shelf']);
+    if (shelfObj != null) {
+      shelfCode = _asNullableString(shelfObj['shelfCode']);
+      binCode = _asNullableString(shelfObj['binCode']);
     }
 
+    final totalAmountNum = _asNum(shipment['totalAmount']);
+    final qtyNum = _asNum(shipment['qty']);
+    final numBoxesNum = _asNum(shipment['numBoxes']);
+
     return TrackShipmentModel(
-      awb: shipment['awb'] as String? ?? '',
-      senderName: shipment['senderName'] as String? ?? '',
-      senderMobile: shipment['senderMobile'] as String? ?? '',
-      receiverName: shipment['receiverName'] as String? ?? '',
-      receiverMobile: shipment['receiverMobile'] as String? ?? '',
+      awb: _asString(shipment['awb']),
+      senderName: _asString(shipment['senderName']),
+      senderMobile: _asString(shipment['senderMobile']),
+      receiverName: _asString(shipment['receiverName']),
+      receiverMobile: _asString(shipment['receiverMobile']),
       name: receiverBranchName ?? '',
       senderBranchName: senderBranchName,
       receiverBranchName: receiverBranchName,
-      netFee: (shipment['netFee'] ?? '').toString(),
-      shipmentDescription: shipment['shipmentDescription'] as String? ?? '',
+      netFee: _asString(shipment['netFee']),
+      shipmentDescription: _asString(shipment['shipmentDescription']),
       method: _resolvePaymentMode(shipment),
       updatedBy: addedByFirstName ?? '',
       description: description,
-      createdAt:
-          map['createdAt'] as String? ?? shipment['createdAt'] as String? ?? '',
+      createdAt: _asString(map['createdAt'], _asString(shipment['createdAt'])),
       senderBranchId: senderBranchId,
       receiverBranchId: receiverBranchId,
-      barcodeUrl: shipment['barcodeUrl'] as String?,
-      transactionReference: shipment['transactionReference'] as String?,
-      paymentStatus: shipment['paymentStatus'] as String?,
-      paymentStatusDescription: shipment['paymentStatusDescription'] as String?,
+      barcodeUrl: _asNullableString(shipment['barcodeUrl']),
+      transactionReference: _asNullableString(shipment['transactionReference']),
+      paymentStatus: _asNullableString(shipment['paymentStatus']),
+      paymentStatusDescription:
+          _asNullableString(shipment['paymentStatusDescription']),
       deliveryType: deliveryType,
       transportMode: transportMode,
       shipmentType: shipmentType,
-      totalAmount: shipment['totalAmount'] != null
-          ? (shipment['totalAmount'] is double
-              ? shipment['totalAmount'] as double
-              : (shipment['totalAmount'] as num).toDouble())
-          : null,
-      qty: shipment['qty'] != null
-          ? (shipment['qty'] is int
-              ? shipment['qty'] as int
-              : (shipment['qty'] as num).toInt())
-          : null,
-      unit: shipment['unit'] as String?,
-      numBoxes: shipment['numBoxes'] != null
-          ? (shipment['numBoxes'] is int
-              ? shipment['numBoxes'] as int
-              : (shipment['numBoxes'] as num).toInt())
-          : null,
+      totalAmount: totalAmountNum?.toDouble(),
+      qty: qtyNum?.toInt(),
+      unit: _asNullableString(shipment['unit']),
+      numBoxes: numBoxesNum?.toInt(),
       statusCode: statusCode,
       statusDescription: statusDescription,
       addedByFirstName: addedByFirstName,
       addedByLastName: addedByLastName,
       addedByBranchId: addedByBranchId,
+      addedByBranchName: addedByBranchName,
       shelfCode: shelfCode,
       binCode: binCode,
     );
@@ -466,6 +480,7 @@ class TrackShipmentModel {
         other.addedByFirstName == addedByFirstName &&
         other.addedByLastName == addedByLastName &&
         other.addedByBranchId == addedByBranchId &&
+        other.addedByBranchName == addedByBranchName &&
         other.shelfCode == shelfCode &&
         other.binCode == binCode;
   }
@@ -504,6 +519,7 @@ class TrackShipmentModel {
         addedByFirstName.hashCode ^
         addedByLastName.hashCode ^
         addedByBranchId.hashCode ^
+        addedByBranchName.hashCode ^
         shelfCode.hashCode ^
         binCode.hashCode;
   }

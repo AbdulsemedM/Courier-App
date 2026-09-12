@@ -108,12 +108,16 @@ class TrackShipmentWidgets {
     final mainShipment = shipments.first;
     final latestShipment = _latestShipmentForActions(shipments);
     final paymentShipment = _shipmentWithPaymentDetails(shipments);
-    final canPay = ShipmentStatusHelper.shouldShowPayAction(
-      shipmentStatusCode: latestShipment.statusCode ?? '',
-      paymentStatus: paymentShipment.paymentStatus,
-      paymentMode: paymentShipment.method,
-    );
+    final hasPaymentInfo = paymentShipment.paymentStatus != null &&
+        paymentShipment.paymentStatus!.trim().isNotEmpty;
+    final canPay = hasPaymentInfo &&
+        ShipmentStatusHelper.shouldShowPayAction(
+          shipmentStatusCode: latestShipment.statusCode ?? '',
+          paymentStatus: paymentShipment.paymentStatus,
+          paymentMode: paymentShipment.method,
+        );
     final canDeliver = !canPay &&
+        hasPaymentInfo &&
         ShipmentStatusHelper.shouldShowDeliverAction(
           shipmentStatusCode: latestShipment.statusCode,
           shipmentStatusLabel: latestShipment.statusDescription,
@@ -792,10 +796,13 @@ class TrackShipmentWidgets {
                       ? '${shipment.addedByFirstName} ${shipment.addedByLastName ?? ''}'
                           .trim()
                       : shipment.updatedBy,
-                  branchName: _getBranchName(
-                    shipment.addedByBranchId,
-                    branches,
-                  ),
+                  branchName: shipment.addedByBranchName?.trim().isNotEmpty ==
+                          true
+                      ? shipment.addedByBranchName
+                      : _getBranchName(
+                          shipment.addedByBranchId,
+                          branches,
+                        ),
                   isLast: index == shipments.length - 1,
                   statusCode: shipment.statusCode,
                 );
