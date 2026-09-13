@@ -54,3 +54,29 @@ app.*.map.json
 # Google / Firebase services
 **/google-services.json
 **/GoogleService-Info.plist
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+build/
+
+# Android
+android/.gradle/
+android/local.properties
+android/**/build/
+
+# Java
+*.hprof
+*.class
+
+# IDE
+.idea/
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
