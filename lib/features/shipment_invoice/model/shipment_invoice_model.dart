@@ -27,6 +27,9 @@ class ShipmentInvoiceModel {
   final double vatRate;
   final int? senderBranchId;
   final int? receiverBranchId;
+  final String? shipmentStatusCode;
+  final String? shipmentStatusDescription;
+  final String? paymentStatus;
   ShipmentInvoiceModel({
     required this.awb,
     required this.senderName,
@@ -50,6 +53,9 @@ class ShipmentInvoiceModel {
     this.vatRate = 0,
     this.senderBranchId,
     this.receiverBranchId,
+    this.shipmentStatusCode,
+    this.shipmentStatusDescription,
+    this.paymentStatus,
   });
 
   ShipmentInvoiceModel copyWith({
@@ -120,6 +126,9 @@ class ShipmentInvoiceModel {
       vatRate: vatRate,
       senderBranchId: senderBranchId,
       receiverBranchId: receiverBranchId,
+      shipmentStatusCode: shipmentStatusCode,
+      shipmentStatusDescription: shipmentStatusDescription,
+      paymentStatus: paymentStatus,
     );
   }
 
@@ -208,6 +217,24 @@ class ShipmentInvoiceModel {
     return paymentMode.toString();
   }
 
+  static String? _shipmentStatusCodeFrom(dynamic shipmentStatus) {
+    if (shipmentStatus is Map) {
+      final map = Map<String, dynamic>.from(shipmentStatus);
+      final code = map['code']?.toString().trim();
+      return code == null || code.isEmpty ? null : code;
+    }
+    return null;
+  }
+
+  static String? _shipmentStatusDescriptionFrom(dynamic shipmentStatus) {
+    if (shipmentStatus is Map) {
+      final map = Map<String, dynamic>.from(shipmentStatus);
+      final description = map['description']?.toString().trim();
+      return description == null || description.isEmpty ? null : description;
+    }
+    return null;
+  }
+
   static String _serviceModeNameFrom(dynamic serviceMode) {
     if (serviceMode == null) return 'COURIER';
     if (serviceMode is Map) {
@@ -248,6 +275,12 @@ class ShipmentInvoiceModel {
               ? ((map['vatConfig'] as Map)['vatRate'] as num?)?.toDouble()
               : null) ??
           0.0,
+      shipmentStatusCode: _shipmentStatusCodeFrom(map['shipmentStatus']),
+      shipmentStatusDescription:
+          _shipmentStatusDescriptionFrom(map['shipmentStatus']),
+      paymentStatus: map['paymentStatus']?.toString().trim().isNotEmpty == true
+          ? map['paymentStatus'].toString().trim()
+          : null,
     );
   }
 

@@ -108,16 +108,13 @@ class TrackShipmentWidgets {
     final mainShipment = shipments.first;
     final latestShipment = _latestShipmentForActions(shipments);
     final paymentShipment = _shipmentWithPaymentDetails(shipments);
-    final hasPaymentInfo = paymentShipment.paymentStatus != null &&
-        paymentShipment.paymentStatus!.trim().isNotEmpty;
-    final canPay = hasPaymentInfo &&
-        ShipmentStatusHelper.shouldShowPayAction(
-          shipmentStatusCode: latestShipment.statusCode ?? '',
-          paymentStatus: paymentShipment.paymentStatus,
-          paymentMode: paymentShipment.method,
-        );
+    final canPay = ShipmentStatusHelper.shouldShowPayBeforeDeliverAction(
+      shipmentStatusCode: latestShipment.statusCode,
+      shipmentStatusLabel: latestShipment.statusDescription,
+      paymentStatus: paymentShipment.paymentStatus,
+      paymentMode: paymentShipment.method,
+    );
     final canDeliver = !canPay &&
-        hasPaymentInfo &&
         ShipmentStatusHelper.shouldShowDeliverAction(
           shipmentStatusCode: latestShipment.statusCode,
           shipmentStatusLabel: latestShipment.statusDescription,

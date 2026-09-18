@@ -41,12 +41,20 @@ class TrackShipmentRepository {
           )
           .toList();
 
-      // Tracking history often omits shipment detail fields; enrich from invoice.
-      if (orders.isNotEmpty && orders.first.senderName.trim().isEmpty) {
+      // Tracking history often omits shipment/payment fields; enrich from invoice.
+      if (orders.isNotEmpty) {
         final invoice = await _tryFetchInvoice(searchedAwb);
         if (invoice != null) {
           orders = orders
-              .map((order) => _mergeInvoiceDetails(order, invoice))
+              .asMap()
+              .entries
+              .map(
+                (entry) => _mergeInvoiceDetails(
+                  entry.value,
+                  invoice,
+                  applyCurrentStatus: entry.key == 0,
+                ),
+              )
               .toList();
         }
       }
@@ -76,8 +84,9 @@ class TrackShipmentRepository {
 
   TrackShipmentModel _mergeInvoiceDetails(
     TrackShipmentModel order,
-    ShipmentInvoiceModel invoice,
-  ) {
+    ShipmentInvoiceModel invoice, {
+    bool applyCurrentStatus = false,
+  }) {
     return order.copyWith(
       awb: order.awb.trim().isEmpty ? invoice.awb : order.awb,
       senderName:
@@ -124,6 +133,17 @@ class TrackShipmentRepository {
       qty: order.qty ?? invoice.qty,
       unit: order.unit ?? invoice.unit,
       numBoxes: order.numBoxes ?? invoice.numPcs,
+      paymentStatus: order.paymentStatus ?? invoice.paymentStatus,
+      statusCode: applyCurrentStatus &&
+              invoice.shipmentStatusCode != null &&
+              invoice.shipmentStatusCode!.trim().isNotEmpty
+          ? invoice.shipmentStatusCode
+          : order.statusCode,
+      statusDescription: applyCurrentStatus &&
+              invoice.shipmentStatusDescription != null &&
+              invoice.shipmentStatusDescription!.trim().isNotEmpty
+          ? invoice.shipmentStatusDescription
+          : order.statusDescription,
     );
   }
 }
