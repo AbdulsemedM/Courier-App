@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:courier_app/core/utils/branch_name_resolver.dart';
+import 'package:courier_app/features/branches/data/data_provider/branches_data_provider.dart';
+import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:courier_app/features/shipment_invoice/data/data_provider/shipment_invoice_data_provider.dart';
 import 'package:courier_app/features/shipment_invoice/model/shipment_invoice_model.dart';
 import 'package:courier_app/features/track_shipment/data/data_provider/track_shipment_data_provider.dart';
@@ -8,12 +11,16 @@ import 'package:courier_app/features/track_shipment/model/track_shipment_model.d
 class TrackShipmentRepository {
   final TrackShipmentDataProvider trackShipmentDataProvider;
   final ShipmentInvoiceDataProvider shipmentInvoiceDataProvider;
+  final BranchesDataProvider branchesDataProvider;
 
   TrackShipmentRepository(
     this.trackShipmentDataProvider, {
     ShipmentInvoiceDataProvider? shipmentInvoiceDataProvider,
-  }) : shipmentInvoiceDataProvider =
-            shipmentInvoiceDataProvider ?? ShipmentInvoiceDataProvider();
+    BranchesDataProvider? branchesDataProvider,
+  })  : shipmentInvoiceDataProvider =
+            shipmentInvoiceDataProvider ?? ShipmentInvoiceDataProvider(),
+        branchesDataProvider =
+            branchesDataProvider ?? BranchesDataProvider();
 
   Future<List<TrackShipmentModel>> getTrackShipment(String awb) async {
     try {
@@ -57,6 +64,10 @@ class TrackShipmentRepository {
               )
               .toList();
         }
+
+        // Invoice often returns branch IDs only — resolve names here so the UI
+        // does not depend on BranchesBloc timing.
+        orders = await _resolveBranchNames(orders, searchedAwb);
       }
 
       return orders;
@@ -77,6 +88,76 @@ class TrackShipmentRepository {
       return ShipmentInvoiceModel.fromMap(
         Map<String, dynamic>.from(data['data'] as Map),
       );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<List<TrackShipmentModel>> _resolveBranchNames(
+    List<TrackShipmentModel> orders,
+    String awb,
+  ) async {
+    final needsLookup = orders.any(
+      (order) =>
+          (order.senderBranchName == null ||
+              order.senderBranchName!.trim().isEmpty) ||
+          (order.receiverBranchName == null ||
+              order.receiverBranchName!.trim().isEmpty) ||
+          order.name.trim().isEmpty,
+    );
+    if (!needsLookup) return orders;
+
+    final branches = await _tryFetchBranches();
+    if (branches == null || branches.isEmpty) return orders;
+
+    final lookup = BranchNameResolver.lookupFromBranches(branches);
+
+    return orders
+        .map((order) {
+          final senderName = BranchNameResolver.resolve(
+            name: order.senderBranchName,
+            branchId: order.senderBranchId,
+            branchNamesById: lookup,
+            branches: branches,
+            awb: awb,
+          );
+          final receiverName = BranchNameResolver.resolve(
+            name: order.receiverBranchName ?? order.name,
+            branchId: order.receiverBranchId,
+            branchNamesById: lookup,
+            branches: branches,
+          );
+
+          return order.copyWith(
+            senderBranchName: senderName.isNotEmpty
+                ? senderName
+                : order.senderBranchName,
+            receiverBranchName: receiverName.isNotEmpty
+                ? receiverName
+                : order.receiverBranchName,
+            name: order.name.trim().isEmpty && receiverName.isNotEmpty
+                ? receiverName
+                : order.name,
+          );
+        })
+        .toList();
+  }
+
+  Future<List<BranchesModel>?> _tryFetchBranches() async {
+    try {
+      final response = await branchesDataProvider.fetchBranches();
+      final data = jsonDecode(response);
+      if (data['status'] != 200 || data['data'] is! List) {
+        return null;
+      }
+      return (data['data'] as List)
+          .whereType<Map>()
+          .map(
+            (branch) => BranchesModel.fromMap(
+              Map<String, dynamic>.from(branch),
+            ),
+          )
+          .toList();
     } catch (_) {
       return null;
     }

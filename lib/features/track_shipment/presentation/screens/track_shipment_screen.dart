@@ -9,6 +9,7 @@ import 'package:courier_app/features/add_shipment/bloc/add_shipment_bloc.dart'
 import 'package:courier_app/features/pay_by_awb/presentation/widgets/process_payment_dialog.dart';
 import 'package:courier_app/features/track_order/presentation/widgets/track_order_widget.dart';
 import 'package:courier_app/features/branches/bloc/branches_bloc.dart';
+import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:courier_app/features/shipment/data/data_provider/deliver_shipment_data_provider.dart';
 import 'package:courier_app/features/shipment/data/repository/deliver_shipment_repository.dart';
 import 'package:courier_app/features/shipment/presentation/widgets/deliver_shipment_modal.dart';
@@ -36,6 +37,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   bool _isHardwareScanner = false;
   bool _hasCameraPermission = false;
   bool _handlingHidScan = false;
+  List<BranchesModel>? _cachedBranches;
 
   @override
   void initState() {
@@ -505,9 +507,12 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                   if (state is TrackShipmentSuccess) {
                     return BlocBuilder<BranchesBloc, BranchesState>(
                       builder: (context, branchesState) {
+                        if (branchesState is FetchBranchesLoaded) {
+                          _cachedBranches = branchesState.branches;
+                        }
                         final branches = branchesState is FetchBranchesLoaded
                             ? branchesState.branches
-                            : null;
+                            : _cachedBranches;
                         return BlocBuilder<AddShipmentBloc, AddShipmentState>(
                           builder: (context, paymentState) {
                             final isPaymentActionLoading =

@@ -15,12 +15,23 @@ class BranchesBloc extends Bloc<BranchesEvent, BranchesState> {
     on<AddBranch>(_addBranch);
   }
   void _fetchBranches(FetchBranches event, Emitter<BranchesState> emit) async {
-    emit(FetchBranchesLoading());
+    // Keep previously loaded branches while refreshing so screens that resolve
+    // branch IDs → names (e.g. Track Shipment origin/destination) don't flash empty.
+    final previous = state is FetchBranchesLoaded
+        ? (state as FetchBranchesLoaded).branches
+        : null;
+    if (previous == null) {
+      emit(FetchBranchesLoading());
+    }
     try {
       final branches = await branchesRepository.fetchBranches();
       emit(FetchBranchesLoaded(branches: branches));
     } catch (e) {
-      emit(FetchBranchesError(message: e.toString()));
+      if (previous != null) {
+        emit(FetchBranchesLoaded(branches: previous));
+      } else {
+        emit(FetchBranchesError(message: e.toString()));
+      }
     }
   }
 

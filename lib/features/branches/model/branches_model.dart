@@ -62,16 +62,35 @@ class BranchesModel {
   }
 
   factory BranchesModel.fromMap(Map<String, dynamic> map) {
+    final idValue = map['id'];
+    final balanceValue = map['balance'];
+    final currencyValue = map['currency'];
+
+    String currencyCode = '';
+    if (currencyValue is Map) {
+      currencyCode = currencyValue['code']?.toString() ?? '';
+    } else if (currencyValue != null) {
+      currencyCode = currencyValue.toString();
+    }
+
     return BranchesModel(
-      id: map['id'] as int? ?? 0,
-      name: map['name'] as String? ?? '',
-      phone: map['phone'] as String? ?? '',
-      code: map['code'] as String? ?? '',
+      id: idValue is int
+          ? idValue
+          : idValue is num
+              ? idValue.toInt()
+              : int.tryParse(idValue?.toString() ?? '') ?? 0,
+      name: map['name']?.toString() ?? '',
+      phone: map['phone']?.toString() ?? '',
+      code: map['code']?.toString() ?? '',
       isAgent: map['isAgent'] as bool? ?? false,
-      settlementAccount: map['settlementAccount'] as String? ?? '',
-      balance: map['balance'] as double? ?? 0.0,
-      createdAt: map['createdAt'] as String? ?? '',
-      currency: map['currency']['code'] as String? ?? '',
+      settlementAccount: map['settlementAccount']?.toString() ?? '',
+      balance: balanceValue is double
+          ? balanceValue
+          : balanceValue is num
+              ? balanceValue.toDouble()
+              : double.tryParse(balanceValue?.toString() ?? '') ?? 0.0,
+      createdAt: map['createdAt']?.toString() ?? '',
+      currency: currencyCode,
     );
   }
 

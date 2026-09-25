@@ -3,6 +3,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../model/track_shipment_model.dart';
 import 'package:intl/intl.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
+import 'package:courier_app/core/utils/branch_name_resolver.dart';
 import 'package:courier_app/core/utils/shipment_status_helper.dart';
 import '../../../branches/model/branches_model.dart';
 
@@ -227,7 +228,19 @@ class TrackShipmentWidgets {
     String? parsedName,
     int? branchId,
     List<BranchesModel>? branches,
+    String? awb,
   }) {
+    final resolved = BranchNameResolver.resolve(
+      name: parsedName,
+      branchId: branchId,
+      branchNamesById: branches != null
+          ? BranchNameResolver.lookupFromBranches(branches)
+          : null,
+      branches: branches,
+      awb: awb,
+    );
+    if (resolved.isNotEmpty) return resolved;
+
     final fromList = _getBranchName(branchId, branches);
     if (fromList != null && fromList.isNotEmpty) return fromList;
     if (parsedName != null && parsedName.trim().isNotEmpty) {
@@ -354,6 +367,7 @@ class TrackShipmentWidgets {
       parsedName: shipment.senderBranchName,
       branchId: shipment.senderBranchId,
       branches: branches,
+      awb: shipment.awb,
     );
     final destinationBranch = _displayBranch(
       parsedName: shipment.receiverBranchName ?? shipment.name,
@@ -536,8 +550,14 @@ class TrackShipmentWidgets {
 
   static Widget _buildPaymentCard(
       bool isDarkMode, TrackShipmentModel shipment) {
-    final isPending = shipment.paymentStatus == 'PENDING';
-    final isSuccess = shipment.paymentStatus == 'SUCCESS';
+    final paymentStatusLabel = shipment.paymentStatus?.trim().isNotEmpty == true
+        ? shipment.paymentStatus!.trim()
+        : (ShipmentStatusHelper.isCodPaymentMode(shipment.method)
+            ? 'PENDING'
+            : 'UNKNOWN');
+    final isPending = paymentStatusLabel == 'PENDING';
+    final isSuccess =
+        paymentStatusLabel == 'SUCCESS' || paymentStatusLabel == 'PAID';
 
     return Card(
       elevation: 3,
@@ -585,30 +605,35 @@ class TrackShipmentWidgets {
               child: Column(
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Total Amount',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.w500,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Total Amount',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.deepPurple,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'ETB ${shipment.totalAmount?.toStringAsFixed(2) ?? shipment.netFee}',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepPurple[900],
+                            const SizedBox(height: 8),
+                            Text(
+                              'ETB ${shipment.totalAmount?.toStringAsFixed(2) ?? shipment.netFee}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepPurple[900],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
@@ -621,7 +646,7 @@ class TrackShipmentWidgets {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          shipment.paymentStatus ?? 'UNKNOWN',
+                          paymentStatusLabel,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,

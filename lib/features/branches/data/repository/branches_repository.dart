@@ -18,7 +18,12 @@ class BranchesRepository {
       }
       if (data['data'] is List) {
         final branches = (data['data'] as List)
-            .map((branch) => BranchesModel.fromMap(branch))
+            .whereType<Map>()
+            .map(
+              (branch) => BranchesModel.fromMap(
+                Map<String, dynamic>.from(branch),
+              ),
+            )
             .toList();
         return branches;
       } else {
