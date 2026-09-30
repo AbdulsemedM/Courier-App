@@ -9,3 +9,13 @@ class TrackShipment extends TrackShipmentEvent {
 
   TrackShipment(this.awb, {this.preservePreviousData = false});
 }
+
+class TrackShipmentByPhone extends TrackShipmentEvent {
+  final String phone;
+
+  TrackShipmentByPhone(this.phone);
+}
+
+class TrackShipmentShowPhoneHistory extends TrackShipmentEvent {}
+
+class TrackShipmentClear extends TrackShipmentEvent {}

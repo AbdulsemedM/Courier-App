@@ -6,7 +6,9 @@ import 'package:courier_app/features/branches/model/branches_model.dart';
 import 'package:courier_app/features/shipment_invoice/data/data_provider/shipment_invoice_data_provider.dart';
 import 'package:courier_app/features/shipment_invoice/model/shipment_invoice_model.dart';
 import 'package:courier_app/features/track_shipment/data/data_provider/track_shipment_data_provider.dart';
+import 'package:courier_app/features/track_shipment/model/customer_shipment_history_item.dart';
 import 'package:courier_app/features/track_shipment/model/track_shipment_model.dart';
+import 'package:courier_app/features/track_shipment/utils/phone_query_normalizer.dart';
 
 class TrackShipmentRepository {
   final TrackShipmentDataProvider trackShipmentDataProvider;
@@ -75,6 +77,40 @@ class TrackShipmentRepository {
       print(e.toString());
       rethrow;
     }
+  }
+
+  Future<List<CustomerShipmentHistoryItem>> getCustomerShipmentHistory(
+    String phone,
+  ) async {
+    final normalized = PhoneQueryNormalizer.normalize(phone);
+    final response =
+        await trackShipmentDataProvider.getCustomerShipmentHistory(normalized);
+    final data = jsonDecode(response);
+    if (data is! Map) {
+      throw 'Invalid response format';
+    }
+    if (data['status'] != 200) {
+      throw data['message']?.toString() ?? 'Unable to find shipments';
+    }
+    if (data['data'] is! List) {
+      throw 'Invalid response format: Expected a list';
+    }
+
+    final items = (data['data'] as List)
+        .whereType<Map>()
+        .map(
+          (item) => CustomerShipmentHistoryItem.fromMap(
+            Map<String, dynamic>.from(item),
+          ),
+        )
+        .where((item) => item.awb.isNotEmpty)
+        .toList();
+
+    if (items.isEmpty) {
+      throw 'No shipments found';
+    }
+
+    return items;
   }
 
   Future<ShipmentInvoiceModel?> _tryFetchInvoice(String awb) async {

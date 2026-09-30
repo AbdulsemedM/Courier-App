@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../model/customer_shipment_history_item.dart';
 import '../../model/track_shipment_model.dart';
 import 'package:intl/intl.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
@@ -1444,5 +1445,108 @@ class TrackShipmentWidgets {
         ],
       ),
     );
+  }
+
+  static Widget buildCustomerHistoryList({
+    required BuildContext context,
+    required List<CustomerShipmentHistoryItem> items,
+    required ValueChanged<String> onSelect,
+  }) {
+    final palette = context.palette;
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      itemCount: items.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        final item = items[index];
+        final dateLabel = _formatHistoryDate(item.awbDate);
+        final status = item.statusLabel;
+        return Material(
+          color: palette.surface,
+          borderRadius: BorderRadius.circular(16),
+          elevation: 2,
+          shadowColor: Colors.black.withValues(alpha: 0.08),
+          child: InkWell(
+            onTap: () => onSelect(item.awb),
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: palette.accentMuted,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.inventory_2_outlined,
+                      color: palette.accent,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.awb,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                            color: palette.textPrimary,
+                          ),
+                        ),
+                        if (status.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            status,
+                            style: TextStyle(
+                              color: palette.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                        if (item.origin != null || item.destination != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            '${item.origin ?? '—'} → ${item.destination ?? '—'}',
+                            style: TextStyle(
+                              color: palette.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                        if (dateLabel != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            dateLabel,
+                            style: TextStyle(
+                              color: palette.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: palette.textSecondary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static String? _formatHistoryDate(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return null;
+    final parsed = DateTime.tryParse(raw);
+    if (parsed == null) return raw;
+    return DateFormat('dd MMM yyyy, HH:mm').format(parsed);
   }
 }

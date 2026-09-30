@@ -15,4 +15,17 @@ class TrackShipmentDataProvider {
       throw e.toString();
     }
   }
+
+  Future<String> getCustomerShipmentHistory(String phone) async {
+    try {
+      final apiProvider = ProviderSetup.getApiProvider(ApiConstants.baseUrl);
+      final response = await apiProvider.getRequest(
+        ApiEndpoints.shipmentCustomerHistory,
+        params: {'phone': phone},
+      );
+      return response.body;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }
