@@ -11,7 +11,7 @@ Future<void> displaySnack(
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     duration: duration,
     content: Text(message),
-    backgroundColor: bgColor ?? const Color(0xFF121814),
+    backgroundColor: bgColor ?? const Color(0xFF231F20),
   ));
 }
 
@@ -19,7 +19,7 @@ Future<void> displaySnackWithAction(BuildContext context, String message,
     String actionText, Function onAction, Color? bgColor) async {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text(message),
-    backgroundColor: bgColor ?? const Color(0xFF121814),
+    backgroundColor: bgColor ?? const Color(0xFF231F20),
     action: SnackBarAction(
       label: actionText,
       onPressed: () {

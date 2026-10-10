@@ -13,7 +13,7 @@ class MilesConfigurationWidgets {
     required VoidCallback onAddConfig,
   }) {
     final tableHeaderColor = isDarkMode
-        ? const Color.fromARGB(255, 75, 23, 160)
+        ? BrandColors.purple
         : context.palette.appBarBackground;
     return Column(
       children: [
@@ -194,14 +194,14 @@ class MilesConfigurationWidgets {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Miles configuration added successfully'),
-                  backgroundColor: Colors.green,
+                  backgroundColor: BrandColors.success,
                 ),
               );
             } else if (state is MilesConfigurationFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
-                  backgroundColor: Colors.red,
+                  backgroundColor: BrandColors.danger,
                 ),
               );
             }
@@ -276,8 +276,8 @@ class MilesConfigurationWidgets {
                                         labelText: 'Origin Branch',
                                         labelStyle: TextStyle(
                                           color: isDarkMode
-                                              ? Colors.blue[300]
-                                              : Colors.blue[700],
+                                              ? BrandColors.infoLight
+                                              : BrandColors.infoDeep,
                                         ),
                                         border: OutlineInputBorder(
                                           borderRadius:
@@ -316,8 +316,8 @@ class MilesConfigurationWidgets {
                                         labelText: 'Destination Branch',
                                         labelStyle: TextStyle(
                                           color: isDarkMode
-                                              ? Colors.blue[300]
-                                              : Colors.blue[700],
+                                              ? BrandColors.infoLight
+                                              : BrandColors.infoDeep,
                                         ),
                                         border: OutlineInputBorder(
                                           borderRadius:
@@ -337,8 +337,8 @@ class MilesConfigurationWidgets {
                                         labelText: 'Unit',
                                         labelStyle: TextStyle(
                                           color: isDarkMode
-                                              ? Colors.blue[300]
-                                              : Colors.blue[700],
+                                              ? BrandColors.infoLight
+                                              : BrandColors.infoDeep,
                                         ),
                                         border: OutlineInputBorder(
                                           borderRadius:
@@ -358,8 +358,8 @@ class MilesConfigurationWidgets {
                                         labelText: 'Miles/Unit',
                                         labelStyle: TextStyle(
                                           color: isDarkMode
-                                              ? Colors.blue[300]
-                                              : Colors.blue[700],
+                                              ? BrandColors.infoLight
+                                              : BrandColors.infoDeep,
                                         ),
                                         border: OutlineInputBorder(
                                           borderRadius:
@@ -415,7 +415,7 @@ class MilesConfigurationWidgets {
                                           const SnackBar(
                                             content:
                                                 Text('Please fill all fields'),
-                                            backgroundColor: Colors.red,
+                                            backgroundColor: BrandColors.danger,
                                           ),
                                         );
                                       }

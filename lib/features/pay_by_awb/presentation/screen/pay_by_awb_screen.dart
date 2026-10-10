@@ -48,7 +48,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: backgroundColor ?? Colors.red,
+        backgroundColor: backgroundColor ?? BrandColors.danger,
       ),
     );
   }
@@ -87,7 +87,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
             label,
             style: TextStyle(
               fontSize: 16,
-              color: highlight ? Colors.deepPurple : Colors.grey[700],
+              color: highlight ? BrandColors.purpleMid : BrandColors.neutral700,
               fontWeight: highlight ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -95,7 +95,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
             value,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.deepOrange,
+              color: BrandColors.orange,
               fontWeight: highlight ? FontWeight.bold : FontWeight.w500,
             ),
           ),
@@ -109,13 +109,13 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Row(
         children: [
-          Icon(Icons.arrow_right, color: Colors.deepPurple[700]),
+          Icon(Icons.arrow_right, color: BrandColors.purple),
           Text(
             title,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.deepPurple[700],
+              color: BrandColors.purple,
             ),
           ),
         ],
@@ -179,7 +179,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                 'Payment Details',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              backgroundColor: Colors.deepPurple,
+              backgroundColor: context.palette.appBarBackground,
               elevation: 0,
               actions: _lastFetchedDetails != null
                   ? [
@@ -192,7 +192,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                                   ? null
                                   : () => _onPayNowPressed(authService),
                               icon: const Icon(Icons.payment,
-                                  color: Colors.deepPurple),
+                                  color: BrandColors.purpleMid),
                               label: state is InitiatePaymentLoading
                                   ? const SizedBox(
                                       width: 20,
@@ -204,7 +204,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                                   : const Text(
                                       'Pay Now',
                                       style: TextStyle(
-                                        color: Colors.deepPurple,
+                                        color: BrandColors.purpleMid,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -228,7 +228,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                                     );
                               },
                               icon: const Icon(Icons.refresh,
-                                  color: Colors.deepPurple),
+                                  color: BrandColors.purpleMid),
                               label: state is CheckPaymentStatusLoading
                                   ? const SizedBox(
                                       width: 20,
@@ -240,7 +240,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                                   : const Text(
                                       'Check Status',
                                       style: TextStyle(
-                                        color: Colors.deepPurple,
+                                        color: BrandColors.purpleMid,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -268,7 +268,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16.0),
                     decoration: const BoxDecoration(
-                      color: Colors.deepPurple,
+                      color: BrandColors.purpleMid,
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(30),
                         bottomRight: Radius.circular(30),
@@ -314,7 +314,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.search,
-                                    color: Colors.deepPurple),
+                                    color: BrandColors.purpleMid),
                                 onPressed: () {
                                   if (_awbController.text.isNotEmpty) {
                                     setState(() => _hasSearched = true);
@@ -342,7 +342,7 @@ class _PayByAwbScreenState extends State<PayByAwbScreen> {
                               ? Center(
                                   child: Text(
                                     state.error,
-                                    style: const TextStyle(color: Colors.red),
+                                    style: const TextStyle(color: BrandColors.danger),
                                   ),
                                 )
                               : _lastFetchedDetails != null

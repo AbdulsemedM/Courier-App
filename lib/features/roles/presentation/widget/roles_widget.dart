@@ -73,14 +73,14 @@ class RoleCard extends StatelessWidget {
   // Generate a color based on role name for variety
   Color _getRoleColor(String roleName) {
     final colors = [
-      const Color(0xFF6366F1), // Indigo
-      const Color(0xFF8B5CF6), // Purple
-      const Color(0xFFEC4899), // Pink
-      const Color(0xFFF59E0B), // Amber
-      const Color(0xFF10B981), // Emerald
-      const Color(0xFF3B82F6), // Blue
-      const Color(0xFFEF4444), // Red
-      const Color(0xFF14B8A6), // Teal
+      BrandColors.purpleMid, // Indigo
+      BrandColors.purpleMid, // Purple
+      BrandColors.purpleMid, // Pink
+      BrandColors.warning, // Amber
+      BrandColors.success, // Emerald
+      BrandColors.info, // Blue
+      BrandColors.danger, // Red
+      BrandColors.success, // Teal
     ];
     final index = roleName.hashCode.abs() % colors.length;
     return colors[index];

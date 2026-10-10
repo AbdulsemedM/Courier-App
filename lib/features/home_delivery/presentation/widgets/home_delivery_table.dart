@@ -102,7 +102,7 @@ class HomeDeliveryTable extends StatelessWidget {
                             icon: Icon(
                               Icons.payment,
                               size: 20,
-                              color: Colors.amber[800],
+                              color: BrandColors.warningDeep,
                             ),
                             tooltip: 'Pay',
                             onPressed: () => onPay!(delivery),
@@ -140,17 +140,17 @@ class HomeDeliveryTable extends StatelessWidget {
   Color _statusColor(String code) {
     switch (code.toUpperCase()) {
       case 'PAR':
-        return Colors.deepPurple;
+        return BrandColors.purpleMid;
       case 'R4P':
-        return Colors.deepOrange;
+        return BrandColors.orange;
       case 'ASSIGNED':
-        return Colors.blue;
+        return BrandColors.info;
       case 'DELIVERED':
-        return Colors.green;
+        return BrandColors.success;
       case 'OVERDUE':
-        return Colors.red;
+        return BrandColors.danger;
       default:
-        return Colors.grey;
+        return BrandColors.neutral500;
     }
   }
 }

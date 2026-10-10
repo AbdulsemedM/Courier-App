@@ -25,7 +25,7 @@ class TransactionHqToBranchTable extends StatelessWidget {
           headingRowColor: MaterialStateProperty.all(
             isDarkMode
                 ? Colors.white.withOpacity(0.1)
-                : Colors.grey.withOpacity(0.2),
+                : BrandColors.neutral500.withOpacity(0.2),
           ),
           columns: [
             DataColumn(
@@ -279,14 +279,14 @@ class TransactionHqToBranchTable extends StatelessWidget {
   Color _getStatusColor(String status, bool isDarkMode) {
     switch (status.toUpperCase()) {
       case 'SUCCESS':
-        return Colors.green;
+        return BrandColors.success;
       case 'STAGED':
-        return Colors.orange;
+        return BrandColors.orange;
       case 'PENDING':
-        return Colors.amber;
+        return BrandColors.warning;
       case 'FAILED':
       case 'ERROR':
-        return Colors.red;
+        return BrandColors.danger;
       default:
         return AppPalette.forMode(isDarkMode).textSecondary;
     }

@@ -25,13 +25,9 @@ class _MilesConfigurationScreenState extends State<MilesConfigurationScreen> {
     final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode
-          ? const Color.fromARGB(255, 75, 23, 160)
-          : context.palette.background,
+      backgroundColor: context.palette.background,
       appBar: AppBar(
-        backgroundColor: isDarkMode
-            ? const Color.fromARGB(255, 75, 23, 160)
-            : context.palette.appBarBackground,
+        backgroundColor: context.palette.appBarBackground,
         title: Text(
           'Miles Configuration',
           style: TextStyle(color: context.palette.textPrimary),

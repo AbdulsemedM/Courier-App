@@ -103,7 +103,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
           'Payment Status',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: context.palette.appBarBackground,
         elevation: 0,
       ),
       body: BlocListener<AddShipmentBloc, AddShipmentState>(
@@ -154,12 +154,12 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                         Icon(
                           Icons.error_outline,
                           size: 64,
-                          color: Colors.red[300],
+                          color: BrandColors.dangerLight,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'Error: $_errorMessage',
-                          style: const TextStyle(color: Colors.red),
+                          style: const TextStyle(color: BrandColors.danger),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
@@ -200,10 +200,10 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: isSuccess
-                  ? [Colors.green[400]!, Colors.green[600]!]
+                  ? [BrandColors.success, BrandColors.success]
                   : isPending
-                      ? [Colors.orange[400]!, Colors.orange[600]!]
-                      : [Colors.blue[400]!, Colors.blue[600]!],
+                      ? [BrandColors.orange, BrandColors.orange]
+                      : [BrandColors.info, BrandColors.info],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -211,7 +211,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
             boxShadow: [
               BoxShadow(
                 color:
-                    (isSuccess ? Colors.green : Colors.orange).withOpacity(0.3),
+                    (isSuccess ? BrandColors.success : BrandColors.orange).withOpacity(0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -278,7 +278,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                   children: [
                     Icon(
                       Icons.local_shipping,
-                      color: Colors.deepPurple[400],
+                      color: BrandColors.purpleMid,
                       size: 24,
                     ),
                     const SizedBox(width: 12),
@@ -326,7 +326,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                   children: [
                     Icon(
                       Icons.people,
-                      color: Colors.deepPurple[400],
+                      color: BrandColors.purpleMid,
                       size: 24,
                     ),
                     const SizedBox(width: 12),
@@ -344,7 +344,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: context.isDarkMode ? Colors.grey[900] : context.palette.accentMuted,
+                    color: context.isDarkMode ? BrandColors.neutral900 : context.palette.accentMuted,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -355,7 +355,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                           Icon(
                             Icons.person_outline,
                             size: 20,
-                            color: Colors.blue[700],
+                            color: BrandColors.infoDeep,
                           ),
                           const SizedBox(width: 8),
                           Text(
@@ -363,7 +363,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.blue[700],
+                              color: BrandColors.infoDeep,
                             ),
                           ),
                         ],
@@ -394,7 +394,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[900] : Colors.green[50],
+                    color: isDarkMode ? BrandColors.neutral900 : BrandColors.successSoft,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -405,7 +405,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                           Icon(
                             Icons.person,
                             size: 20,
-                            color: Colors.green[700],
+                            color: BrandColors.successDeep,
                           ),
                           const SizedBox(width: 8),
                           Text(
@@ -413,7 +413,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green[700],
+                              color: BrandColors.successDeep,
                             ),
                           ),
                         ],
@@ -461,7 +461,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                   children: [
                     Icon(
                       Icons.inventory_2,
-                      color: Colors.deepPurple[400],
+                      color: BrandColors.purpleMid,
                       size: 24,
                     ),
                     const SizedBox(width: 12),
@@ -482,7 +482,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                         'Weight',
                         '${details.qty ?? 0} ${details.unit ?? 'kg'}',
                         Icons.scale,
-                        Colors.purple,
+                        BrandColors.purpleMid,
                         isDarkMode,
                       ),
                     ),
@@ -492,7 +492,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                         'Boxes',
                         '${details.numBoxes ?? 0}',
                         Icons.inbox,
-                        Colors.indigo,
+                        BrandColors.info,
                         isDarkMode,
                       ),
                     ),
@@ -526,7 +526,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                   children: [
                     Icon(
                       Icons.payment,
-                      color: Colors.deepPurple[400],
+                      color: BrandColors.purpleMid,
                       size: 24,
                     ),
                     const SizedBox(width: 12),
@@ -545,8 +545,8 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Colors.deepPurple[50]!,
-                        Colors.deepPurple[100]!,
+                        BrandColors.purpleSoft,
+                        BrandColors.purpleSoft,
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -563,7 +563,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                             'Total Amount',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.deepPurple,
+                              color: BrandColors.purpleMid,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -573,7 +573,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: Colors.deepPurple[900],
+                              color: BrandColors.purple,
                             ),
                           ),
                         ],
@@ -586,7 +586,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: Colors.deepPurple[200]!,
+                              color: BrandColors.purpleLight,
                               width: 2,
                             ),
                           ),
@@ -600,7 +600,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
                                   child: Icon(
                                     Icons.image_not_supported,
                                     size: 32,
-                                    color: Colors.grey,
+                                    color: BrandColors.neutral500,
                                   ),
                                 );
                               },
@@ -637,7 +637,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: BrandColors.neutral600,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -657,26 +657,28 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
   }
 
   Widget _buildDetailBox(String label, String value, IconData icon,
-      MaterialColor color, bool isDarkMode) {
+      Color color, bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900] : color[50],
+        color: isDarkMode
+            ? BrandColors.neutral900
+            : Color.alphaBlend(color.withValues(alpha: 0.10), Colors.white),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: color[200]!,
+          color: color.withValues(alpha: 0.35),
           width: 1.5,
         ),
       ),
       child: Column(
         children: [
-          Icon(icon, color: color[700], size: 28),
+          Icon(icon, color: color, size: 28),
           const SizedBox(height: 8),
           Text(
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey[600],
+              color: BrandColors.neutral600,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -686,7 +688,7 @@ class _PaymentWaitingScreenState extends State<PaymentWaitingScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : color[900],
+              color: isDarkMode ? Colors.white : Color.lerp(color, Colors.black, 0.45)!,
             ),
           ),
         ],

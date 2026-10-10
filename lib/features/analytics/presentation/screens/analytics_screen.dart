@@ -100,12 +100,12 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   Widget _buildShimmerCard(bool isDarkMode) {
     return Shimmer.fromColors(
-      baseColor: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
-      highlightColor: isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+      baseColor: isDarkMode ? BrandColors.neutral800 : BrandColors.neutral300,
+      highlightColor: isDarkMode ? BrandColors.neutral700 : BrandColors.neutral100,
       child: Container(
         height: 150,
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[850] : Colors.white,
+          color: isDarkMode ? BrandColors.neutral800 : Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
       ),
@@ -128,15 +128,15 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     if (isForbidden) {
       title = 'Analytics access restricted';
       icon = Icons.lock_outline;
-      iconColor = isDarkMode ? Colors.amber[300]! : Colors.amber[800]!;
+      iconColor = isDarkMode ? BrandColors.warningLight : BrandColors.warningDeep;
     } else if (isUnauthorized) {
       title = 'Sign in required';
       icon = Icons.login;
-      iconColor = isDarkMode ? Colors.orange[300]! : Colors.deepOrange;
+      iconColor = isDarkMode ? BrandColors.orangeLight : BrandColors.orange;
     } else {
       title = 'Couldn\'t load analytics';
       icon = Icons.error_outline;
-      iconColor = isDarkMode ? Colors.red[300]! : Colors.red;
+      iconColor = isDarkMode ? BrandColors.dangerLight : BrandColors.danger;
     }
 
     return ListView(
@@ -165,7 +165,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.4,
-                  color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                  color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                 ),
               ),
               const SizedBox(height: 24),
@@ -193,7 +193,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
                 color: isDarkMode
-                    ? Colors.grey[850]!.withOpacity(0.5)
+                    ? BrandColors.neutral800.withOpacity(0.5)
                     : Colors.white,
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -203,14 +203,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   Icon(
                     Icons.calendar_today,
                     size: 16,
-                    color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                    color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'From: $_fromDate to $_toDate',
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                      color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                     ),
                   ),
                 ],
@@ -239,28 +239,28 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 title: 'Today',
                 value: (analytics.totalShipmentsToday ?? 0).toString(),
                 icon: Icons.inventory_2_outlined,
-                color: const Color(0xFF9C27B0),
+                color: BrandColors.purpleMid,
                 isDarkMode: isDarkMode,
               ),
               AnalyticsWidgets.buildMetricCard(
                 title: 'This Week',
                 value: (analytics.totalShipmentsThisWeek ?? 0).toString(),
                 icon: Icons.inventory_2_outlined,
-                color: const Color(0xFF2196F3),
+                color: BrandColors.info,
                 isDarkMode: isDarkMode,
               ),
               AnalyticsWidgets.buildMetricCard(
                 title: 'Active Drivers',
                 value: (analytics.activeDrivers ?? 0).toString(),
                 icon: Icons.people_outline,
-                color: const Color(0xFFFFC107),
+                color: BrandColors.warning,
                 isDarkMode: isDarkMode,
               ),
               AnalyticsWidgets.buildMetricCard(
                 title: 'Active Customers',
                 value: (analytics.activeCustomers ?? 0).toString(),
                 icon: Icons.people_outline,
-                color: const Color(0xFFE91E63),
+                color: BrandColors.danger,
                 isDarkMode: isDarkMode,
               ),
             ],
@@ -290,28 +290,28 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 title: 'In Transit',
                 value: analytics.deliveriesInTransit ?? 0,
                 icon: Icons.local_shipping,
-                color: const Color(0xFFFFC107),
+                color: BrandColors.warning,
                 isDarkMode: isDarkMode,
               ),
               AnalyticsWidgets.buildStatusCard(
                 title: 'Completed',
                 value: analytics.completedDeliveries ?? 0,
                 icon: Icons.check_circle,
-                color: Colors.green,
+                color: BrandColors.success,
                 isDarkMode: isDarkMode,
               ),
               AnalyticsWidgets.buildStatusCard(
                 title: 'Pending',
                 value: analytics.pendingDeliveries ?? 0,
                 icon: Icons.warning,
-                color: const Color(0xFFE91E63),
+                color: BrandColors.danger,
                 isDarkMode: isDarkMode,
               ),
               AnalyticsWidgets.buildStatusCard(
                 title: 'Delayed',
                 value: analytics.delayedDeliveries ?? 0,
                 icon: Icons.access_time,
-                color: const Color(0xFFE91E63),
+                color: BrandColors.danger,
                 isDarkMode: isDarkMode,
               ),
             ],
@@ -385,21 +385,21 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 title: 'Revenue',
                 value: analytics.revenue ?? 0.0,
                 icon: Icons.attach_money,
-                color: Colors.blue,
+                color: BrandColors.info,
                 isDarkMode: isDarkMode,
               ),
               AnalyticsWidgets.buildFinancialCard(
                 title: 'Expenses',
                 value: analytics.expenses ?? 0.0,
                 icon: Icons.warning,
-                color: Colors.orange,
+                color: BrandColors.orange,
                 isDarkMode: isDarkMode,
               ),
               AnalyticsWidgets.buildFinancialCard(
                 title: 'Profit',
                 value: analytics.profit ?? 0.0,
                 icon: Icons.trending_up,
-                color: Colors.green,
+                color: BrandColors.success,
                 isDarkMode: isDarkMode,
               ),
               AnalyticsWidgets.buildFinancialCard(
@@ -407,8 +407,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 value: analytics.totals?.totalNetCash ?? 0.0,
                 icon: Icons.account_balance_wallet,
                 color: (analytics.totals?.totalNetCash ?? 0.0) < 0
-                    ? Colors.red
-                    : Colors.green,
+                    ? BrandColors.danger
+                    : BrandColors.success,
                 isDarkMode: isDarkMode,
                 suffix: (analytics.totals?.totalNetCash ?? 0.0) < 0
                     ? ' (Loss)'
@@ -454,7 +454,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: isDarkMode
-                        ? Colors.grey[850]!.withOpacity(0.5)
+                        ? BrandColors.neutral800.withOpacity(0.5)
                         : Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
@@ -469,13 +469,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(Icons.inventory_2_outlined,
-                          color: Colors.blue, size: 24),
+                          color: BrandColors.info, size: 24),
                       const SizedBox(height: 12),
                       Text(
                         'Cash AWBs (kg)',
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                          color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -495,7 +495,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: isDarkMode
-                        ? Colors.grey[850]!.withOpacity(0.5)
+                        ? BrandColors.neutral800.withOpacity(0.5)
                         : Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
@@ -510,13 +510,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(Icons.inventory_2_outlined,
-                          color: Colors.blue, size: 24),
+                          color: BrandColors.info, size: 24),
                       const SizedBox(height: 12),
                       Text(
                         'COD AWBs (kg)',
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                          color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 4),

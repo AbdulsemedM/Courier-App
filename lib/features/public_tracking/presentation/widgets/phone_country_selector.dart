@@ -153,7 +153,7 @@ class PhoneCountrySelector extends StatelessWidget {
             color: palette.surfaceMuted,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: errorText != null ? Colors.red : palette.border,
+              color: errorText != null ? BrandColors.danger : palette.border,
             ),
           ),
           child: Row(
@@ -230,7 +230,7 @@ class PhoneCountrySelector extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             errorText!,
-            style: const TextStyle(color: Colors.red, fontSize: 12),
+            style: const TextStyle(color: BrandColors.danger, fontSize: 12),
           ),
         ],
       ],

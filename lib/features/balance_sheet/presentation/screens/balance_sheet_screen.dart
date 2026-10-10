@@ -94,10 +94,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [context.palette.background, context.palette.background],
           ),
         ),
@@ -178,7 +175,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                       fontSize: 12,
                                       color: isDarkMode
                                           ? Colors.white70
-                                          : Colors.grey[600],
+                                          : BrandColors.neutral600,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -286,7 +283,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                       fontSize: 12,
                                       color: isDarkMode
                                           ? Colors.white70
-                                          : Colors.grey[700],
+                                          : BrandColors.neutral700,
                                     ),
                                   ),
                                   Text(
@@ -295,7 +292,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                       fontSize: 12,
                                       color: isDarkMode
                                           ? Colors.white70
-                                          : Colors.grey[700],
+                                          : BrandColors.neutral700,
                                     ),
                                   ),
                                   Text(
@@ -304,7 +301,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                       fontSize: 12,
                                       color: isDarkMode
                                           ? Colors.white70
-                                          : Colors.grey[700],
+                                          : BrandColors.neutral700,
                                     ),
                                   ),
                                 ],
@@ -318,7 +315,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                   child: SummaryCard(
                                     title: 'Total Assets',
                                     amount: balanceSheet.totalAssets,
-                                    color: Colors.blue,
+                                    color: BrandColors.info,
                                     icon: Icons.account_balance_wallet,
                                   ),
                                 ),
@@ -327,7 +324,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                   child: SummaryCard(
                                     title: 'Total Liabilities',
                                     amount: balanceSheet.totalLiabilities,
-                                    color: Colors.orange,
+                                    color: BrandColors.orange,
                                     icon: Icons.account_balance,
                                   ),
                                 ),
@@ -336,7 +333,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                   child: SummaryCard(
                                     title: 'Total Equity',
                                     amount: balanceSheet.totalEquity,
-                                    color: Colors.green,
+                                    color: BrandColors.success,
                                     icon: Icons.trending_up,
                                   ),
                                 ),
@@ -348,7 +345,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                             SectionHeader(
                               title: 'Assets',
                               subtitle: 'Current and fixed assets breakdown',
-                              titleColor: Colors.blue,
+                              titleColor: BrandColors.info,
                               isExpanded: _assetsExpanded,
                               onTap: () {
                                 setState(() {
@@ -378,7 +375,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                 label: 'Current Assets',
                                 amount: balanceSheet.assets.currentAssets,
                                 isTotal: true,
-                                backgroundColor: Colors.blue[50],
+                                backgroundColor: BrandColors.infoSoft,
                               ),
                               CategoryRow(
                                 label: 'Fixed Assets',
@@ -388,7 +385,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                 label: 'Total Assets',
                                 amount: balanceSheet.assets.totalAssets,
                                 isTotal: true,
-                                backgroundColor: Colors.blue[100],
+                                backgroundColor: BrandColors.infoSoft,
                               ),
                               if (balanceSheet.assets.assetItems.isNotEmpty)
                                 BalanceSheetTable(
@@ -401,7 +398,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                             SectionHeader(
                               title: 'Liabilities',
                               subtitle: 'Current and long-term liabilities breakdown',
-                              titleColor: Colors.red,
+                              titleColor: BrandColors.danger,
                               isExpanded: _liabilitiesExpanded,
                               onTap: () {
                                 setState(() {
@@ -427,7 +424,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                 label: 'Current Liabilities',
                                 amount: balanceSheet.liabilities.currentLiabilities,
                                 isTotal: true,
-                                backgroundColor: Colors.orange[50],
+                                backgroundColor: BrandColors.orangeSoft,
                               ),
                               CategoryRow(
                                 label: 'Long-term Debt',
@@ -437,7 +434,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                 label: 'Total Liabilities',
                                 amount: balanceSheet.liabilities.totalLiabilities,
                                 isTotal: true,
-                                backgroundColor: Colors.orange[100],
+                                backgroundColor: BrandColors.orangeSoft,
                               ),
                               if (balanceSheet.liabilities.liabilityItems.isNotEmpty)
                                 BalanceSheetTable(
@@ -450,7 +447,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                             SectionHeader(
                               title: 'Equity',
                               subtitle: "Owner's equity and retained earnings",
-                              titleColor: Colors.green,
+                              titleColor: BrandColors.success,
                               isExpanded: _equityExpanded,
                               onTap: () {
                                 setState(() {
@@ -476,7 +473,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                 label: 'Total Equity',
                                 amount: balanceSheet.equity.totalEquity,
                                 isTotal: true,
-                                backgroundColor: Colors.green[50],
+                                backgroundColor: BrandColors.successSoft,
                               ),
                               if (balanceSheet.equity.equityItems.isNotEmpty)
                                 BalanceSheetTable(
@@ -490,13 +487,13 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: balanceSheet.balancingAmount < 0
-                                    ? Colors.red.withOpacity(0.2)
-                                    : Colors.green.withOpacity(0.2),
+                                    ? BrandColors.danger.withOpacity(0.2)
+                                    : BrandColors.success.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: balanceSheet.balancingAmount < 0
-                                      ? Colors.red
-                                      : Colors.green,
+                                      ? BrandColors.danger
+                                      : BrandColors.success,
                                   width: 2,
                                 ),
                               ),
@@ -517,8 +514,8 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen> {
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: balanceSheet.balancingAmount < 0
-                                          ? Colors.red
-                                          : Colors.green,
+                                          ? BrandColors.danger
+                                          : BrandColors.success,
                                     ),
                                   ),
                                 ],

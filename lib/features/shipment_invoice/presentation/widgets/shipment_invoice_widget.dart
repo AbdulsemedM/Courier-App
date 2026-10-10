@@ -66,8 +66,8 @@ class ShipmentInvoiceWidgets {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Shimmer.fromColors(
-        baseColor: isDarkMode ? Colors.grey[850]! : AppPalette.forMode(isDarkMode).border,
-        highlightColor: isDarkMode ? Colors.grey[700]! : AppPalette.forMode(isDarkMode).surfaceMuted,
+        baseColor: isDarkMode ? BrandColors.neutral800 : AppPalette.forMode(isDarkMode).border,
+        highlightColor: isDarkMode ? BrandColors.neutral700 : AppPalette.forMode(isDarkMode).surfaceMuted,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -154,8 +154,8 @@ class ShipmentInvoiceWidgets {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isDarkMode
-                  ? const Color.fromARGB(255, 73, 4, 185)
-                  : const Color.fromARGB(255, 73, 4, 185),
+                  ? BrandColors.purple
+                  : BrandColors.purple,
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(16)),
             ),
@@ -244,8 +244,8 @@ class ShipmentInvoiceWidgets {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isDarkMode
-                  ? const Color.fromARGB(255, 73, 4, 185)
-                  : const Color.fromARGB(255, 73, 4, 185),
+                  ? BrandColors.purple
+                  : BrandColors.purple,
               borderRadius:
                   const BorderRadius.vertical(bottom: Radius.circular(16)),
             ),
@@ -291,8 +291,8 @@ class ShipmentInvoiceWidgets {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDarkMode
-            ? const Color.fromARGB(255, 73, 4, 185)
-            : const Color.fromARGB(255, 73, 4, 185),
+            ? BrandColors.purple
+            : BrandColors.purple,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppPalette.forMode(isDarkMode).border,
@@ -306,7 +306,7 @@ class ShipmentInvoiceWidgets {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.blue[300] : Colors.blue[700],
+              color: isDarkMode ? BrandColors.infoLight : BrandColors.infoDeep,
             ),
           ),
           const SizedBox(height: 8),

@@ -16,7 +16,7 @@ class BarcodeReaderWidgets {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isDarkMode ? Colors.blue.shade700 : Colors.blue.shade200,
+                color: isDarkMode ? BrandColors.infoDeep : BrandColors.infoLight,
                 width: 2,
               ),
             ),
@@ -112,7 +112,7 @@ class BarcodeReaderWidgets {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: isDarkMode ? Colors.blue[400]! : Colors.blue[700]!,
+                  color: isDarkMode ? BrandColors.info : BrandColors.infoDeep,
                 ),
               ),
             ),
@@ -197,24 +197,24 @@ class BarcodeReaderWidgets {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.red[900]!.withOpacity(0.2) : Colors.red[100],
+        color: isDarkMode ? BrandColors.dangerDeep.withOpacity(0.2) : BrandColors.dangerSoft,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDarkMode ? Colors.red[700]! : Colors.red[300]!,
+          color: isDarkMode ? BrandColors.dangerDeep : BrandColors.dangerLight,
         ),
       ),
       child: Row(
         children: [
           Icon(
             Icons.error_outline,
-            color: isDarkMode ? Colors.red[300] : Colors.red[700],
+            color: isDarkMode ? BrandColors.dangerLight : BrandColors.dangerDeep,
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
               style: TextStyle(
-                color: isDarkMode ? Colors.red[300] : Colors.red[700],
+                color: isDarkMode ? BrandColors.dangerLight : BrandColors.dangerDeep,
               ),
             ),
           ),

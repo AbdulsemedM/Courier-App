@@ -143,13 +143,13 @@ class _PermissionsModalState extends State<PermissionsModal> {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? (isDarkMode
-                            ? Colors.green.withOpacity(0.2)
-                            : Colors.green.withOpacity(0.1))
+                            ? BrandColors.success.withOpacity(0.2)
+                            : BrandColors.success.withOpacity(0.1))
                         : (context.palette.surfaceMuted),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isSelected
-                          ? Colors.green
+                          ? BrandColors.success
                           : (context.palette.border),
                       width: isSelected ? 2 : 1,
                     ),
@@ -173,7 +173,7 @@ class _PermissionsModalState extends State<PermissionsModal> {
                             ),
                           )
                         : null,
-                    activeColor: Colors.green,
+                    activeColor: BrandColors.success,
                     inactiveThumbColor: context.palette.textSecondary,
                     inactiveTrackColor: context.palette.surfaceMuted,
                   ),
@@ -193,7 +193,7 @@ class _PermissionsModalState extends State<PermissionsModal> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(state.message),
-                      backgroundColor: Colors.green,
+                      backgroundColor: BrandColors.success,
                     ),
                   );
                   Navigator.pop(context);
@@ -206,7 +206,7 @@ class _PermissionsModalState extends State<PermissionsModal> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(state.message),
-                      backgroundColor: Colors.red,
+                      backgroundColor: BrandColors.danger,
                     ),
                   );
                 }
@@ -238,7 +238,7 @@ class _PermissionsModalState extends State<PermissionsModal> {
                   child: ElevatedButton(
                     onPressed: _isSaving ? null : _savePermissions,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: BrandColors.success,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(

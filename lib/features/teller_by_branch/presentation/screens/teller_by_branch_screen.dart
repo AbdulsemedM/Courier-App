@@ -57,10 +57,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [context.palette.background, context.palette.background],
           ),
         ),
@@ -169,7 +166,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide:
-                              const BorderSide(color: Colors.blue, width: 2),
+                              const BorderSide(color: BrandColors.info, width: 2),
                         ),
                       ),
                       style: TextStyle(
@@ -189,7 +186,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(state.message),
-                          backgroundColor: Colors.green,
+                          backgroundColor: BrandColors.success,
                         ),
                       );
                       // Refresh the tellers list
@@ -201,7 +198,7 @@ class _TellerByBranchScreenState extends State<TellerByBranchScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(state.message),
-                          backgroundColor: Colors.red,
+                          backgroundColor: BrandColors.danger,
                         ),
                       );
                     }

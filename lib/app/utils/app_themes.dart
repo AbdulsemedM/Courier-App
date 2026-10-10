@@ -8,7 +8,7 @@ class AppTheme {
         primaryColor: AppColors.primaryColor,
         textTheme: const TextTheme(
           displayLarge: TextStyle(
-              fontFamily: "Poppins",
+              fontFamily: "Inter",
               fontSize: 32.0,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryTextColor),
@@ -20,25 +20,24 @@ class AppTheme {
               fontSize: 20,
               // fontStyle: FontStyle.italic,
               color: AppColors.primaryTextColor),
-          bodyLarge: TextStyle(fontSize: 16.0, color: Colors.black),
-          bodyMedium: TextStyle(fontSize: 14.0, color: Colors.black),
-          bodySmall: TextStyle(fontSize: 12.0, color: Colors.black),
+          bodyLarge: TextStyle(fontSize: 16.0, color: AppColors.primaryTextColor),
+          bodyMedium: TextStyle(fontSize: 14.0, color: AppColors.primaryTextColor),
+          bodySmall: TextStyle(fontSize: 12.0, color: AppColors.secondaryTextColor),
         ),
-        fontFamily: 'Poppins',
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: 'Inter',
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
         useMaterial3: true,
         appBarTheme: appBarTheme());
   }
 
   static AppBarTheme appBarTheme() {
     return AppBarTheme(
-      backgroundColor: Colors.white,
-      // color: AppColors.primaryDarkColor,
+      backgroundColor: AppColors.bgColor,
       elevation: 0,
-      iconTheme: const IconThemeData(color: Colors.black),
+      iconTheme: const IconThemeData(color: AppColors.primaryTextColor),
       titleTextStyle: textStyle(),
       toolbarTextStyle: textStyle(),
-      systemOverlayStyle: SystemUiOverlayStyle(
+      systemOverlayStyle: const SystemUiOverlayStyle(
         statusBarColor: AppColors.primaryDarkColor,
         statusBarIconBrightness: Brightness.light,
         statusBarBrightness: Brightness.dark,
@@ -48,7 +47,7 @@ class AppTheme {
 
   static TextStyle textStyle() {
     return const TextStyle(
-        color: AppColors.primaryTextColor, fontSize: 14, fontFamily: 'Poppins');
+        color: AppColors.primaryTextColor, fontSize: 14, fontFamily: 'Inter');
   }
 }
 

@@ -294,8 +294,8 @@ class _HomeDeliveriesScreenState extends State<HomeDeliveriesScreen> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Shimmer.fromColors(
-        baseColor: isDarkMode ? Colors.grey[850]! : Colors.grey[300]!,
-        highlightColor: isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+        baseColor: isDarkMode ? BrandColors.neutral800 : BrandColors.neutral300,
+        highlightColor: isDarkMode ? BrandColors.neutral700 : BrandColors.neutral100,
         child: Container(
           height: 300,
           decoration: BoxDecoration(

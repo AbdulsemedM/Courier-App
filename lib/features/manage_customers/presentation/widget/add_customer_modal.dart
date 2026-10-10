@@ -55,7 +55,7 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
               content: Text(isEditing
                   ? 'Customer updated successfully'
                   : 'Customer added successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: BrandColors.success,
             ),
           );
         } else if (state is AddCustomerError || state is UpdateCustomerError) {
@@ -64,7 +64,7 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
               content: Text(state is AddCustomerError
                   ? state.error
                   : (state as UpdateCustomerError).error),
-              backgroundColor: Colors.red,
+              backgroundColor: BrandColors.danger,
             ),
           );
         }
@@ -251,7 +251,7 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: BrandColors.info,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24, vertical: 12),

@@ -36,14 +36,14 @@ class _AddExchangeRateModalState extends State<AddExchangeRateModal> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Exchange rate added successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: BrandColors.success,
             ),
           );
         } else if (state is AddExchangeRateFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.error),
-              backgroundColor: Colors.red,
+              backgroundColor: BrandColors.danger,
             ),
           );
         }
@@ -192,7 +192,7 @@ class _AddExchangeRateModalState extends State<AddExchangeRateModal> {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: BrandColors.info,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24, vertical: 12),

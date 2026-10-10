@@ -1,3 +1,4 @@
+import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/core/update/force_update_service.dart';
 import 'package:courier_app/core/update/remote_config_service.dart';
 import 'package:flutter/material.dart';
@@ -129,7 +130,7 @@ class _ForceUpdateGateState extends State<ForceUpdateGate> {
                   const SizedBox(height: 8),
                   Text(
                     'A newer version is available. Please update to continue using the app.',
-                    style: TextStyle(color: Colors.grey.shade700, fontSize: 15),
+                    style: TextStyle(color: BrandColors.neutral700, fontSize: 15),
                     textAlign: TextAlign.center,
                   ),
                   if (_result.storeVersion != null &&
@@ -137,7 +138,7 @@ class _ForceUpdateGateState extends State<ForceUpdateGate> {
                     const SizedBox(height: 12),
                     Text(
                       'Installed: ${_result.localVersion}  |  Latest: ${_result.storeVersion}',
-                      style: TextStyle(color: Colors.grey.shade600),
+                      style: TextStyle(color: BrandColors.neutral600),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -146,7 +147,7 @@ class _ForceUpdateGateState extends State<ForceUpdateGate> {
                     const SizedBox(height: 4),
                     Text(
                       'Minimum required: ${_result.minimumSupportedVersion}',
-                      style: TextStyle(color: Colors.grey.shade600),
+                      style: TextStyle(color: BrandColors.neutral600),
                       textAlign: TextAlign.center,
                     ),
                   ],

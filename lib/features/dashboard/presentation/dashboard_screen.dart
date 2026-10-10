@@ -67,7 +67,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error during logout: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: BrandColors.danger,
           ),
         );
       }
@@ -104,7 +104,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: BrandColors.danger,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Logout'),
@@ -177,7 +177,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   decoration: BoxDecoration(
                     color: palette.navBarBackground,
                     border: Border(
-                      top: BorderSide(color: palette.border),
+                      top: BorderSide(
+                        color: palette.accent.withValues(alpha: 0.8),
+                        width: 1.5,
+                      ),
                     ),
                     boxShadow: [
                       BoxShadow(

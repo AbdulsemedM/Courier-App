@@ -1,3 +1,4 @@
+import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/app/utils/responsive_helper.dart';
 import 'package:courier_app/core/services/remembered_credentials_vault.dart';
 import 'package:courier_app/features/dashboard/presentation/dashboard_screen.dart';
@@ -89,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage),
-              backgroundColor: Colors.red.shade700,
+              backgroundColor: BrandColors.dangerDeep,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

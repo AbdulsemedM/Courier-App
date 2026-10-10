@@ -454,9 +454,9 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFF4F46E5),
-            Color(0xFF7C3AED),
-            Color(0xFF0D9488),
+            BrandColors.purpleMid,
+            BrandColors.purpleMid,
+            BrandColors.success,
           ],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
@@ -464,7 +464,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4F46E5).withOpacity(0.25),
+            color: BrandColors.purpleMid.withOpacity(0.25),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -500,7 +500,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
             icon: const Icon(Icons.download, size: 18),
             label: const Text('Export'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF22C55E),
+              backgroundColor: BrandColors.success,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -552,15 +552,15 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
   Widget _buildSummaryCards(BranchShipmentReportSummary summary) {
     final cards = [
       _SummaryCardData('Total Shipments', summary.totalShipments.toString(),
-          const Color(0xFF2563EB)),
-      _SummaryCardData('CASH', summary.cash.toString(), const Color(0xFF16A34A)),
-      _SummaryCardData('COD', summary.cod.toString(), const Color(0xFFEA580C)),
-      _SummaryCardData('EBIRR', summary.ebirr.toString(), const Color(0xFF9333EA)),
-      _SummaryCardData('SAHAY', summary.sahay.toString(), const Color(0xFFDB2777)),
+          BrandColors.info),
+      _SummaryCardData('CASH', summary.cash.toString(), BrandColors.success),
+      _SummaryCardData('COD', summary.cod.toString(), BrandColors.orange),
+      _SummaryCardData('EBIRR', summary.ebirr.toString(), BrandColors.purpleMid),
+      _SummaryCardData('SAHAY', summary.sahay.toString(), BrandColors.danger),
       _SummaryCardData(
         'Total Fee',
         summary.totalFee.toStringAsFixed(0),
-        const Color(0xFF0D9488),
+        BrandColors.success,
       ),
     ];
 
@@ -802,7 +802,7 @@ class _BranchReportScreenState extends State<BranchReportScreen> {
       padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
       child: Column(
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
+          Icon(Icons.error_outline, size: 64, color: BrandColors.dangerLight),
           const SizedBox(height: 16),
           Text(
             'Error: $message',

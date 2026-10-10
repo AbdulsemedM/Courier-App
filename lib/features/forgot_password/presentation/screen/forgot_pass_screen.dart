@@ -1,3 +1,4 @@
+import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:flutter/material.dart';
 import '../widget/forgot_pass_widget.dart';
 
@@ -24,7 +25,7 @@ class ForgotPasswordScreen extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Reset instructions sent to your email'),
-          backgroundColor: Colors.green,
+          backgroundColor: BrandColors.success,
         ),
       );
 
@@ -36,7 +37,7 @@ class ForgotPasswordScreen extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${e.toString()}'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
     }
@@ -54,8 +55,8 @@ class ForgotPasswordScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color.fromARGB(255, 103, 21, 234),
-              Color.fromARGB(255, 75, 23, 160),
+              BrandColors.purpleMid,
+              BrandColors.purple,
             ],
           ),
         ),

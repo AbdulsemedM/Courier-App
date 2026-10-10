@@ -25,7 +25,7 @@ class TellerLiabilityTable extends StatelessWidget {
           headingRowColor: MaterialStateProperty.all(
             isDarkMode
                 ? Colors.white.withOpacity(0.1)
-                : Colors.grey.withOpacity(0.2),
+                : BrandColors.neutral500.withOpacity(0.2),
           ),
           columns: [
             DataColumn(
@@ -132,7 +132,7 @@ class TellerLiabilityTable extends StatelessWidget {
             final createdAt = DateTime.tryParse(liability.createdAt);
             final statusColor = _getStatusColor(liability.status, isDarkMode);
             final shortfallColor = liability.shortfallAmount > 0
-                ? Colors.red
+                ? BrandColors.danger
                 : (AppPalette.forMode(isDarkMode).textSecondary);
 
             return DataRow(
@@ -253,13 +253,13 @@ class TellerLiabilityTable extends StatelessWidget {
   Color _getStatusColor(String status, bool isDarkMode) {
     switch (status.toUpperCase()) {
       case 'PENDING':
-        return Colors.amber;
+        return BrandColors.warning;
       case 'APPROVED':
-        return Colors.green;
+        return BrandColors.success;
       case 'REJECTED':
-        return Colors.red;
+        return BrandColors.danger;
       case 'RESOLVED':
-        return Colors.blue;
+        return BrandColors.info;
       default:
         return AppPalette.forMode(isDarkMode).textSecondary;
     }

@@ -28,7 +28,7 @@ class _TransportModesScreenState extends State<TransportModesScreen> {
     final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
+      backgroundColor: context.palette.background,
       body: SafeArea(
           child: Column(
             children: [

@@ -62,7 +62,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             label,
             style: TextStyle(
               fontSize: 16,
-              color: highlight ? Colors.deepPurple : Colors.grey[700],
+              color: highlight ? BrandColors.purpleMid : BrandColors.neutral700,
               fontWeight: highlight ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -70,7 +70,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             value,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.deepOrange,
+              color: BrandColors.orange,
               fontWeight: highlight ? FontWeight.bold : FontWeight.w500,
             ),
           ),
@@ -84,13 +84,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Row(
         children: [
-          Icon(Icons.arrow_right, color: Colors.deepPurple[700]),
+          Icon(Icons.arrow_right, color: BrandColors.purple),
           Text(
             title,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.deepPurple[700],
+              color: BrandColors.purple,
             ),
           ),
         ],
@@ -132,7 +132,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 'Payment Summary',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              backgroundColor: Colors.deepPurple,
+              backgroundColor: context.palette.appBarBackground,
               elevation: 0,
               actions: [
                 Container(
@@ -144,7 +144,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ? null
                             : _onPayNowPressed,
                         icon:
-                            const Icon(Icons.payment, color: Colors.deepPurple),
+                            const Icon(Icons.payment, color: BrandColors.purpleMid),
                         label: state is InitiatePaymentLoading
                             ? const SizedBox(
                                 width: 20,
@@ -156,7 +156,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             : const Text(
                                 'Pay Now',
                                 style: TextStyle(
-                                  color: Colors.deepPurple,
+                                  color: BrandColors.purpleMid,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -179,7 +179,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               );
                         },
                         icon:
-                            const Icon(Icons.refresh, color: Colors.deepPurple),
+                            const Icon(Icons.refresh, color: BrandColors.purpleMid),
                         label: state is CheckPaymentStatusLoading
                             ? const SizedBox(
                                 width: 20,
@@ -191,7 +191,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             : const Text(
                                 'Check Status',
                                 style: TextStyle(
-                                  color: Colors.deepPurple,
+                                  color: BrandColors.purpleMid,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -233,7 +233,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.only(bottom: 30.0),
                       decoration: const BoxDecoration(
-                        color: Colors.deepPurple,
+                        color: BrandColors.purpleMid,
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(30),
                           bottomRight: Radius.circular(30),
@@ -280,14 +280,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     version: QrVersions.auto,
                                     size: 200.0,
                                     backgroundColor: Colors.white,
-                                    foregroundColor: Colors.deepPurple,
+                                    foregroundColor: BrandColors.purpleMid,
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
                                     'Scan to track shipment',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: Colors.grey[600],
+                                      color: BrandColors.neutral600,
                                     ),
                                   ),
                                 ],
@@ -339,7 +339,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   _buildSectionTitle('Payment Information'),
                                   _buildInfoRow('Rate',
                                       '${widget.formData['rate']?.toString() ?? '0.00'} ETB'),
-                                  const Divider(color: Colors.deepPurple),
+                                  const Divider(color: BrandColors.purpleMid),
                                   _buildInfoRow(
                                       'Total Amount', '$totalAmount ETB',
                                       highlight: true),

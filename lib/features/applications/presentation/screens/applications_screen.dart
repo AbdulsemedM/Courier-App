@@ -49,7 +49,7 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
       displaySnack(
         context,
         'You do not have permission to access ${option.title}',
-        Colors.red,
+        BrandColors.danger,
       );
       return;
     }
@@ -113,7 +113,7 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
     if (state is FetchStatusSuccess) {
       _openShipmentTypeModal(context, state.statuses);
     } else if (state is FetchStatusFailure) {
-      displaySnack(context, state.errorMessage, Colors.red);
+      displaySnack(context, state.errorMessage, BrandColors.danger);
     }
   }
 
@@ -122,7 +122,7 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
     List<StatusModel> statuses,
   ) {
     if (statuses.isEmpty) {
-      displaySnack(context, 'No shipment statuses available', Colors.red);
+      displaySnack(context, 'No shipment statuses available', BrandColors.danger);
       return;
     }
 

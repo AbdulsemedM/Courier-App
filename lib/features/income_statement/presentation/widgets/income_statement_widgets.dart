@@ -197,8 +197,8 @@ class BreakdownSection extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isRevenue
-                  ? Colors.green.withOpacity(0.1)
-                  : Colors.orange.withOpacity(0.1),
+                  ? BrandColors.success.withOpacity(0.1)
+                  : BrandColors.orange.withOpacity(0.1),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(12),
                 bottomRight: Radius.circular(12),
@@ -222,7 +222,7 @@ class BreakdownSection extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: isRevenue ? Colors.green : Colors.red,
+                        color: isRevenue ? BrandColors.success : BrandColors.danger,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -381,19 +381,19 @@ class AccountBalancesTable extends StatelessWidget {
   Color _getAccountTypeColor(String accountType) {
     switch (accountType.toUpperCase()) {
       case 'BRANCH':
-        return Colors.blue;
+        return BrandColors.info;
       case 'BRANCH_EXPENSE':
-        return Colors.orange;
+        return BrandColors.orange;
       case 'TELLER':
-        return Colors.green;
+        return BrandColors.success;
       case 'HQ':
-        return Colors.purple;
+        return BrandColors.purpleMid;
       case 'HQ_EXPENSE':
-        return Colors.red;
+        return BrandColors.danger;
       case 'EXPENSE':
-        return Colors.red;
+        return BrandColors.danger;
       default:
-        return Colors.grey;
+        return BrandColors.neutral500;
     }
   }
 }

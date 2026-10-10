@@ -110,14 +110,14 @@ class _AssignMessengerModalState extends State<AssignMessengerModal> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.green,
+              backgroundColor: BrandColors.success,
             ),
           );
         } else if (state is AssignMessengerFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: BrandColors.danger,
             ),
           );
         }
@@ -160,7 +160,7 @@ class _AssignMessengerModalState extends State<AssignMessengerModal> {
                 if (snapshot.hasError) {
                   return Text(
                     snapshot.error.toString(),
-                    style: const TextStyle(color: Colors.red),
+                    style: const TextStyle(color: BrandColors.danger),
                   );
                 }
                 final messengers = snapshot.data ?? [];

@@ -138,13 +138,13 @@ class _RolesScreenState extends State<RolesScreen> {
                   Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: isDarkMode ? Colors.red[300] : Colors.red,
+                    color: isDarkMode ? BrandColors.dangerLight : BrandColors.danger,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Error: ${state.message}',
                     style: TextStyle(
-                      color: isDarkMode ? Colors.red[300] : Colors.red,
+                      color: isDarkMode ? BrandColors.dangerLight : BrandColors.danger,
                     ),
                   ),
                   const SizedBox(height: 16),

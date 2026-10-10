@@ -40,7 +40,7 @@ class SearchBarWidget extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.blue, width: 2),
+            borderSide: const BorderSide(color: BrandColors.info, width: 2),
           ),
         ),
         style: TextStyle(

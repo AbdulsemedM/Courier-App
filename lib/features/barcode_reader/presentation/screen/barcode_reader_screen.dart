@@ -422,7 +422,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //       ElevatedButton(
   //         onPressed: () => Navigator.pop(context, true),
   //         style: ElevatedButton.styleFrom(
-  //           backgroundColor: isDarkMode ? Colors.blue[700] : Colors.blue,
+  //           backgroundColor: isDarkMode ? BrandColors.infoDeep : BrandColors.info,
   //           foregroundColor: Colors.white,
   //         ),
   //         child: const Text('Store & Continue'),
@@ -436,7 +436,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a status first'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
       return;
@@ -448,7 +448,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a shelf'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
       return;
@@ -476,7 +476,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color:
-            isDarkMode ? Colors.grey[900]!.withOpacity(0.5) : context.palette.surfaceMuted,
+            isDarkMode ? BrandColors.neutral900.withOpacity(0.5) : context.palette.surfaceMuted,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: context.palette.border,
@@ -505,7 +505,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                       label: const Text('Update'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
-                            isDarkMode ? Colors.blue[700] : Colors.blue,
+                            isDarkMode ? BrandColors.infoDeep : BrandColors.info,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                       ),
@@ -539,8 +539,8 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
                         ),
                       ),
                       backgroundColor: isDarkMode
-                          ? Colors.blue[900]!.withOpacity(0.3)
-                          : Colors.blue[100],
+                          ? BrandColors.infoDeep.withOpacity(0.3)
+                          : BrandColors.infoSoft,
                       deleteIcon: Icon(
                         Icons.close,
                         size: 16,
@@ -579,7 +579,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
   //           padding: const EdgeInsets.symmetric(horizontal: 12),
   //           decoration: BoxDecoration(
   //             color: isDarkMode
-  //                 ? Colors.grey[800]!.withOpacity(0.5)
+  //                 ? BrandColors.neutral800.withOpacity(0.5)
   //                 : Colors.white,
   //             borderRadius: BorderRadius.circular(12),
   //             border: Border.all(
@@ -630,7 +630,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter tracking number(s)'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
       return;
@@ -640,7 +640,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a status'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
       return;
@@ -695,7 +695,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
-                  backgroundColor: Colors.green,
+                  backgroundColor: BrandColors.success,
                 ),
               );
               _trackingController.clear();
@@ -713,7 +713,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
-                  backgroundColor: Colors.red,
+                  backgroundColor: BrandColors.danger,
                 ),
               );
             }
@@ -759,7 +759,7 @@ class _BarcodeReaderScreenState extends State<BarcodeReaderScreen> {
               context.palette.appBarBackground,
           appBar: AppBar(
             elevation: 0,
-            backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
+            backgroundColor: context.palette.appBarBackground,
             title: Text(
               'Track Shipment',
               style: TextStyle(

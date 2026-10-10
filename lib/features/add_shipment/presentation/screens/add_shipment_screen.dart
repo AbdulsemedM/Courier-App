@@ -196,10 +196,10 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                       height: 32,
                       decoration: BoxDecoration(
                         color: isActive
-                            ? Colors.blue
+                            ? BrandColors.info
                             : (isCompleted
                                 ? context.palette.accent
-                                : Colors.grey[300]),
+                                : BrandColors.neutral300),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -222,7 +222,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                           decoration: BoxDecoration(
                             color: isCompleted || (index < _currentPage)
                                 ? context.palette.accent
-                                : Colors.grey[300],
+                                : BrandColors.neutral300,
                           ),
                         ),
                       ),
@@ -292,7 +292,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
                     height: 50,
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        isDarkMode ? Colors.blue[400]! : Colors.blue,
+                        isDarkMode ? BrandColors.info : BrandColors.info,
                       ),
                       strokeWidth: 4,
                     ),
@@ -542,9 +542,7 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
               backgroundColor: context.palette.appBarBackground,
               appBar: AppBar(
                 elevation: 0,
-                backgroundColor: isDarkMode
-                    ? const Color.fromARGB(255, 75, 23, 160)
-                    : const Color.fromARGB(255, 75, 23, 160),
+                backgroundColor: context.palette.appBarBackground,
                 title: Text(
                   'Add Shipment',
                   style: TextStyle(

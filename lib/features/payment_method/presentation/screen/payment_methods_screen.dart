@@ -43,10 +43,10 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
+      backgroundColor: context.palette.background,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
+        backgroundColor: context.palette.appBarBackground,
         title: Text('Payment Methods', style: TextStyle(color: context.palette.textPrimary)),
         actions: [
           IconButton(

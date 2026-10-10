@@ -55,7 +55,7 @@ class _AddAgentModalState extends State<AddAgentModal> {
               content: Text(isEditing
                   ? 'Agent updated successfully'
                   : 'Agent added successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: BrandColors.success,
             ),
           );
         } else if (state is AddAgentError || state is UpdateAgentError) {
@@ -64,7 +64,7 @@ class _AddAgentModalState extends State<AddAgentModal> {
               content: Text(state is AddAgentError
                   ? state.error
                   : (state as UpdateAgentError).error),
-              backgroundColor: Colors.red,
+              backgroundColor: BrandColors.danger,
             ),
           );
         }
@@ -251,7 +251,7 @@ class _AddAgentModalState extends State<AddAgentModal> {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: BrandColors.info,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24, vertical: 12),

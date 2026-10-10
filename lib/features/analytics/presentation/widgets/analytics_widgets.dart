@@ -15,7 +15,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+        color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -46,7 +46,7 @@ class AnalyticsWidgets {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+              color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -74,7 +74,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+        color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -105,7 +105,7 @@ class AnalyticsWidgets {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+              color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -132,12 +132,12 @@ class AnalyticsWidgets {
     required bool isDarkMode,
   }) {
     final isPass = status.toLowerCase() == 'pass';
-    final progressColor = isPass ? Colors.green : Colors.red;
+    final progressColor = isPass ? BrandColors.success : BrandColors.danger;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+        color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -225,7 +225,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+        color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -249,7 +249,7 @@ class AnalyticsWidgets {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+              color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -275,7 +275,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+        color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -298,16 +298,16 @@ class AnalyticsWidgets {
           ),
           const SizedBox(height: 12),
           _buildFinancialRow(
-              'Cash', financialPeriod.cash ?? 0.0, Colors.green, isDarkMode),
+              'Cash', financialPeriod.cash ?? 0.0, BrandColors.success, isDarkMode),
           const SizedBox(height: 8),
           _buildFinancialRow(
-              'COD', financialPeriod.cod ?? 0.0, Colors.blue, isDarkMode),
+              'COD', financialPeriod.cod ?? 0.0, BrandColors.info, isDarkMode),
           const SizedBox(height: 8),
           _buildFinancialRow('Expenses', financialPeriod.expenses ?? 0.0,
-              Colors.orange, isDarkMode),
+              BrandColors.orange, isDarkMode),
           const SizedBox(height: 8),
           _buildFinancialRow('Expected Net',
-              financialPeriod.expectedNetCash ?? 0.0, Colors.green, isDarkMode),
+              financialPeriod.expectedNetCash ?? 0.0, BrandColors.success, isDarkMode),
         ],
       ),
     );
@@ -322,7 +322,7 @@ class AnalyticsWidgets {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+            color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
           ),
         ),
         Text(
@@ -347,7 +347,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+        color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -363,7 +363,7 @@ class AnalyticsWidgets {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, color: Colors.green, size: 24),
+              Icon(icon, color: BrandColors.success, size: 24),
             ],
           ),
           const SizedBox(height: 12),
@@ -371,7 +371,7 @@ class AnalyticsWidgets {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+              color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -381,7 +381,7 @@ class AnalyticsWidgets {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.green,
+              color: BrandColors.success,
             ),
           ),
           if (subtitle != null) ...[
@@ -390,7 +390,7 @@ class AnalyticsWidgets {
               subtitle,
               style: TextStyle(
                 fontSize: 11,
-                color: isDarkMode ? Colors.grey[500] : Colors.grey[600],
+                color: isDarkMode ? BrandColors.neutral500 : BrandColors.neutral600,
               ),
             ),
           ],
@@ -408,14 +408,14 @@ class AnalyticsWidgets {
         height: 200,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+          color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
           child: Text(
             'No data available',
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+              color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
             ),
           ),
         ),
@@ -426,7 +426,7 @@ class AnalyticsWidgets {
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+        color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -444,7 +444,7 @@ class AnalyticsWidgets {
             horizontalInterval: 1,
             getDrawingHorizontalLine: (value) {
               return FlLine(
-                color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+                color: isDarkMode ? BrandColors.neutral800 : BrandColors.neutral200,
                 strokeWidth: 1,
               );
             },
@@ -471,8 +471,8 @@ class AnalyticsWidgets {
                           style: TextStyle(
                             fontSize: 10,
                             color: isDarkMode
-                                ? Colors.grey[400]
-                                : Colors.grey[600],
+                                ? BrandColors.neutral400
+                                : BrandColors.neutral600,
                           ),
                         );
                       } catch (e) {
@@ -493,7 +493,7 @@ class AnalyticsWidgets {
                     value.toInt().toString(),
                     style: TextStyle(
                       fontSize: 10,
-                      color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                      color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                     ),
                   );
                 },
@@ -504,7 +504,7 @@ class AnalyticsWidgets {
           borderData: FlBorderData(
             show: true,
             border: Border.all(
-              color: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+              color: isDarkMode ? BrandColors.neutral800 : BrandColors.neutral300,
             ),
           ),
           minX: 0,
@@ -524,13 +524,13 @@ class AnalyticsWidgets {
                 );
               }).toList(),
               isCurved: true,
-              color: const Color(0xFF5b3895),
+              color: BrandColors.purple,
               barWidth: 3,
               isStrokeCapRound: true,
               dotData: const FlDotData(show: true),
               belowBarData: BarAreaData(
                 show: true,
-                color: const Color(0xFF5b3895).withOpacity(0.1),
+                color: BrandColors.purple.withOpacity(0.1),
               ),
             ),
           ],
@@ -548,14 +548,14 @@ class AnalyticsWidgets {
         height: 200,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+          color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
           child: Text(
             'No data available',
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+              color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
             ),
           ),
         ),
@@ -575,7 +575,7 @@ class AnalyticsWidgets {
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+        color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -602,7 +602,7 @@ class AnalyticsWidgets {
                       period,
                       style: TextStyle(
                         fontSize: 10,
-                        color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                        color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                       ),
                     );
                   }
@@ -619,7 +619,7 @@ class AnalyticsWidgets {
                     value.toInt().toString(),
                     style: TextStyle(
                       fontSize: 10,
-                      color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                      color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                     ),
                   );
                 },
@@ -636,7 +636,7 @@ class AnalyticsWidgets {
           borderData: FlBorderData(
             show: true,
             border: Border.all(
-              color: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+              color: isDarkMode ? BrandColors.neutral800 : BrandColors.neutral300,
             ),
           ),
           barGroups: earningsOverTime.asMap().entries.map((entry) {
@@ -647,17 +647,17 @@ class AnalyticsWidgets {
               barRods: [
                 BarChartRodData(
                   toY: earnings.revenue ?? 0,
-                  color: Colors.blue,
+                  color: BrandColors.info,
                   width: 8,
                 ),
                 BarChartRodData(
                   toY: earnings.expenses ?? 0,
-                  color: Colors.orange,
+                  color: BrandColors.orange,
                   width: 8,
                 ),
                 BarChartRodData(
                   toY: earnings.profit ?? 0,
-                  color: Colors.green,
+                  color: BrandColors.success,
                   width: 8,
                 ),
               ],
@@ -678,27 +678,27 @@ class AnalyticsWidgets {
         height: 200,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+          color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
           child: Text(
             'No data available',
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+              color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
             ),
           ),
         ),
       );
     }
 
-    final colors = [Colors.green, Colors.blue, Colors.orange, Colors.red];
+    final colors = [BrandColors.success, BrandColors.info, BrandColors.orange, BrandColors.danger];
 
     return Container(
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+        color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -733,7 +733,7 @@ class AnalyticsWidgets {
                         style: TextStyle(
                           fontSize: 9,
                           color:
-                              isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                              isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -752,7 +752,7 @@ class AnalyticsWidgets {
                     value.toInt().toString(),
                     style: TextStyle(
                       fontSize: 10,
-                      color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                      color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                     ),
                   );
                 },
@@ -769,7 +769,7 @@ class AnalyticsWidgets {
           borderData: FlBorderData(
             show: true,
             border: Border.all(
-              color: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+              color: isDarkMode ? BrandColors.neutral800 : BrandColors.neutral300,
             ),
           ),
           barGroups: averageDeliveryTime.asMap().entries.map((entry) {
@@ -801,7 +801,7 @@ class AnalyticsWidgets {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+          color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -831,7 +831,7 @@ class AnalyticsWidgets {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                      color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -839,7 +839,7 @@ class AnalyticsWidgets {
                     '0 deliveries',
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDarkMode ? Colors.grey[500] : Colors.grey[600],
+                      color: isDarkMode ? BrandColors.neutral500 : BrandColors.neutral600,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -847,7 +847,7 @@ class AnalyticsWidgets {
                     '0% of total',
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDarkMode ? Colors.grey[500] : Colors.grey[600],
+                      color: isDarkMode ? BrandColors.neutral500 : BrandColors.neutral600,
                     ),
                   ),
                 ],
@@ -863,7 +863,7 @@ class AnalyticsWidgets {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850]!.withOpacity(0.5) : AppPalette.light.surface,
+        color: isDarkMode ? BrandColors.neutral800.withOpacity(0.5) : AppPalette.light.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -898,7 +898,7 @@ class AnalyticsWidgets {
             '${topLocation.count ?? 0} deliveries',
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+              color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -909,7 +909,7 @@ class AnalyticsWidgets {
                   value: (topLocation.percentage ?? 0) / 100,
                   backgroundColor: AppPalette.light.accentMuted,
                   valueColor:
-                      const AlwaysStoppedAnimation<Color>(Color(0xFF5b3895)),
+                      const AlwaysStoppedAnimation<Color>(BrandColors.purple),
                   minHeight: 8,
                   borderRadius: BorderRadius.circular(4),
                 ),
@@ -919,7 +919,7 @@ class AnalyticsWidgets {
                 '${topLocation.percentage?.toStringAsFixed(1) ?? 0}% of total',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDarkMode ? Colors.grey[400] : AppPalette.light.textSecondary,
+                  color: isDarkMode ? BrandColors.neutral400 : AppPalette.light.textSecondary,
                 ),
               ),
             ],

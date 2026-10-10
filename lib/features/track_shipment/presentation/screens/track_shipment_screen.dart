@@ -211,7 +211,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Camera permission is required to scan barcodes'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
       _requestCameraPermission();
@@ -243,7 +243,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter an AWB number'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
       return;
@@ -271,7 +271,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString()),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
       return;
@@ -404,7 +404,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
             displaySnack(
               outerContext,
               successMessage,
-              Colors.green,
+              BrandColors.success,
               duration: const Duration(seconds: 4),
             );
             _refreshTrackingForAwb(awb, preservePreviousData: true);
@@ -417,14 +417,14 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                 displaySnack(
                   outerContext,
                   recovered,
-                  Colors.green,
+                  BrandColors.success,
                   duration: const Duration(seconds: 4),
                 );
                 _refreshTrackingForAwb(awb, preservePreviousData: true);
                 return;
               }
             }
-            displaySnack(outerContext, error.toString(), Colors.red);
+            displaySnack(outerContext, error.toString(), BrandColors.danger);
           }
         },
       ),
@@ -450,7 +450,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
   Widget _modeChip(String label, _SearchMode mode, IconData icon) {
     final selected = _searchMode == mode;
-    const selectedColor = Color.fromARGB(255, 75, 23, 160);
+    const selectedColor = BrandColors.purple;
     return Expanded(
       child: GestureDetector(
         onTap: () => _setSearchMode(mode),
@@ -497,17 +497,17 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
           current is CheckPaymentStatusFailure,
       listener: (context, state) {
         if (state is InitiatePaymentSuccess) {
-          displaySnack(context, state.message, Colors.green);
+          displaySnack(context, state.message, BrandColors.success);
         } else if (state is InitiatePaymentFailure) {
-          displaySnack(context, state.errorMessage, Colors.red);
+          displaySnack(context, state.errorMessage, BrandColors.danger);
         } else if (state is CheckPaymentStatusSuccess) {
           final awb = _currentAwb;
           if (awb.isNotEmpty) {
             _refreshTrackingForAwb(awb);
           }
-          displaySnack(context, state.message, Colors.green);
+          displaySnack(context, state.message, BrandColors.success);
         } else if (state is CheckPaymentStatusFailure) {
-          displaySnack(context, state.errorMessage, Colors.red);
+          displaySnack(context, state.errorMessage, BrandColors.danger);
         }
       },
       child: Scaffold(
@@ -515,9 +515,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
           context.palette.appBarBackground,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: isDarkMode
-            ? const Color.fromARGB(255, 75, 23, 160)
-            : const Color.fromARGB(255, 75, 23, 160),
+        backgroundColor: context.palette.appBarBackground,
         leading: BlocBuilder<TrackShipmentBloc, TrackShipmentState>(
           builder: (context, state) {
             final showHistoryBack = _openedFromPhoneHistory &&
@@ -593,8 +591,8 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                                   ? Icons.qr_code_scanner
                                   : Icons.scanner,
                               color: isDarkMode
-                                  ? Colors.blue[300]
-                                  : Colors.blue[700],
+                                  ? BrandColors.infoLight
+                                  : BrandColors.infoDeep,
                             ),
                             onPressed: () {
                               // Scanner is always active for hardware scanners
@@ -606,7 +604,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                                         : 'Urovo Scanner Active - Press scan button',
                                   ),
                                   duration: const Duration(seconds: 2),
-                                  backgroundColor: Colors.blue,
+                                  backgroundColor: BrandColors.info,
                                 ),
                               );
                             },
@@ -618,8 +616,8 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                             icon: Icon(
                               Icons.camera_alt,
                               color: isDarkMode
-                                  ? Colors.green[300]
-                                  : Colors.green[700],
+                                  ? BrandColors.successLight
+                                  : BrandColors.successDeep,
                             ),
                             onPressed: _showCameraScanner,
                             tooltip: 'Scan with Camera',
@@ -718,14 +716,14 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                           Icon(
                             Icons.error_outline,
                             size: 64,
-                            color: isDarkMode ? Colors.red[300] : Colors.red,
+                            color: isDarkMode ? BrandColors.dangerLight : BrandColors.danger,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Error tracking shipment',
                             style: TextStyle(
                               fontSize: 18,
-                              color: isDarkMode ? Colors.red[300] : Colors.red,
+                              color: isDarkMode ? BrandColors.dangerLight : BrandColors.danger,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -849,8 +847,8 @@ class _CameraScannerDialogState extends State<_CameraScannerDialog> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: widget.isDarkMode
-                      ? Colors.blue.shade700
-                      : Colors.blue.shade200,
+                      ? BrandColors.infoDeep
+                      : BrandColors.infoLight,
                   width: 2,
                 ),
               ),

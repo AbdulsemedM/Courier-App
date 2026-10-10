@@ -159,7 +159,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Please select a status'),
-                        backgroundColor: Colors.red,
+                        backgroundColor: BrandColors.danger,
                       ),
                     );
                     return;
@@ -168,7 +168,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Please select a shelf'),
-                        backgroundColor: Colors.red,
+                        backgroundColor: BrandColors.danger,
                       ),
                     );
                     return;
@@ -303,9 +303,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
     if (isSelectionMode) {
       return AppBar(
         elevation: 0,
-        backgroundColor: isDarkMode
-            ? const Color.fromARGB(255, 75, 23, 160)
-            : const Color.fromARGB(255, 75, 23, 160),
+        backgroundColor: context.palette.appBarBackground,
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () {
@@ -362,7 +360,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
-                  backgroundColor: Colors.green,
+                  backgroundColor: BrandColors.success,
                 ),
               );
             }
@@ -370,7 +368,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
         ),
       ],
       child: Scaffold(
-        backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
+        backgroundColor: context.palette.background,
         appBar: _buildAppBar(isDarkMode),
         body: RefreshIndicator(
           onRefresh: _loadShipments,
@@ -394,7 +392,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                       Icon(
                         Icons.error_outline,
                         size: 64,
-                        color: isDarkMode ? Colors.red[300] : Colors.red,
+                        color: isDarkMode ? BrandColors.dangerLight : BrandColors.danger,
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -419,7 +417,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                         onPressed: _loadShipments,
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              isDarkMode ? Colors.blue[700] : Colors.blue,
+                              isDarkMode ? BrandColors.infoDeep : BrandColors.info,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
