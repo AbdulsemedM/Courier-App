@@ -990,7 +990,7 @@ class TrackShipmentWidgets {
                   color: statusColor,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white,
+                    color: AppPalette.forMode(isDarkMode).surface,
                     width: 3,
                   ),
                   boxShadow: [

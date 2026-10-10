@@ -532,14 +532,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
             );
           },
         ),
-        title: Text(
-          'Track Shipment',
-          style: TextStyle(
-            color: context.palette.textPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text('Track Shipment'),
       ),
       body: Column(
           children: [
@@ -550,16 +543,8 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container(
-                decoration: BoxDecoration(
-                  color: context.palette.appBarBackground,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                decoration: context.palette.cardDecoration.copyWith(
+                  borderRadius: BorderRadius.circular(18),
                 ),
                 child: TextField(
                   controller: _searchController,
@@ -634,12 +619,12 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                       ],
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(18),
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
                     fillColor:
-                        context.palette.appBarBackground,
+                        context.palette.surface,
                   ),
                   textInputAction: TextInputAction.search,
                   onSubmitted: (_) => _onSearch(),

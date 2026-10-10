@@ -110,7 +110,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.only(bottom: 24),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       LoginWidgets.buildBrandHero(
                         isDarkMode: isDarkMode,
@@ -145,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         isDarkMode: isDarkMode,
                         onTap: _openPublicTracking,
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),

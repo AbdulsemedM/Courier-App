@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
+import 'package:courier_app/core/widgets/ui_primitives.dart';
 import 'first_page.dart';
 import 'second_page.dart';
 import 'third_page.dart';
@@ -170,93 +171,14 @@ class _AddShipmentScreenState extends State<AddShipmentScreen> {
   }
 
   Widget _buildStepIndicator(bool isDarkMode) {
-    final steps = [
-      'Sender & Receiver',
-      'Shipment Details',
-      'Payment',
-    ];
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       color: context.palette.appBarBackground,
-      child: Column(
-        children: [
-          // Row with circles and connecting lines
-          Row(
-            children: List.generate(3, (index) {
-              final isActive = index == _currentPage;
-              final isCompleted = index < _currentPage;
-
-              return Expanded(
-                child: Row(
-                  children: [
-                    // Step Circle
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: isActive
-                            ? BrandColors.info
-                            : (isCompleted
-                                ? context.palette.accent
-                                : BrandColors.neutral300),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${index + 1}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Connecting Line
-                    if (index < 2)
-                      Expanded(
-                        child: Container(
-                          height: 2,
-                          margin: const EdgeInsets.symmetric(horizontal: 8),
-                          decoration: BoxDecoration(
-                            color: isCompleted || (index < _currentPage)
-                                ? context.palette.accent
-                                : BrandColors.neutral300,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              );
-            }),
-          ),
-          const SizedBox(height: 8),
-          // Row with step labels
-          Row(
-            children: List.generate(3, (index) {
-              final isActive = index == _currentPage;
-              final isCompleted = index < _currentPage;
-
-              return Expanded(
-                child: Text(
-                  steps[index],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: isActive
-                        ? (context.palette.textPrimary)
-                        : (isCompleted
-                            ? context.palette.accent
-                            : (context.palette.textSecondary)),
-                    fontSize: 12,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                ),
-              );
-            }),
-          ),
+      child: StepIndicator(
+        current: _currentPage,
+        labels: const [
+          'Sender & Receiver',
+          'Shipment Details',
+          'Payment',
         ],
       ),
     );

@@ -154,14 +154,7 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
         elevation: 0,
         backgroundColor: palette.appBarBackground,
         surfaceTintColor: Colors.transparent,
-        title: Text(
-          'Applications',
-          style: TextStyle(
-            color: palette.textPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text('Applications'),
       ),
       body: _visibleOptions.isEmpty
           ? ApplicationWidgets.buildEmptyState(

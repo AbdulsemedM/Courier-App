@@ -112,17 +112,17 @@ class AppPalette extends ThemeExtension<AppPalette> {
   });
 
   static const light = AppPalette(
-    background: BrandColors.ivory,
+    background: Color(0xFFF8F4EE),
     surface: Color(0xFFFFFFFF),
-    surfaceMuted: Color(0xFFF4F0EA),
+    surfaceMuted: Color(0xFFF1EBE3),
     textPrimary: BrandColors.charcoal,
     textSecondary: Color(0xFF6E666A),
     border: Color(0xFFE6DFD6),
     accent: BrandColors.orange,
     accentMuted: Color(0xFFFDEDE3),
-    appBarBackground: BrandColors.ivory,
-    scaffoldSecondary: Color(0xFFF4F0EA),
-    cardShadow: Color(0x14231F20),
+    appBarBackground: Color(0xFFF8F4EE),
+    scaffoldSecondary: Color(0xFFF1EBE3),
+    cardShadow: Color(0x1A231F20),
     navBarBackground: BrandColors.purple,
     navInactive: Color(0xFFC9BCE0),
     navActive: Color(0xFFFF7A33),
@@ -141,8 +141,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
 
   static const dark = AppPalette(
     background: Color(0xFF15101F),
-    surface: Color(0xFF201833),
-    surfaceMuted: Color(0xFF2A2040),
+    surface: Color(0xFF231A38),
+    surfaceMuted: Color(0xFF2E2448),
     textPrimary: Color(0xFFF6F2EC),
     textSecondary: Color(0xFFB8AFC4),
     border: Color(0xFF3A2F52),
@@ -172,13 +172,22 @@ class AppPalette extends ThemeExtension<AppPalette> {
 
   BoxDecoration get cardDecoration => BoxDecoration(
         color: surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: border),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: background.computeLuminance() < 0.5
+              ? border
+              : border.withValues(alpha: 0.45),
+        ),
         boxShadow: [
           BoxShadow(
             color: cardShadow,
-            blurRadius: 14,
-            offset: const Offset(0, 4),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: cardShadow.withValues(alpha: 0.35),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       );

@@ -73,7 +73,7 @@ class ThemeProvider extends ChangeNotifier {
 
     OutlineInputBorder inputBorder(Color color, [double width = 1]) =>
         OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: color, width: width),
         );
 
@@ -90,9 +90,9 @@ class ThemeProvider extends ChangeNotifier {
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.android: _SoftPageTransitionsBuilder(),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS: _SoftPageTransitionsBuilder(),
           TargetPlatform.windows: _SoftPageTransitionsBuilder(),
-          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: _SoftPageTransitionsBuilder(),
           TargetPlatform.linux: _SoftPageTransitionsBuilder(),
         },
       ),
@@ -105,10 +105,10 @@ class ThemeProvider extends ChangeNotifier {
         iconTheme: IconThemeData(color: palette.textPrimary),
         actionsIconTheme: IconThemeData(color: palette.textPrimary),
         titleTextStyle: AppFonts.heading(
-          fontSize: 20,
+          fontSize: 22,
           fontWeight: FontWeight.w600,
           color: headingColor,
-          letterSpacing: -0.2,
+          letterSpacing: -0.3,
         ),
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -134,8 +134,10 @@ class ThemeProvider extends ChangeNotifier {
         surfaceTintColor: Colors.transparent,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: BorderSide(color: palette.border),
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(
+            color: isDark ? palette.border : palette.border.withValues(alpha: 0.4),
+          ),
         ),
       ),
       dividerTheme: DividerThemeData(
@@ -173,9 +175,10 @@ class ThemeProvider extends ChangeNotifier {
             fontWeight: FontWeight.w600,
             letterSpacing: 0.2,
           ),
+          minimumSize: const Size.fromHeight(52),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
       ),
@@ -187,8 +190,9 @@ class ThemeProvider extends ChangeNotifier {
             fontFamily: AppFonts.sans,
             fontWeight: FontWeight.w600,
           ),
+          minimumSize: const Size.fromHeight(52),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
       ),
@@ -200,8 +204,9 @@ class ThemeProvider extends ChangeNotifier {
             fontFamily: AppFonts.sans,
             fontWeight: FontWeight.w600,
           ),
+          minimumSize: const Size.fromHeight(48),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
       ),
@@ -294,7 +299,7 @@ class ThemeProvider extends ChangeNotifier {
           color: palette.textSecondary,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           side: BorderSide(color: palette.border),
         ),
       ),

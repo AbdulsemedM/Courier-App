@@ -2,6 +2,7 @@ import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/core/theme/app_typography.dart';
 import 'package:courier_app/core/widgets/brand_widgets.dart';
 import 'package:courier_app/core/widgets/status_chip.dart';
+import 'package:courier_app/core/widgets/ui_primitives.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -93,20 +94,16 @@ class HomeWidgets {
               child: Row(
                 children: [
                   Container(
-                    width: 54,
-                    height: 54,
+                    width: 58,
+                    height: 58,
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.12),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.4),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.local_shipping_outlined,
-                      size: 26,
                       color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Image.asset(
+                      'assets/images/hudhud_logo.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -404,9 +401,9 @@ class _HomeActionCardState extends State<_HomeActionCard> {
         duration: const Duration(milliseconds: 100),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             color: palette.surface,
-            border: Border.all(color: palette.border),
+            border: Border.all(color: palette.border.withValues(alpha: 0.6)),
             boxShadow: [
               BoxShadow(
                 color: palette.cardShadow,
@@ -420,19 +417,7 @@ class _HomeActionCardState extends State<_HomeActionCard> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: widget.color.withValues(alpha: 0.12),
-                  ),
-                  child: Icon(
-                    widget.icon,
-                    size: 22,
-                    color: widget.color,
-                  ),
-                ),
+                IconBadge(icon: widget.icon, color: widget.color, size: 44),
                 const SizedBox(height: 10),
                 Text(
                   widget.label,
@@ -496,10 +481,10 @@ class _HomeFeatureTile extends StatelessWidget {
           HapticFeedback.selectionClick();
           onTap();
         },
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(18),
         child: Ink(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(18),
             color: palette.surface,
             border: Border.all(color: palette.border),
             boxShadow: isDarkMode
@@ -516,15 +501,7 @@ class _HomeFeatureTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: accentColor.withValues(alpha: 0.12),
-                  ),
-                  child: Icon(icon, color: accentColor, size: 22),
-                ),
+                IconBadge(icon: icon, color: accentColor),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(

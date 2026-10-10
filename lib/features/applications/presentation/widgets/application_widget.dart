@@ -12,6 +12,8 @@ import 'package:courier_app/features/shipment_invoice/presentation/screens/shipm
 import 'package:courier_app/features/home_delivery/presentation/screens/home_deliveries_screen.dart';
 import 'package:courier_app/features/manifest/presentation/screens/manifest_screen.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
+import 'package:courier_app/core/theme/app_typography.dart';
+import 'package:courier_app/core/widgets/ui_primitives.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -63,11 +65,9 @@ class ApplicationWidgets {
                   const SizedBox(height: 2),
                   Text(
                     'Pick a tool to get started',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      height: 1.2,
-                      letterSpacing: -0.4,
+                    style: AppFonts.heading(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                       color: palette.textPrimary,
                     ),
                   ),
@@ -137,39 +137,10 @@ class ApplicationWidgets {
   }
 
   static Widget buildEmptyState({required bool isDarkMode}) {
-    final palette = AppPalette.forMode(isDarkMode);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: palette.accentMuted,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.apps_rounded,
-              size: 48,
-              color: palette.accent,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'No applications yet',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: palette.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Check back later for new tools',
-            style: TextStyle(color: palette.textSecondary),
-          ),
-        ],
-      ),
+    return const EmptyState(
+      icon: Icons.apps_rounded,
+      title: 'No applications yet',
+      hint: 'Check back later for new tools',
     );
   }
 }
