@@ -27,7 +27,7 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
     final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
+      backgroundColor: context.palette.background,
       body: SafeArea(
           child: Column(
             children: [
@@ -58,7 +58,7 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
                     //   icon: const Icon(Icons.add),
                     //   label: const Text('Add User'),
                     //   style: ElevatedButton.styleFrom(
-                    //     backgroundColor: Colors.blue,
+                    //     backgroundColor: BrandColors.info,
                     //     foregroundColor: Colors.white,
                     //     padding: const EdgeInsets.symmetric(horizontal: 16),
                     //     shape: RoundedRectangleBorder(
@@ -205,7 +205,7 @@ class _ManageUserScreenState extends State<ManageUserScreen> {
           //   },
           //   child: const Text(
           //     'Delete',
-          //     style: TextStyle(color: Colors.red),
+          //     style: TextStyle(color: BrandColors.danger),
           //   ),
           // ),
         ],

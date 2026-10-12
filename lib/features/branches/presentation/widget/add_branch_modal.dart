@@ -246,7 +246,7 @@ class _AddBranchModalState extends State<AddBranchModal> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Branch added successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: BrandColors.success,
             ),
           );
           context.read<BranchesBloc>().add(FetchBranches());
@@ -257,7 +257,7 @@ class _AddBranchModalState extends State<AddBranchModal> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${state.message}'),
-              backgroundColor: Colors.red,
+              backgroundColor: BrandColors.danger,
             ),
           );
           break;

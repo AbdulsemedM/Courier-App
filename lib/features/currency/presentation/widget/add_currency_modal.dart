@@ -36,14 +36,14 @@ class _AddCurrencyModalState extends State<AddCurrencyModal> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Currency added successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: BrandColors.success,
             ),
           );
         } else if (state is AddCurrencyFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: BrandColors.danger,
             ),
           );
         }
@@ -172,7 +172,7 @@ class _AddCurrencyModalState extends State<AddCurrencyModal> {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: BrandColors.info,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24, vertical: 12),

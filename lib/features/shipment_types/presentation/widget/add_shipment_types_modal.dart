@@ -115,7 +115,7 @@ class _AddShipmentTypeModalState extends State<AddShipmentTypeModal> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Shipment type added successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: BrandColors.success,
             ),
           );
           context.read<ShipmentTypesBloc>().add(FetchShipmentTypes());
@@ -125,7 +125,7 @@ class _AddShipmentTypeModalState extends State<AddShipmentTypeModal> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${state.message}'),
-              backgroundColor: Colors.red,
+              backgroundColor: BrandColors.danger,
             ),
           );
           break;

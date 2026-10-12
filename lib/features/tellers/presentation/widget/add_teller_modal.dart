@@ -35,14 +35,14 @@ class _AddTellerModalState extends State<AddTellerModal> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Teller added successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: BrandColors.success,
             ),
           );
         } else if (state is AddTellerError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: BrandColors.danger,
             ),
           );
           setState(() {
@@ -154,17 +154,17 @@ class _AddTellerModalState extends State<AddTellerModal> {
                       return Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: BrandColors.danger.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.error_outline, color: Colors.red),
+                            const Icon(Icons.error_outline, color: BrandColors.danger),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'Error loading branches: ${state.message}',
-                                style: const TextStyle(color: Colors.red),
+                                style: const TextStyle(color: BrandColors.danger),
                               ),
                             ),
                           ],

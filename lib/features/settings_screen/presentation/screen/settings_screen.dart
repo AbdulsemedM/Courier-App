@@ -67,7 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade600,
+              backgroundColor: palette.danger,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -100,7 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error during logout: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: context.palette.danger,
         ),
       );
     }
@@ -123,16 +123,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: palette.background,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          'Settings',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: palette.textPrimary,
-          ),
-        ),
+        title: const Text('Settings'),
       ),
       body: SettingsWidgets.buildPageBackground(
         isDarkMode: isDarkMode,
@@ -150,14 +141,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsWidgets.buildNavRow(
                   title: 'Personal Information',
                   icon: Icons.person_outline_rounded,
-                  accentColor: const Color(0xFF2563EB),
+                  accentColor: palette.info,
                   subtitle: 'Name, contact & profile',
                   onTap: _openComingSoon,
                 ),
                 SettingsWidgets.buildNavRow(
                   title: 'Payment Methods',
                   icon: Icons.payments_outlined,
-                  accentColor: const Color(0xFF059669),
+                  accentColor: palette.success,
                   subtitle: 'Cards and payment options',
                   onTap: _openComingSoon,
                 ),
@@ -169,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsWidgets.buildToggleRow(
                   title: 'Push Notifications',
                   icon: Icons.notifications_outlined,
-                  accentColor: const Color(0xFF7C3AED),
+                  accentColor: palette.primary,
                   value: notificationsEnabled,
                   subtitle: 'Delivery and status alerts',
                   onChanged: (value) {
@@ -179,7 +170,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsWidgets.buildToggleRow(
                   title: 'Dark Mode',
                   icon: Icons.dark_mode_outlined,
-                  accentColor: const Color(0xFF4F46E5),
+                  accentColor: palette.info,
                   value: isDarkMode,
                   subtitle: isDarkMode ? 'Switch to light theme' : 'Switch to dark theme',
                   onChanged: (_) => themeProvider.toggleTheme(),
@@ -187,7 +178,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsWidgets.buildToggleRow(
                   title: 'Location Services',
                   icon: Icons.my_location_outlined,
-                  accentColor: const Color(0xFFDC2626),
+                  accentColor: palette.danger,
                   value: locationEnabled,
                   subtitle: 'Track deliveries on map',
                   onChanged: (value) {
@@ -202,21 +193,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsWidgets.buildNavRow(
                   title: 'Help Center',
                   icon: Icons.help_outline_rounded,
-                  accentColor: const Color(0xFF0D9488),
+                  accentColor: palette.success,
                   subtitle: 'FAQs and contact support',
                   onTap: _openComingSoon,
                 ),
                 SettingsWidgets.buildNavRow(
                   title: 'Terms & Privacy',
                   icon: Icons.shield_outlined,
-                  accentColor: const Color(0xFF64748B),
+                  accentColor: palette.textSecondary,
                   subtitle: 'Legal information',
                   onTap: _openComingSoon,
                 ),
                 SettingsWidgets.buildNavRow(
                   title: 'About App',
                   icon: Icons.info_outline_rounded,
-                  accentColor: const Color(0xFF2563EB),
+                  accentColor: palette.info,
                   subtitle: 'Version 1.0.3',
                   onTap: _openComingSoon,
                 ),

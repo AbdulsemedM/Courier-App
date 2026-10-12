@@ -1,8 +1,9 @@
-import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:courier_app/configuration/auth_service.dart';
 import 'package:courier_app/configuration/phone_number_manager.dart';
 import 'package:courier_app/core/utils/app_permissions.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
+import 'package:courier_app/core/widgets/floating_pill_nav.dart';
+import 'package:courier_app/features/add_shipment/presentation/screens/add_shipment_screen.dart';
 import 'package:courier_app/features/analytics/presentation/screens/analytics_screen.dart';
 import 'package:courier_app/features/applications/presentation/screens/applications_screen.dart';
 import 'package:courier_app/features/home_screen/presentation/screen/home_screen.dart';
@@ -21,6 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
   PageController? _pageController;
   bool _canViewDashboard = false;
+  bool _canAddShipment = false;
   bool _isLoading = true;
   final AuthService _authService = AuthService();
 
@@ -31,10 +33,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _checkDashboardAccess() async {
-    final canView = await PermissionManager().has(AppPermissions.viewDashboard);
+    final permissions = PermissionManager();
+    final canView = await permissions.has(AppPermissions.viewDashboard);
+    final canAdd = await permissions.has(AppPermissions.addShipment);
     if (!mounted) return;
     setState(() {
       _canViewDashboard = canView;
+      _canAddShipment = canAdd;
       _pageController = PageController();
       _isLoading = false;
     });
@@ -67,7 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error during logout: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: BrandColors.danger,
           ),
         );
       }
@@ -104,7 +109,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: BrandColors.danger,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Logout'),
@@ -120,19 +125,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return false;
   }
 
-  BottomNavyBarItem _navItem({
-    required IconData icon,
-    required String title,
-    required AppPalette palette,
-  }) {
-    return BottomNavyBarItem(
-      icon: Icon(icon),
-      title: Text(title),
-      activeColor: palette.navActive,
-      inactiveColor: palette.navInactive,
-      textAlign: TextAlign.center,
-    );
-  }
+  List<PillNavItem> get _navItems => _canViewDashboard
+      ? const [
+          PillNavItem(icon: Icons.home_rounded, label: 'Home'),
+          PillNavItem(icon: Icons.apps_rounded, label: 'Apps'),
+          PillNavItem(icon: Icons.analytics_rounded, label: 'Analytics'),
+          PillNavItem(icon: Icons.settings_rounded, label: 'Settings'),
+        ]
+      : const [
+          PillNavItem(icon: Icons.home_rounded, label: 'Home'),
+          PillNavItem(icon: Icons.apps_rounded, label: 'Apps'),
+          PillNavItem(icon: Icons.settings_rounded, label: 'Settings'),
+        ];
 
   @override
   Widget build(BuildContext context) {
@@ -173,69 +177,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
           bottomNavigationBar: _isLoading
               ? null
-              : Container(
-                  decoration: BoxDecoration(
-                    color: palette.navBarBackground,
-                    border: Border(
-                      top: BorderSide(color: palette.border),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: palette.cardShadow,
-                        blurRadius: 10,
-                        offset: const Offset(0, -4),
+              : FloatingPillNav(
+                  selectedIndex: _currentIndex,
+                  items: _navItems,
+                  showAdd: _canAddShipment,
+                  onAdd: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AddShipmentScreen(),
                       ),
-                    ],
-                  ),
-                  child: BottomNavyBar(
-                    selectedIndex: _currentIndex,
-                    showElevation: false,
-                    backgroundColor: palette.navBarBackground,
-                    onItemSelected: (index) {
-                      setState(() => _currentIndex = index);
-                      _pageController!.jumpToPage(index);
-                    },
-                    items: _canViewDashboard
-                        ? [
-                            _navItem(
-                              icon: Icons.home,
-                              title: 'Home',
-                              palette: palette,
-                            ),
-                            _navItem(
-                              icon: Icons.app_shortcut_rounded,
-                              title: 'Application',
-                              palette: palette,
-                            ),
-                            _navItem(
-                              icon: Icons.analytics,
-                              title: 'Analytics',
-                              palette: palette,
-                            ),
-                            _navItem(
-                              icon: Icons.settings,
-                              title: 'Settings',
-                              palette: palette,
-                            ),
-                          ]
-                        : [
-                            _navItem(
-                              icon: Icons.home,
-                              title: 'Home',
-                              palette: palette,
-                            ),
-                            _navItem(
-                              icon: Icons.app_shortcut_rounded,
-                              title: 'Application',
-                              palette: palette,
-                            ),
-                            _navItem(
-                              icon: Icons.settings,
-                              title: 'Settings',
-                              palette: palette,
-                            ),
-                          ],
-                  ),
+                    );
+                  },
+                  onSelected: (index) {
+                    setState(() => _currentIndex = index);
+                    _pageController!.jumpToPage(index);
+                  },
                 ),
         ),
       ),

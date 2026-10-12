@@ -229,10 +229,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color(0xFF1A1C2E),
-                    const Color(0xFF2D3250),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [context.palette.background, context.palette.background],
           ),
         ),
@@ -247,7 +244,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      const Color.fromARGB(255, 239, 146, 96),
+                      BrandColors.orangeLight,
                       context.palette.accent,
                     ],
                     begin: Alignment.topLeft,
@@ -258,7 +255,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     BoxShadow(
                       color: isDarkMode
                           ? Colors.black.withOpacity(0.3)
-                          : Colors.grey.withOpacity(0.2),
+                          : BrandColors.neutral500.withOpacity(0.2),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),

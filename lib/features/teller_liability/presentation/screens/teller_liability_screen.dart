@@ -103,10 +103,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [context.palette.background, context.palette.background],
           ),
         ),
@@ -315,7 +312,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
                                 Icon(
                                   Icons.error_outline,
                                   size: 48,
-                                  color: isDarkMode ? Colors.white : Colors.red,
+                                  color: isDarkMode ? Colors.white : BrandColors.danger,
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
@@ -422,7 +419,7 @@ class _TellerLiabilityScreenState extends State<TellerLiabilityScreen> {
         border: Border.all(
           color: isDarkMode
               ? Colors.white.withOpacity(0.2)
-              : Colors.grey.withOpacity(0.3),
+              : BrandColors.neutral500.withOpacity(0.3),
         ),
       ),
       child: Column(

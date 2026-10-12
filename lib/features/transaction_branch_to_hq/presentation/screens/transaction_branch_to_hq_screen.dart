@@ -131,10 +131,7 @@ class _TransactionBranchToHqScreenState
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [context.palette.background, context.palette.background],
           ),
         ),
@@ -221,7 +218,7 @@ class _TransactionBranchToHqScreenState
                                             fontSize: 12,
                                             color: isDarkMode
                                                 ? Colors.white70
-                                                : Colors.grey[600],
+                                                : BrandColors.neutral600,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -279,7 +276,7 @@ class _TransactionBranchToHqScreenState
                                             fontSize: 12,
                                             color: isDarkMode
                                                 ? Colors.white70
-                                                : Colors.grey[600],
+                                                : BrandColors.neutral600,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -408,7 +405,7 @@ class _TransactionBranchToHqScreenState
                                         fontSize: 12,
                                         color: isDarkMode
                                             ? Colors.white70
-                                            : Colors.grey[600],
+                                            : BrandColors.neutral600,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -431,7 +428,7 @@ class _TransactionBranchToHqScreenState
                                         fontSize: 12,
                                         color: isDarkMode
                                             ? Colors.white70
-                                            : Colors.grey[600],
+                                            : BrandColors.neutral600,
                                       ),
                                     ),
                                     const SizedBox(height: 4),

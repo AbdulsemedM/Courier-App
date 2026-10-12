@@ -3,6 +3,7 @@ import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
+import 'package:courier_app/core/utils/ethiopian_phone_normalizer.dart';
 
 class FirstPage extends StatefulWidget {
   final Map<String, dynamic> formData;
@@ -25,7 +26,9 @@ class _FirstPageState extends State<FirstPage> {
   String? senderName;
   final TextEditingController _receiverNameController = TextEditingController();
   final TextEditingController _senderNameController = TextEditingController();
-  // String _lastFetchType = ''; // 'receiver' or 'sender'
+  final TextEditingController _receiverMobileController =
+      TextEditingController();
+  final TextEditingController _senderMobileController = TextEditingController();
 
   @override
   void initState() {
@@ -34,13 +37,50 @@ class _FirstPageState extends State<FirstPage> {
     senderName = widget.formData['senderName'];
     _receiverNameController.text = receiverName ?? '';
     _senderNameController.text = senderName ?? '';
+    _receiverMobileController.text =
+        widget.formData['receiverMobile']?.toString() ?? '';
+    _senderMobileController.text =
+        widget.formData['senderMobile']?.toString() ?? '';
   }
 
   @override
   void dispose() {
     _receiverNameController.dispose();
     _senderNameController.dispose();
+    _receiverMobileController.dispose();
+    _senderMobileController.dispose();
     super.dispose();
+  }
+
+  void _setReceiverMobile(String value) {
+    widget.formData['receiverMobile'] = value;
+    if (_receiverMobileController.text != value) {
+      _receiverMobileController.text = value;
+      _receiverMobileController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _receiverMobileController.text.length),
+      );
+    }
+  }
+
+  void _setSenderMobile(String value) {
+    widget.formData['senderMobile'] = value;
+    if (_senderMobileController.text != value) {
+      _senderMobileController.text = value;
+      _senderMobileController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _senderMobileController.text.length),
+      );
+    }
+  }
+
+  String? _canonicalPhoneOrNull(String? raw) {
+    if (raw == null || raw.trim().isEmpty) {
+      return null;
+    }
+    try {
+      return EthiopianPhoneNormalizer.normalize(raw);
+    } catch (_) {
+      return EthiopianPhoneNormalizer.toLocal09(raw);
+    }
   }
 
   void _updateReceiverName(String value) {
@@ -79,7 +119,7 @@ class _FirstPageState extends State<FirstPage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.red[400],
+              color: BrandColors.danger,
             ),
           ),
           const SizedBox(height: 16),
@@ -109,7 +149,7 @@ class _FirstPageState extends State<FirstPage> {
           const SizedBox(height: 16),
           _buildTextField(
             label: 'Receiver Mobile',
-            value: widget.formData['receiverMobile'],
+            controller: _receiverMobileController,
             onChanged: (value) => setState(() {
               widget.formData['receiverMobile'] = value;
             }),
@@ -118,17 +158,20 @@ class _FirstPageState extends State<FirstPage> {
           ),
           ElevatedButton(
             onPressed: () {
-              final phoneNumber = widget.formData['receiverMobile']?.toString();
-              if (phoneNumber == null || phoneNumber.isEmpty) {
+              final raw = widget.formData['receiverMobile']?.toString();
+              late final String phoneNumber;
+              try {
+                phoneNumber = EthiopianPhoneNormalizer.normalize(raw ?? '');
+              } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please enter a phone number'),
-                    backgroundColor: Colors.red,
+                  SnackBar(
+                    content: Text(e.toString()),
+                    backgroundColor: BrandColors.danger,
                   ),
                 );
                 return;
               }
-
+              setState(() => _setReceiverMobile(phoneNumber));
               context.read<AddShipmentBloc>().add(
                     FetchCustomerByPhone(
                       phoneNumber: phoneNumber,
@@ -162,12 +205,18 @@ class _FirstPageState extends State<FirstPage> {
           BlocListener<AddShipmentBloc, AddShipmentState>(
             listener: (context, state) {
               if (state is FetchCustomerByPhoneSuccess) {
+                final canonical = state.customer.phone ??
+                    _canonicalPhoneOrNull(
+                        widget.formData['receiverMobile']?.toString());
+                if (canonical != null && canonical.isNotEmpty) {
+                  _setReceiverMobile(canonical);
+                }
                 if (state.customer.fullname != null) {
                   _updateReceiverName(state.customer.fullname!);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Customer found!'),
-                      backgroundColor: Colors.green,
+                      backgroundColor: BrandColors.success,
                     ),
                   );
                 }
@@ -175,7 +224,7 @@ class _FirstPageState extends State<FirstPage> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.errorMessage),
-                    backgroundColor: Colors.red,
+                    backgroundColor: BrandColors.danger,
                   ),
                 );
               }
@@ -204,13 +253,13 @@ class _FirstPageState extends State<FirstPage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.green[400],
+              color: BrandColors.success,
             ),
           ),
           const SizedBox(height: 16),
           _buildTextField(
             label: 'Sender Mobile',
-            value: widget.formData['senderMobile'],
+            controller: _senderMobileController,
             onChanged: (value) => setState(() {
               widget.formData['senderMobile'] = value;
             }),
@@ -219,17 +268,20 @@ class _FirstPageState extends State<FirstPage> {
           ),
           ElevatedButton(
             onPressed: () {
-              final phoneNumber = widget.formData['senderMobile']?.toString();
-              if (phoneNumber == null || phoneNumber.isEmpty) {
+              final raw = widget.formData['senderMobile']?.toString();
+              late final String phoneNumber;
+              try {
+                phoneNumber = EthiopianPhoneNormalizer.normalize(raw ?? '');
+              } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please enter a phone number'),
-                    backgroundColor: Colors.red,
+                  SnackBar(
+                    content: Text(e.toString()),
+                    backgroundColor: BrandColors.danger,
                   ),
                 );
                 return;
               }
-
+              setState(() => _setSenderMobile(phoneNumber));
               context.read<AddShipmentBloc>().add(
                     FetchSenderByPhone(
                       phoneNumber: phoneNumber,
@@ -263,12 +315,18 @@ class _FirstPageState extends State<FirstPage> {
           BlocListener<AddShipmentBloc, AddShipmentState>(
             listener: (context, state) {
               if (state is FetchSenderByPhoneSuccess) {
+                final canonical = state.customer.phone ??
+                    _canonicalPhoneOrNull(
+                        widget.formData['senderMobile']?.toString());
+                if (canonical != null && canonical.isNotEmpty) {
+                  _setSenderMobile(canonical);
+                }
                 if (state.customer.fullname != null) {
                   _updateSenderName(state.customer.fullname!);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Customer found!'),
-                      backgroundColor: Colors.green,
+                      backgroundColor: BrandColors.success,
                     ),
                   );
                 }
@@ -276,7 +334,7 @@ class _FirstPageState extends State<FirstPage> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.errorMessage),
-                    backgroundColor: Colors.red,
+                    backgroundColor: BrandColors.danger,
                   ),
                 );
               }
@@ -412,7 +470,7 @@ class _FirstPageState extends State<FirstPage> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.blue[400]! : Colors.blue[700]!,
+                color: isDarkMode ? BrandColors.info : BrandColors.infoDeep,
               ),
             ),
           ),
@@ -474,7 +532,7 @@ class _FirstPageState extends State<FirstPage> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.blue[400]! : Colors.blue[700]!,
+                color: isDarkMode ? BrandColors.info : BrandColors.infoDeep,
               ),
             ),
           ),

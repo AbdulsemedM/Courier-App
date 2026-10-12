@@ -40,7 +40,7 @@ class SearchBarWidget extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.blue, width: 2),
+            borderSide: const BorderSide(color: BrandColors.info, width: 2),
           ),
         ),
         style: TextStyle(
@@ -166,7 +166,7 @@ class CurrencyTable extends StatelessWidget {
                 //         IconButton(
                 //           icon: Icon(
                 //             Icons.edit,
-                //             color: isDarkMode ? Colors.blue[300] : Colors.blue,
+                //             color: isDarkMode ? BrandColors.infoLight : BrandColors.info,
                 //           ),
                 //           onPressed: () => onEdit!(currency),
                 //         ),
@@ -174,7 +174,7 @@ class CurrencyTable extends StatelessWidget {
                 //         IconButton(
                 //           icon: Icon(
                 //             Icons.delete,
-                //             color: isDarkMode ? Colors.red[300] : Colors.red,
+                //             color: isDarkMode ? BrandColors.dangerLight : BrandColors.danger,
                 //           ),
                 //           onPressed: () => onDelete!(currency),
                 //         ),

@@ -153,10 +153,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color(0xFF1A1C2E),
-                    const Color(0xFF2D3250),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [context.palette.background, context.palette.background],
           ),
         ),
@@ -340,7 +337,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                           Icon(
                             Icons.error_outline,
                             size: 64,
-                            color: Colors.red[300],
+                            color: BrandColors.dangerLight,
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -374,7 +371,7 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
                               size: 64,
                               color: isDarkMode
                                   ? Colors.white38
-                                  : Colors.grey[400],
+                                  : BrandColors.neutral400,
                             ),
                             const SizedBox(height: 16),
                             Text(
@@ -540,8 +537,8 @@ class _AdminExpensesScreenState extends State<AdminExpensesScreen> {
               (Set<MaterialState> states) {
                 if (states.contains(MaterialState.selected)) {
                   return isDarkMode
-                      ? Colors.blue.withOpacity(0.1)
-                      : Colors.blue[100]!;
+                      ? BrandColors.info.withOpacity(0.1)
+                      : BrandColors.infoSoft;
                 }
                 return context.palette.surface;
               },

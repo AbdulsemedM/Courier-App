@@ -120,7 +120,7 @@ class _PublicTrackingScreenState extends State<PublicTrackingScreen> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A1931) : palette.background,
+      backgroundColor: palette.background,
       body: Column(
         children: [
           _buildHero(context, palette),
@@ -190,7 +190,7 @@ class _PublicTrackingScreenState extends State<PublicTrackingScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFFF7A33), Color(0xFFFF5A00)],
+          colors: [BrandColors.orange, BrandColors.orange],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(28),
@@ -326,7 +326,7 @@ class _PublicTrackingScreenState extends State<PublicTrackingScreen> {
                 icon,
                 size: 16,
                 color: isSelected
-                    ? const Color(0xFFFF5A00)
+                    ? BrandColors.orange
                     : Colors.white.withValues(alpha: 0.85),
               ),
               const SizedBox(width: 6),
@@ -336,7 +336,7 @@ class _PublicTrackingScreenState extends State<PublicTrackingScreen> {
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
                   color: isSelected
-                      ? const Color(0xFFFF5A00)
+                      ? BrandColors.orange
                       : Colors.white.withValues(alpha: 0.85),
                 ),
               ),
@@ -356,7 +356,7 @@ class _PublicTrackingScreenState extends State<PublicTrackingScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: _awbError != null ? Colors.red : Colors.transparent,
+              color: _awbError != null ? BrandColors.danger : Colors.transparent,
             ),
           ),
           child: Row(
@@ -425,12 +425,12 @@ class _PublicTrackingScreenState extends State<PublicTrackingScreen> {
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.radar_rounded, color: Color(0xFFFF5A00), size: 22),
+              Icon(Icons.radar_rounded, color: BrandColors.orange, size: 22),
               SizedBox(width: 8),
               Text(
                 'Track now',
                 style: TextStyle(
-                  color: Color(0xFFFF5A00),
+                  color: BrandColors.orange,
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
                 ),
@@ -492,7 +492,7 @@ class _PublicBarcodeScannerState extends State<_PublicBarcodeScanner> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Scan AWB'),
-        backgroundColor: const Color(0xFFFF5A00),
+        backgroundColor: BrandColors.orange,
         foregroundColor: Colors.white,
       ),
       body: MobileScanner(

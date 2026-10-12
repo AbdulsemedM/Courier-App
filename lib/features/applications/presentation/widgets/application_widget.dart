@@ -12,6 +12,8 @@ import 'package:courier_app/features/shipment_invoice/presentation/screens/shipm
 import 'package:courier_app/features/home_delivery/presentation/screens/home_deliveries_screen.dart';
 import 'package:courier_app/features/manifest/presentation/screens/manifest_screen.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
+import 'package:courier_app/core/theme/app_typography.dart';
+import 'package:courier_app/core/widgets/ui_primitives.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -32,7 +34,7 @@ class ApplicationWidgets {
           colors: isDarkMode
               ? [
                   palette.background,
-                  const Color(0xFF0F2444),
+                  palette.background,
                   palette.background,
                 ]
               : [
@@ -63,11 +65,9 @@ class ApplicationWidgets {
                   const SizedBox(height: 2),
                   Text(
                     'Pick a tool to get started',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      height: 1.2,
-                      letterSpacing: -0.4,
+                    style: AppFonts.heading(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                       color: palette.textPrimary,
                     ),
                   ),
@@ -137,39 +137,10 @@ class ApplicationWidgets {
   }
 
   static Widget buildEmptyState({required bool isDarkMode}) {
-    final palette = AppPalette.forMode(isDarkMode);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: palette.accentMuted,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.apps_rounded,
-              size: 48,
-              color: palette.accent,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'No applications yet',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: palette.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Check back later for new tools',
-            style: TextStyle(color: palette.textSecondary),
-          ),
-        ],
-      ),
+    return const EmptyState(
+      icon: Icons.apps_rounded,
+      title: 'No applications yet',
+      hint: 'Check back later for new tools',
     );
   }
 }
@@ -442,9 +413,9 @@ final List<MenuOption> defaultMenuOptions = [
     title: 'Pay by AWB',
     subtitle: 'Quick payment lookup',
     icon: Icons.payments_rounded,
-    color: const Color(0xFF1D4ED8),
-    gradientStart: const Color(0xFFEFF6FF),
-    gradientEnd: const Color(0xFFDBEAFE),
+    color: BrandColors.info,
+    gradientStart: BrandColors.infoSoft,
+    gradientEnd: BrandColors.infoSoft,
     screen: const PayByAwbScreen(),
     permission: AppPermissions.payByAwb,
   ),
@@ -452,9 +423,9 @@ final List<MenuOption> defaultMenuOptions = [
     title: 'Shipment Invoice',
     subtitle: 'Scan & print invoice',
     icon: Icons.receipt_long_rounded,
-    color: const Color(0xFF6D28D9),
-    gradientStart: const Color(0xFFF5F3FF),
-    gradientEnd: const Color(0xFFEDE9FE),
+    color: BrandColors.purpleMid,
+    gradientStart: BrandColors.purpleSoft,
+    gradientEnd: BrandColors.purpleSoft,
     screen: const ShipmentInvoiceScreen(),
     permission: AppPermissions.shipmentInvoice,
   ),
@@ -462,9 +433,9 @@ final List<MenuOption> defaultMenuOptions = [
     title: 'All Shipments',
     subtitle: 'Track every shipment',
     icon: Icons.local_shipping_rounded,
-    color: const Color(0xFFC2410C),
-    gradientStart: const Color(0xFFFFF7ED),
-    gradientEnd: const Color(0xFFFFEDD5),
+    color: BrandColors.orange,
+    gradientStart: BrandColors.orangeSoft,
+    gradientEnd: BrandColors.orangeSoft,
     screen: const ShipmentsScreen(),
     permission: AppPermissions.manageShipments,
   ),
@@ -472,9 +443,9 @@ final List<MenuOption> defaultMenuOptions = [
     title: 'Manifest',
     subtitle: 'Create & view manifests',
     icon: Icons.fact_check_rounded,
-    color: const Color(0xFF4338CA),
-    gradientStart: const Color(0xFFEEF2FF),
-    gradientEnd: const Color(0xFFE0E7FF),
+    color: BrandColors.purpleMid,
+    gradientStart: BrandColors.purpleSoft,
+    gradientEnd: BrandColors.purpleSoft,
     screen: const ManifestScreen(),
     anyOf: AppPermissions.manifestAny,
   ),
@@ -482,9 +453,9 @@ final List<MenuOption> defaultMenuOptions = [
     title: 'Home Deliveries',
     subtitle: 'Assign & track deliveries',
     icon: Icons.delivery_dining_rounded,
-    color: const Color(0xFFBE185D),
-    gradientStart: const Color(0xFFFDF2F8),
-    gradientEnd: const Color(0xFFFCE7F3),
+    color: BrandColors.danger,
+    gradientStart: BrandColors.dangerSoft,
+    gradientEnd: BrandColors.dangerSoft,
     screen: const HomeDeliveriesScreen(),
     permission: AppPermissions.manageHomeDelivery,
   ),
@@ -492,9 +463,9 @@ final List<MenuOption> defaultMenuOptions = [
     title: 'Add Extra Fee',
     subtitle: 'Apply additional charges',
     icon: Icons.add_circle_outline_rounded,
-    color: const Color(0xFF0F766E),
-    gradientStart: const Color(0xFFF0FDFA),
-    gradientEnd: const Color(0xFFCCFBF1),
+    color: BrandColors.success,
+    gradientStart: BrandColors.successSoft,
+    gradientEnd: BrandColors.successLight,
     screen: const ComingSoonScreen(),
     permission: AppPermissions.manageExtraFee,
   ),
@@ -502,9 +473,9 @@ final List<MenuOption> defaultMenuOptions = [
     title: 'Shelves',
     subtitle: 'Branch shelf layout',
     icon: Icons.grid_view_rounded,
-    color: const Color(0xFF0369A1),
-    gradientStart: const Color(0xFFF0F9FF),
-    gradientEnd: const Color(0xFFE0F2FE),
+    color: BrandColors.info,
+    gradientStart: BrandColors.infoSoft,
+    gradientEnd: BrandColors.infoSoft,
     screen: const ShelvesScreen(),
     permission: AppPermissions.shelvesManagement,
   ),
@@ -512,9 +483,9 @@ final List<MenuOption> defaultMenuOptions = [
     title: 'Shelf Transfer',
     subtitle: 'Move parcel to another shelf',
     icon: Icons.swap_horiz_rounded,
-    color: const Color(0xFF0E7490),
-    gradientStart: const Color(0xFFECFEFF),
-    gradientEnd: const Color(0xFFCFFAFE),
+    color: BrandColors.info,
+    gradientStart: BrandColors.infoSoft,
+    gradientEnd: BrandColors.infoSoft,
     screen: const ShelfTransferScreen(),
     permission: AppPermissions.shelvesManagement,
   ),

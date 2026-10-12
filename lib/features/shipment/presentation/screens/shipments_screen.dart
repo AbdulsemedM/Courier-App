@@ -169,7 +169,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
             displaySnack(
               outerContext,
               successMessage,
-              Colors.green,
+              BrandColors.success,
               duration: const Duration(seconds: 4),
             );
 
@@ -187,7 +187,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                 displaySnack(
                   outerContext,
                   recovered,
-                  Colors.green,
+                  BrandColors.success,
                   duration: const Duration(seconds: 4),
                 );
                 if (_selectedStatus != null) {
@@ -198,7 +198,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                 return;
               }
             }
-            displaySnack(outerContext, error.toString(), Colors.red);
+            displaySnack(outerContext, error.toString(), BrandColors.danger);
           }
         },
       ),
@@ -245,7 +245,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                 BlocListener<TrackOrderBloc, TrackOrderState>(
                   listener: (context, state) {
                     if (state is ChangeStatusSuccess) {
-                      displaySnack(context, state.message, Colors.green);
+                      displaySnack(context, state.message, BrandColors.success);
                       // Refresh shipments after status change
                       if (_selectedStatus != null) {
                         context.read<ShipmentsBloc>().add(
@@ -253,7 +253,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                         );
                       }
                     } else if (state is ChangeStatusFailure) {
-                      displaySnack(context, state.errorMessage, Colors.red);
+                      displaySnack(context, state.errorMessage, BrandColors.danger);
                     }
                   },
                 ),

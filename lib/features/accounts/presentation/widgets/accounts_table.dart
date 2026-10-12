@@ -191,26 +191,26 @@ class AccountsTable extends StatelessWidget {
   Color _getAccountTypeColor(String accountType) {
     switch (accountType.toUpperCase()) {
       case 'BRANCH':
-        return Colors.blue;
+        return BrandColors.info;
       case 'BRANCH_EXPENSE':
-        return Colors.orange;
+        return BrandColors.orange;
       case 'TELLER':
-        return Colors.green;
+        return BrandColors.success;
       case 'HQ':
-        return Colors.purple;
+        return BrandColors.purpleMid;
       default:
-        return Colors.grey;
+        return BrandColors.neutral500;
     }
   }
 
   Color _getStatusColor(String status) {
     switch (status.toUpperCase()) {
       case 'ASSIGNED':
-        return Colors.green;
+        return BrandColors.success;
       case 'UNASSIGNED':
-        return Colors.red;
+        return BrandColors.danger;
       default:
-        return Colors.grey;
+        return BrandColors.neutral500;
     }
   }
 }

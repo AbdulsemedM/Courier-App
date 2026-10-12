@@ -1,3 +1,4 @@
+import 'package:courier_app/core/theme/app_palette.dart';
 import 'package:courier_app/core/utils/shipment_status_helper.dart';
 import 'package:courier_app/features/track_order/model/statuses_model.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class ShipmentTypeModal extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF5b3895) : Colors.white,
+        color: isDarkMode ? BrandColors.purple : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
@@ -40,7 +41,7 @@ class ShipmentTypeModal extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[600] : Colors.grey[400],
+              color: isDarkMode ? BrandColors.neutral600 : BrandColors.neutral400,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -158,7 +159,7 @@ class ShipmentTypeModal extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           color:
-                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                              isDarkMode ? BrandColors.neutral400 : BrandColors.neutral600,
                         ),
                       ),
                     ],
@@ -167,7 +168,7 @@ class ShipmentTypeModal extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios,
                   size: 16,
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  color: isDarkMode ? BrandColors.neutral400 : BrandColors.neutral600,
                 ),
               ],
             ),

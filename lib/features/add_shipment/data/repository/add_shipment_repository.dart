@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:courier_app/core/services/cache_service.dart';
+import 'package:courier_app/core/utils/ethiopian_phone_normalizer.dart';
 import 'package:courier_app/features/add_shipment/data/data_provider/add_shipment_data_provider.dart';
 import 'package:courier_app/features/add_shipment/model/branch_model.dart';
 import 'package:courier_app/features/add_shipment/model/customer_by_phone.dart';
@@ -280,10 +281,24 @@ class AddShipmentRepository {
   }
 
   // Note: We don't cache addShipment since it's a POST request
+  String? _canonicalMobile(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    final raw = value.toString();
+    if (raw.trim().isEmpty) {
+      return raw;
+    }
+    return EthiopianPhoneNormalizer.toLocal09(raw);
+  }
+
   Future<String> addShipment(Map<String, dynamic> body) async {
     try {
-      print('[Repository] addShipment called with body: $body');
-      final response = await addShipmentDataProvider.addNewShipment(body);
+      final payload = Map<String, dynamic>.from(body);
+      payload['senderMobile'] = _canonicalMobile(payload['senderMobile']);
+      payload['receiverMobile'] = _canonicalMobile(payload['receiverMobile']);
+      print('[Repository] addShipment called with body: $payload');
+      final response = await addShipmentDataProvider.addNewShipment(payload);
       print('[Repository] Received response: $response');
       final data = jsonDecode(response);
       print('[Repository] Parsed data: $data');
@@ -325,8 +340,9 @@ class AddShipmentRepository {
   // Note: We don't cache customer phone lookups since they need to be real-time
   Future<CustomerByPhone> fetchCustomerByPhone(String phoneNumber) async {
     try {
+      final normalized = EthiopianPhoneNormalizer.normalize(phoneNumber);
       final response =
-          await addShipmentDataProvider.fetchCustomerByPhone(phoneNumber);
+          await addShipmentDataProvider.fetchCustomerByPhone(normalized);
       final data = jsonDecode(response);
       if (data['status'] != 200) {
         throw data['message'];

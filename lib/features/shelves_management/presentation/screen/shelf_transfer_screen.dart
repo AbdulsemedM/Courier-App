@@ -35,15 +35,15 @@ class _ShelfTransferScreenState extends State<ShelfTransferScreen> {
     final reason = _reasonController.text.trim();
 
     if (awb.isEmpty) {
-      displaySnack(context, 'Please enter an AWB number', Colors.red);
+      displaySnack(context, 'Please enter an AWB number', BrandColors.danger);
       return;
     }
     if (_selectedShelfId == null) {
-      displaySnack(context, 'Please select a destination shelf', Colors.red);
+      displaySnack(context, 'Please select a destination shelf', BrandColors.danger);
       return;
     }
     if (reason.isEmpty) {
-      displaySnack(context, 'Please enter a reason', Colors.red);
+      displaySnack(context, 'Please enter a reason', BrandColors.danger);
       return;
     }
 
@@ -66,13 +66,13 @@ class _ShelfTransferScreenState extends State<ShelfTransferScreen> {
     return BlocListener<ShelvesManagementBloc, ShelvesManagementState>(
       listener: (context, state) {
         if (state is TransferShelfSuccess) {
-          displaySnack(context, state.message, Colors.green);
+          displaySnack(context, state.message, BrandColors.success);
           _clearForm();
           context.read<ShelvesManagementBloc>().add(
                 RestoreShelvesStateEvent(state.previous),
               );
         } else if (state is TransferShelfFailure) {
-          displaySnack(context, state.message, Colors.red);
+          displaySnack(context, state.message, BrandColors.danger);
           context.read<ShelvesManagementBloc>().add(
                 RestoreShelvesStateEvent(state.previous),
               );

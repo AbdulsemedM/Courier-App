@@ -56,7 +56,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
           icon: Icons.account_tree_outlined,
           title: 'Branches',
           subtitle: 'Manage branches',
-          color: Colors.blue,
+          color: BrandColors.info,
           isDarkMode: isDarkMode,
           onTap: () => _handleOptionTap(context, 'Branches'),
         ),
@@ -65,7 +65,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
           icon: Icons.public,
           title: 'Countries',
           subtitle: 'Manage locations',
-          color: Colors.green,
+          color: BrandColors.success,
           isDarkMode: isDarkMode,
           onTap: () => _handleOptionTap(context, 'Countries'),
         ),
@@ -74,7 +74,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
           icon: Icons.payment,
           title: 'Payment Methods',
           subtitle: 'Configure options',
-          color: Colors.orange,
+          color: BrandColors.orange,
           isDarkMode: isDarkMode,
           onTap: () => _handleOptionTap(context, 'Payment methods'),
         ),
@@ -83,7 +83,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
           icon: Icons.local_shipping_outlined,
           title: 'Shipment Types',
           subtitle: 'Manage types',
-          color: Colors.purple,
+          color: BrandColors.purpleMid,
           isDarkMode: isDarkMode,
           onTap: () => _handleOptionTap(context, 'Shipment types'),
         ),
@@ -92,7 +92,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
           icon: Icons.miscellaneous_services_outlined,
           title: 'Services Modes',
           subtitle: 'Configure services',
-          color: Colors.teal,
+          color: BrandColors.info,
           isDarkMode: isDarkMode,
           onTap: () => _handleOptionTap(context, 'Services modes'),
         ),
@@ -101,7 +101,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
           icon: Icons.currency_exchange,
           title: 'Currency',
           subtitle: 'Set currency options',
-          color: Colors.indigo,
+          color: BrandColors.info,
           isDarkMode: isDarkMode,
           onTap: () => _handleOptionTap(context, 'Currency'),
         ),
@@ -113,7 +113,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
           icon: Icons.directions_bus_filled_outlined,
           title: 'Transport Modes',
           subtitle: 'Configure transportation options',
-          color: Colors.amber,
+          color: BrandColors.warning,
           isDarkMode: isDarkMode,
           onTap: () => _handleOptionTap(context, 'Transport modes'),
         ),
@@ -131,7 +131,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
           icon: Icons.people_outline,
           title: 'Accounts Management',
           subtitle: 'Manage accounts',
-          color: Colors.deepOrange,
+          color: BrandColors.orange,
           isDarkMode: isDarkMode,
           onTap: () => _handleOptionTap(context, 'Account management'),
         ),
@@ -140,16 +140,14 @@ class _OptionsScreenState extends State<OptionsScreen> {
           icon: Icons.people_outline,
           title: 'User Management',
           subtitle: 'Manage user access and permissions',
-          color: Colors.cyan,
+          color: BrandColors.info,
           isDarkMode: isDarkMode,
           onTap: () => _handleOptionTap(context, 'User management'),
         ),
     ];
 
     return Scaffold(
-      backgroundColor: context.isDarkMode
-          ? const Color(0xFF5B3895)
-          : context.palette.background,
+      backgroundColor: context.palette.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -263,9 +261,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
     } else if (option == 'User management') {
       showModalBottomSheet(
         context: context,
-        backgroundColor: context.isDarkMode
-            ? const Color.fromARGB(255, 75, 23, 160)
-            : context.palette.appBarBackground,
+        backgroundColor: context.palette.appBarBackground,
         isScrollControlled: true,
         builder: (context) {
           final isDarkMode = context.isDarkMode;
@@ -276,9 +272,9 @@ class _OptionsScreenState extends State<OptionsScreen> {
                 icon: Icons.admin_panel_settings,
                 title: 'Manage Users',
                 subtitle: 'Staff & Admins',
-                color: Colors.blue,
+                color: BrandColors.info,
                 gradient: const LinearGradient(
-                  colors: [Colors.blue, Colors.blueAccent],
+                  colors: [BrandColors.info, BrandColors.info],
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -292,9 +288,9 @@ class _OptionsScreenState extends State<OptionsScreen> {
                 icon: Icons.people,
                 title: 'Manage Customer',
                 subtitle: 'Client Accounts',
-                color: Colors.purple,
+                color: BrandColors.purpleMid,
                 gradient: const LinearGradient(
-                  colors: [Colors.purple, Colors.purpleAccent],
+                  colors: [BrandColors.purpleMid, Colors.purpleAccent],
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -308,9 +304,9 @@ class _OptionsScreenState extends State<OptionsScreen> {
                 icon: Icons.support_agent,
                 title: 'Manage Agents',
                 subtitle: 'Field Staff',
-                color: Colors.orange,
+                color: BrandColors.orange,
                 gradient: const LinearGradient(
-                  colors: [Colors.orange, Colors.deepOrange],
+                  colors: [BrandColors.orange, BrandColors.orange],
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -324,7 +320,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
             height: MediaQuery.of(context).size.height * 0.5,
             decoration: BoxDecoration(
               color: isDarkMode
-                  ? const Color.fromARGB(255, 75, 23, 160)
+                  ? BrandColors.purple
                   : context.palette.surface,
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(24)),
@@ -383,9 +379,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
     } else if (option == 'Account management') {
       showModalBottomSheet(
         context: context,
-        backgroundColor: context.isDarkMode
-            ? const Color.fromARGB(255, 75, 23, 160)
-            : context.palette.appBarBackground,
+        backgroundColor: context.palette.appBarBackground,
         isScrollControlled: true,
         builder: (context) {
           final isDarkMode = context.isDarkMode;
@@ -396,7 +390,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                 icon: Icons.admin_panel_settings,
                 title: 'Teller List',
                 subtitle: 'Staff & Admins',
-                color: Colors.blue,
+                color: BrandColors.info,
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(MaterialPageRoute(
@@ -412,7 +406,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                 icon: Icons.people,
                 title: 'Assign Tellers',
                 subtitle: 'Client Accounts',
-                color: Colors.purple,
+                color: BrandColors.purpleMid,
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(MaterialPageRoute(
@@ -428,7 +422,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                 icon: Icons.account_box_outlined,
                 title: 'Accounts',
                 subtitle: 'Field Staff',
-                color: Colors.orange,
+                color: BrandColors.orange,
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(MaterialPageRoute(
@@ -444,7 +438,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                 icon: Icons.filter_list,
                 title: 'Filter by Branch',
                 subtitle: 'Field Staff',
-                color: Colors.red,
+                color: BrandColors.danger,
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(MaterialPageRoute(
@@ -460,7 +454,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                 icon: Icons.filter,
                 title: 'Filter by Status',
                 subtitle: 'Field Staff',
-                color: Colors.green,
+                color: BrandColors.success,
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(MaterialPageRoute(
@@ -475,7 +469,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
               height: MediaQuery.of(context).size.height * 0.8,
               decoration: BoxDecoration(
                 color: isDarkMode
-                    ? const Color.fromARGB(255, 75, 23, 160)
+                    ? BrandColors.purple
                     : context.palette.surface,
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(24)),

@@ -25,7 +25,7 @@ class PendingCloseoutTable extends StatelessWidget {
           headingRowColor: MaterialStateProperty.all(
             isDarkMode
                 ? Colors.white.withOpacity(0.1)
-                : Colors.grey.withOpacity(0.2),
+                : BrandColors.neutral500.withOpacity(0.2),
           ),
           columns: [
             DataColumn(
@@ -141,7 +141,7 @@ class PendingCloseoutTable extends StatelessWidget {
             final createdAt = DateTime.tryParse(closeout.createdAt);
             final statusColor = _getStatusColor(closeout.status, isDarkMode);
             final shortfallColor = closeout.shortfallAmount > 0
-                ? Colors.red
+                ? BrandColors.danger
                 : (AppPalette.forMode(isDarkMode).textSecondary);
 
             return DataRow(
@@ -259,20 +259,20 @@ class PendingCloseoutTable extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: closeout.daysPending > 7
-                          ? Colors.red.withOpacity(0.2)
+                          ? BrandColors.danger.withOpacity(0.2)
                           : closeout.daysPending > 3
-                              ? Colors.orange.withOpacity(0.2)
-                              : Colors.green.withOpacity(0.2),
+                              ? BrandColors.orange.withOpacity(0.2)
+                              : BrandColors.success.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       '${closeout.daysPending} days',
                       style: TextStyle(
                         color: closeout.daysPending > 7
-                            ? Colors.red
+                            ? BrandColors.danger
                             : closeout.daysPending > 3
-                                ? Colors.orange
-                                : Colors.green,
+                                ? BrandColors.orange
+                                : BrandColors.success,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -290,13 +290,13 @@ class PendingCloseoutTable extends StatelessWidget {
   Color _getStatusColor(String status, bool isDarkMode) {
     switch (status.toUpperCase()) {
       case 'PENDING':
-        return Colors.amber;
+        return BrandColors.warning;
       case 'APPROVED':
-        return Colors.green;
+        return BrandColors.success;
       case 'REJECTED':
-        return Colors.red;
+        return BrandColors.danger;
       case 'RESOLVED':
-        return Colors.blue;
+        return BrandColors.info;
       default:
         return AppPalette.forMode(isDarkMode).textSecondary;
     }

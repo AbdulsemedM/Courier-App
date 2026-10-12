@@ -81,7 +81,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
                 ? e.toString().replaceFirst('Exception: ', '')
                 : 'Could not prepare the photo. Please try again.',
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
     }
@@ -123,7 +123,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please upload customer ID'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
       return;
@@ -134,7 +134,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please enter delivered to name'),
-            backgroundColor: Colors.red,
+            backgroundColor: BrandColors.danger,
           ),
         );
         return;
@@ -143,7 +143,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please enter delivered to phone'),
-            backgroundColor: Colors.red,
+            backgroundColor: BrandColors.danger,
           ),
         );
         return;
@@ -221,7 +221,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
                   'Photo ready · ${ImageCompressionHelper.formatFileSize(_customerIdFileSizeBytes!)}',
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.green.shade700,
+                    color: BrandColors.successDeep,
                   ),
                 ),
               ),
@@ -319,7 +319,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
                   color: context.palette.textPrimary,
                 ),
               ),
-              activeColor: Colors.green,
+              activeColor: BrandColors.success,
               contentPadding: EdgeInsets.zero,
             ),
             const SizedBox(height: 16),
@@ -377,7 +377,7 @@ class _DeliverShipmentModalState extends State<DeliverShipmentModal> {
             ElevatedButton(
               onPressed: (_isLoading || _isCompressingImage) ? null : _handleSubmit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: BrandColors.success,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(

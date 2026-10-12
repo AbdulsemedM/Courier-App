@@ -56,7 +56,7 @@ class SearchBarWidget extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: BrandColors.info, width: 2),
           ),
         ),
         style: TextStyle(
@@ -194,16 +194,16 @@ class BranchesTable extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: branch.isAgent
-                          ? (isDarkMode ? Colors.blue[900] : Colors.blue[100])
-                          : (isDarkMode ? Colors.green[900] : Colors.green[100]),
+                          ? (isDarkMode ? BrandColors.infoDeep : BrandColors.infoSoft)
+                          : (isDarkMode ? BrandColors.successDeep : BrandColors.successSoft),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       branch.isAgent ? 'Agent' : 'Branch',
                       style: TextStyle(
                         color: branch.isAgent
-                            ? (isDarkMode ? Colors.blue[100] : Colors.blue[900])
-                            : (isDarkMode ? Colors.green[100] : Colors.green[900]),
+                            ? (isDarkMode ? BrandColors.infoSoft : BrandColors.infoDeep)
+                            : (isDarkMode ? BrandColors.successSoft : BrandColors.successDeep),
                       ),
                     ),
                   ),
@@ -212,11 +212,11 @@ class BranchesTable extends StatelessWidget {
                 //   mainAxisSize: MainAxisSize.min,
                 //   children: [
                 //     IconButton(
-                //       icon: const Icon(Icons.edit, color: Colors.blue),
+                //       icon: const Icon(Icons.edit, color: BrandColors.info),
                 //       onPressed: () => onEdit(branch),
                 //     ),
                 //     IconButton(
-                //       icon: const Icon(Icons.delete, color: Colors.red),
+                //       icon: const Icon(Icons.delete, color: BrandColors.danger),
                 //       onPressed: () => onDelete(branch),
                 //     ),
                 //   ],

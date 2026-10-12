@@ -41,10 +41,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [context.palette.background, context.palette.background],
           ),
         ),

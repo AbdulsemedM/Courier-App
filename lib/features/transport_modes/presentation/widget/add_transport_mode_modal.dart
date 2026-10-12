@@ -28,14 +28,14 @@ class _AddTransportModeModalState extends State<AddTransportModeModal> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Transport mode added successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: BrandColors.success,
             ),
           );
         } else if (state is AddTransportModeFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: BrandColors.danger,
             ),
           );
         }
@@ -129,7 +129,7 @@ class _AddTransportModeModalState extends State<AddTransportModeModal> {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: BrandColors.info,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24, vertical: 12),

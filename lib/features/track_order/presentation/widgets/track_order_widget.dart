@@ -11,8 +11,8 @@ class TrackOrderWidgets {
       itemCount: 6,
       itemBuilder: (ctx, index) {
         return Shimmer.fromColors(
-          baseColor: isDarkMode ? Colors.grey[850]! : context.palette.border,
-          highlightColor: isDarkMode ? Colors.grey[700]! : context.palette.surfaceMuted,
+          baseColor: isDarkMode ? BrandColors.neutral800 : context.palette.border,
+          highlightColor: isDarkMode ? BrandColors.neutral700 : context.palette.surfaceMuted,
           child: Container(
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.all(16),
@@ -87,7 +87,7 @@ class TrackOrderWidgets {
         borderRadius: BorderRadius.circular(12),
         border: isSelected
             ? Border.all(
-                color: isDarkMode ? Colors.blue[400]! : Colors.blue[700]!,
+                color: isDarkMode ? BrandColors.info : BrandColors.infoDeep,
                 width: 2,
               )
             : null,
@@ -129,8 +129,8 @@ class TrackOrderWidgets {
                             child: Icon(
                               Icons.check_circle,
                               color: isDarkMode
-                                  ? Colors.blue[400]
-                                  : Colors.blue[700],
+                                  ? BrandColors.info
+                                  : BrandColors.infoDeep,
                               size: 20,
                             ),
                           ),
@@ -170,7 +170,7 @@ class TrackOrderWidgets {
                       'Fee: ${shipment.netFee} ${shipment.senderBranch?.currency?.code}',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
+                        color: isDarkMode ? BrandColors.infoLight : BrandColors.infoDeep,
                       ),
                     ),
                   ],
@@ -185,8 +185,8 @@ class TrackOrderWidgets {
                         style: TextStyle(
                           fontSize: 12,
                           color: isDarkMode
-                              ? Colors.orange[200]
-                              : Colors.orange[700],
+                              ? BrandColors.orangeLight
+                              : BrandColors.orangeDeep,
                         ),
                       ),
                       if (shipment.extraFeeDescription?.isNotEmpty == true) ...[
@@ -197,8 +197,8 @@ class TrackOrderWidgets {
                             Icons.info_outline,
                             size: 14,
                             color: isDarkMode
-                                ? Colors.orange[200]
-                                : Colors.orange[700],
+                                ? BrandColors.orangeLight
+                                : BrandColors.orangeDeep,
                           ),
                         ),
                       ],
@@ -261,7 +261,7 @@ class TrackOrderWidgets {
 
     switch (status.toUpperCase()) {
       case 'ARR':
-        chipColor = Colors.green;
+        chipColor = BrandColors.success;
         statusText = 'Arrived';
         break;
       case 'TRA':
@@ -269,26 +269,26 @@ class TrackOrderWidgets {
         statusText = 'In Transit';
         break;
       case 'OTW':
-        chipColor = Colors.yellowAccent;
+        chipColor = BrandColors.warning;
         statusText = 'On the way';
         break;
       case 'R4P':
-        chipColor = Colors.orange;
+        chipColor = BrandColors.orange;
         statusText = 'Ready for pickup';
         break;
       case 'MIS':
-        chipColor = Colors.red;
+        chipColor = BrandColors.danger;
         statusText = 'Missing';
         break;
       case 'DEL':
-        chipColor = Colors.green;
+        chipColor = BrandColors.success;
         statusText = 'Delivered';
       case 'CTM':
-        chipColor = Colors.indigo;
+        chipColor = BrandColors.info;
         statusText = 'Customs';
         break;
       default:
-        chipColor = Colors.grey;
+        chipColor = BrandColors.neutral500;
         statusText = 'Unknown';
     }
 
@@ -392,7 +392,7 @@ class ShipmentCard extends StatelessWidget {
                       'Fee: ${shipment.netFee} ${shipment.senderBranch?.currency?.code}',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
+                        color: isDarkMode ? BrandColors.infoLight : BrandColors.infoDeep,
                       ),
                     ),
                   ],

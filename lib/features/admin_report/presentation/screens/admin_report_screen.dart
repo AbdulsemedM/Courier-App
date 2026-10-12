@@ -151,10 +151,7 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color(0xFF1A1C2E),
-                    const Color(0xFF2D3250),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [
                     context.palette.background,
                     context.palette.surface,
@@ -335,7 +332,7 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
                           Icon(
                             Icons.error_outline,
                             size: 64,
-                            color: Colors.red[300],
+                            color: BrandColors.dangerLight,
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -524,8 +521,8 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
               (Set<MaterialState> states) {
                 if (states.contains(MaterialState.selected)) {
                   return isDarkMode
-                      ? Colors.blue.withOpacity(0.1)
-                      : Colors.blue[100]!;
+                      ? BrandColors.info.withOpacity(0.1)
+                      : BrandColors.infoSoft;
                 }
                 return context.palette.surface;
               },
@@ -698,26 +695,26 @@ class _AdminReportScreenState extends State<AdminReportScreen> {
   Color _getStatusColor(String status) {
     switch (status.toUpperCase()) {
       case 'ARR':
-        return Colors.green;
+        return BrandColors.success;
       case 'PAR':
-        return Colors.orange;
+        return BrandColors.orange;
       case 'DEL':
-        return Colors.blue;
+        return BrandColors.info;
       default:
-        return Colors.grey;
+        return BrandColors.neutral500;
     }
   }
 
   Color _getPaymentStatusColor(String status) {
     switch (status.toUpperCase()) {
       case 'SUCCESS':
-        return Colors.green;
+        return BrandColors.success;
       case 'PENDING':
-        return Colors.orange;
+        return BrandColors.orange;
       case 'FAILED':
-        return Colors.red;
+        return BrandColors.danger;
       default:
-        return Colors.grey;
+        return BrandColors.neutral500;
     }
   }
 }

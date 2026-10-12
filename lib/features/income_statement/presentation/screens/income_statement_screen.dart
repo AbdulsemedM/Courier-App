@@ -129,10 +129,7 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [context.palette.background, context.palette.background],
           ),
         ),
@@ -217,7 +214,7 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
                                             fontSize: 12,
                                             color: isDarkMode
                                                 ? Colors.white70
-                                                : Colors.grey[600],
+                                                : BrandColors.neutral600,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -271,7 +268,7 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
                                             fontSize: 12,
                                             color: isDarkMode
                                                 ? Colors.white70
-                                                : Colors.grey[600],
+                                                : BrandColors.neutral600,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -393,7 +390,7 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
                                           vertical: 4,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.purple.withOpacity(0.2),
+                                          color: BrandColors.purpleMid.withOpacity(0.2),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: Text(
@@ -403,7 +400,7 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
                                           style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.purple,
+                                            color: BrandColors.purpleMid,
                                           ),
                                         ),
                                       ),
@@ -416,7 +413,7 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
                                       fontSize: 12,
                                       color: isDarkMode
                                           ? Colors.white70
-                                          : Colors.grey[700],
+                                          : BrandColors.neutral700,
                                     ),
                                   ),
                                 ],
@@ -430,7 +427,7 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
                                   child: IncomeSummaryCard(
                                     title: 'Gross Revenue',
                                     amount: incomeStatement.grossRevenue,
-                                    color: Colors.green,
+                                    color: BrandColors.success,
                                     icon: Icons.trending_up,
                                     marginText:
                                         'Margin: ${NumberFormat.currency(symbol: '', decimalDigits: 2).format(incomeStatement.grossMargin)}%',
@@ -441,7 +438,7 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
                                   child: IncomeSummaryCard(
                                     title: 'Total Expenses',
                                     amount: incomeStatement.totalExpenses,
-                                    color: Colors.red,
+                                    color: BrandColors.danger,
                                     icon: Icons.trending_down,
                                   ),
                                 ),
@@ -451,8 +448,8 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
                                     title: 'Net Income',
                                     amount: incomeStatement.netIncome,
                                     color: incomeStatement.netIncome >= 0
-                                        ? Colors.green
-                                        : Colors.red,
+                                        ? BrandColors.success
+                                        : BrandColors.danger,
                                     icon: Icons.account_balance_wallet,
                                     marginText:
                                         'Margin: ${NumberFormat.currency(symbol: '', decimalDigits: 2).format(incomeStatement.netMargin)}%',
@@ -465,7 +462,7 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
                             // Revenue Breakdown
                             BreakdownSection(
                               title: 'Revenue Breakdown',
-                              titleColor: Colors.green,
+                              titleColor: BrandColors.success,
                               items: [
                                 {
                                   'label': 'Shipment Fees',
@@ -492,7 +489,7 @@ class _IncomeStatementScreenState extends State<IncomeStatementScreen> {
                             // Expense Breakdown
                             BreakdownSection(
                               title: 'Expense Breakdown',
-                              titleColor: Colors.red,
+                              titleColor: BrandColors.danger,
                               items: [
                                 {
                                   'label': 'Operational',

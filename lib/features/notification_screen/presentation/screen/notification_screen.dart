@@ -34,11 +34,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
             },
             icon: Icon(Icons.done_all,
                 color:
-                    isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700),
+                    isDarkMode ? BrandColors.infoLight : BrandColors.infoDeep),
             label: Text(
               'Mark all as read',
               style: TextStyle(
-                color: isDarkMode ? Colors.blue.shade200 : Colors.blue.shade700,
+                color: isDarkMode ? BrandColors.infoLight : BrandColors.infoDeep,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -56,7 +56,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           NotificationWidgets.buildNotificationItem(
             context: context,
             icon: Icons.local_shipping,
-            color: Colors.green,
+            color: BrandColors.success,
             title: 'Package Delivered',
             description: 'Your package #1234 has been delivered successfully',
             time: '2 hours ago',
@@ -68,7 +68,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           NotificationWidgets.buildNotificationItem(
             context: context,
             icon: Icons.warning_rounded,
-            color: Colors.orange,
+            color: BrandColors.orange,
             title: 'Delivery Delayed',
             description:
                 'Package #5678 delivery is delayed due to heavy traffic',
@@ -85,7 +85,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           NotificationWidgets.buildNotificationItem(
             context: context,
             icon: Icons.location_on,
-            color: Colors.blue,
+            color: BrandColors.info,
             title: 'Out for Delivery',
             description: 'Package #9012 is out for delivery to your location',
             time: '1 day ago',
@@ -97,7 +97,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           NotificationWidgets.buildNotificationItem(
             context: context,
             icon: Icons.receipt_long,
-            color: Colors.purple,
+            color: BrandColors.purpleMid,
             title: 'New Invoice',
             description: 'Invoice for package #3456 has been generated',
             time: '1 day ago',
@@ -113,7 +113,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           NotificationWidgets.buildNotificationItem(
             context: context,
             icon: Icons.discount_rounded,
-            color: Colors.pink,
+            color: BrandColors.purpleMid,
             title: 'Special Offer',
             description: 'Get 20% off on your next international shipment',
             time: '3 days ago',
@@ -125,7 +125,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           NotificationWidgets.buildNotificationItem(
             context: context,
             icon: Icons.rate_review,
-            color: Colors.teal,
+            color: BrandColors.info,
             title: 'Rate Your Experience',
             description: 'How was your experience with delivery #7890?',
             time: '5 days ago',

@@ -18,7 +18,7 @@ class SettingsWidgets {
               colors: isDarkMode
                   ? [
                       palette.background,
-                      const Color(0xFF0F2444),
+                      palette.background,
                       palette.background,
                     ]
                   : [
@@ -53,14 +53,14 @@ class SettingsWidgets {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFFFF7A33),
-                Color(0xFFFF5A00),
-                Color(0xFFE85D04),
+                Color(0xFF4F1D9E),
+                Color(0xFF411486),
+                Color(0xFF2E0F66),
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: context.palette.accent.withValues(alpha: 0.3),
+                color: BrandColors.purple.withValues(alpha: 0.3),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -121,7 +121,7 @@ class SettingsWidgets {
                                       style: const TextStyle(
                                         fontSize: 26,
                                         fontWeight: FontWeight.w800,
-                                        color: Color(0xFFFF5A00),
+                                        color: BrandColors.purple,
                                       ),
                                     ),
                                   ),
@@ -350,7 +350,7 @@ class SettingsWidgets {
                   borderRadius: BorderRadius.circular(16),
                   color: palette.surface,
                   border: Border.all(
-                    color: Colors.red.withValues(alpha: 0.35),
+                    color: palette.danger.withValues(alpha: 0.35),
                   ),
                 ),
                 child: Padding(
@@ -361,7 +361,7 @@ class SettingsWidgets {
                       Icon(
                         Icons.logout_rounded,
                         size: 20,
-                        color: Colors.red.shade600,
+                        color: palette.danger,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -369,7 +369,7 @@ class SettingsWidgets {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: Colors.red.shade600,
+                          color: palette.danger,
                         ),
                       ),
                     ],

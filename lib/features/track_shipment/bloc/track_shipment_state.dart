@@ -16,3 +16,8 @@ final class TrackShipmentFailure extends TrackShipmentState {
   final String message;
   TrackShipmentFailure(this.message);
 }
+
+final class TrackShipmentPhoneHistorySuccess extends TrackShipmentState {
+  final List<CustomerShipmentHistoryItem> items;
+  TrackShipmentPhoneHistorySuccess(this.items);
+}

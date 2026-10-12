@@ -153,7 +153,7 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
     if (awb.isEmpty) return;
 
     if (_awbs.contains(awb)) {
-      displaySnack(context, 'AWB already added', Colors.orange);
+      displaySnack(context, 'AWB already added', BrandColors.orange);
       return;
     }
 
@@ -169,7 +169,7 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
 
   Future<void> _submit() async {
     if (_awbs.isEmpty) {
-      displaySnack(context, 'Add at least one AWB', Colors.red);
+      displaySnack(context, 'Add at least one AWB', BrandColors.danger);
       return;
     }
 
@@ -179,7 +179,7 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
     final userId = int.tryParse(userIdRaw ?? '');
     if (!mounted) return;
     if (userId == null) {
-      displaySnack(context, 'User not found. Please log in again.', Colors.red);
+      displaySnack(context, 'User not found. Please log in again.', BrandColors.danger);
       return;
     }
     context.read<ManifestBloc>().add(
@@ -207,11 +207,11 @@ class _CreateManifestScreenState extends State<CreateManifestScreen> {
           displaySnack(
             context,
             state.message,
-            Colors.green,
+            BrandColors.success,
           );
           Navigator.pop(context, true);
         } else if (state is CreateManifestFailure) {
-          displaySnack(context, state.message, Colors.red);
+          displaySnack(context, state.message, BrandColors.danger);
         }
       },
       child: Scaffold(

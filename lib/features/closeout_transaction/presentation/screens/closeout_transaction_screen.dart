@@ -135,10 +135,7 @@ class _CloseoutTransactionScreenState extends State<CloseoutTransactionScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [context.palette.background, context.palette.background],
           ),
         ),
@@ -237,7 +234,7 @@ class _CloseoutTransactionScreenState extends State<CloseoutTransactionScreen> {
                                 border: Border.all(
                                   color: isDarkMode
                                       ? Colors.white.withOpacity(0.3)
-                                      : Colors.grey.withOpacity(0.3),
+                                      : BrandColors.neutral500.withOpacity(0.3),
                                 ),
                               ),
                               child: Row(
@@ -286,7 +283,7 @@ class _CloseoutTransactionScreenState extends State<CloseoutTransactionScreen> {
                                 border: Border.all(
                                   color: isDarkMode
                                       ? Colors.white.withOpacity(0.3)
-                                      : Colors.grey.withOpacity(0.3),
+                                      : BrandColors.neutral500.withOpacity(0.3),
                                 ),
                               ),
                               child: Row(
@@ -352,7 +349,7 @@ class _CloseoutTransactionScreenState extends State<CloseoutTransactionScreen> {
                               Icon(
                                 Icons.error_outline,
                                 size: 48,
-                                color: isDarkMode ? Colors.white : Colors.red,
+                                color: isDarkMode ? Colors.white : BrandColors.danger,
                               ),
                               const SizedBox(height: 16),
                               Text(
@@ -453,7 +450,7 @@ class _CloseoutTransactionScreenState extends State<CloseoutTransactionScreen> {
         border: Border.all(
           color: isDarkMode
               ? Colors.white.withOpacity(0.2)
-              : Colors.grey.withOpacity(0.3),
+              : BrandColors.neutral500.withOpacity(0.3),
         ),
       ),
       child: Column(

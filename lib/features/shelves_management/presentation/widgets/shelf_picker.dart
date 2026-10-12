@@ -259,7 +259,7 @@ class _ShelfPickerState extends State<ShelfPicker> {
               child: Text(
                 _error!,
                 style: TextStyle(
-                  color: isDarkMode ? Colors.red[300] : Colors.red[700],
+                  color: isDarkMode ? BrandColors.dangerLight : BrandColors.dangerDeep,
                   fontSize: 13,
                 ),
               ),

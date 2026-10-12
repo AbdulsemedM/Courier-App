@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../model/customer_shipment_history_item.dart';
 import '../../model/track_shipment_model.dart';
 import 'package:intl/intl.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
@@ -13,8 +14,8 @@ class TrackShipmentWidgets {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Shimmer.fromColors(
-        baseColor: isDarkMode ? Colors.grey[850]! : AppPalette.forMode(isDarkMode).border,
-        highlightColor: isDarkMode ? Colors.grey[700]! : AppPalette.forMode(isDarkMode).surfaceMuted,
+        baseColor: isDarkMode ? BrandColors.neutral800 : AppPalette.forMode(isDarkMode).border,
+        highlightColor: isDarkMode ? BrandColors.neutral700 : AppPalette.forMode(isDarkMode).surfaceMuted,
         child: Column(
           children: [
             // Header shimmer
@@ -255,8 +256,8 @@ class TrackShipmentWidgets {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.deepPurple[400]!,
-            Colors.deepPurple[600]!,
+            BrandColors.purpleMid,
+            BrandColors.purpleMid,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -264,7 +265,7 @@ class TrackShipmentWidgets {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.deepPurple.withOpacity(0.3),
+            color: BrandColors.purpleMid.withOpacity(0.3),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -390,7 +391,7 @@ class TrackShipmentWidgets {
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: Colors.deepPurple[400],
+                  color: BrandColors.purpleMid,
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -423,7 +424,7 @@ class TrackShipmentWidgets {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[900] : AppPalette.forMode(isDarkMode).accentMuted,
+                color: isDarkMode ? BrandColors.neutral900 : AppPalette.forMode(isDarkMode).accentMuted,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -432,14 +433,14 @@ class TrackShipmentWidgets {
                   Row(
                     children: [
                       Icon(Icons.person_outline,
-                          size: 20, color: Colors.blue[700]),
+                          size: 20, color: BrandColors.infoDeep),
                       const SizedBox(width: 8),
                       Text(
                         'Sender',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue[700],
+                          color: BrandColors.infoDeep,
                         ),
                       ),
                     ],
@@ -458,7 +459,7 @@ class TrackShipmentWidgets {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[900] : Colors.green[50],
+                color: isDarkMode ? BrandColors.neutral900 : BrandColors.successSoft,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -466,14 +467,14 @@ class TrackShipmentWidgets {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.person, size: 20, color: Colors.green[700]),
+                      Icon(Icons.person, size: 20, color: BrandColors.successDeep),
                       const SizedBox(width: 8),
                       Text(
                         'Receiver',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.green[700],
+                          color: BrandColors.successDeep,
                         ),
                       ),
                     ],
@@ -496,7 +497,7 @@ class TrackShipmentWidgets {
                     child: _buildDetailChip(
                       Icons.local_shipping,
                       shipment.deliveryType!,
-                      Colors.blue,
+                      BrandColors.info,
                       isDarkMode,
                     ),
                   ),
@@ -506,7 +507,7 @@ class TrackShipmentWidgets {
                     child: _buildDetailChip(
                       Icons.directions_car,
                       shipment.transportMode!,
-                      Colors.purple,
+                      BrandColors.purpleMid,
                       isDarkMode,
                     ),
                   ),
@@ -524,7 +525,7 @@ class TrackShipmentWidgets {
                       'Weight',
                       '${shipment.qty} ${shipment.unit}',
                       Icons.scale,
-                      Colors.indigo,
+                      BrandColors.info,
                       isDarkMode,
                     ),
                   ),
@@ -536,7 +537,7 @@ class TrackShipmentWidgets {
                       'Boxes',
                       '${shipment.numBoxes}',
                       Icons.inbox,
-                      Colors.orange,
+                      BrandColors.orange,
                       isDarkMode,
                     ),
                   ),
@@ -548,8 +549,22 @@ class TrackShipmentWidgets {
     );
   }
 
+  static String _formatTrackedAmount(TrackShipmentModel shipment) {
+    final formatter = NumberFormat('#,##0.00');
+    if (shipment.totalAmount != null) {
+      return 'ETB ${formatter.format(shipment.totalAmount)}';
+    }
+    final netFee = shipment.netFee.trim();
+    final parsed = double.tryParse(netFee.replaceAll(',', ''));
+    if (parsed != null) {
+      return 'ETB ${formatter.format(parsed)}';
+    }
+    return netFee.isEmpty ? 'ETB 0.00' : 'ETB $netFee';
+  }
+
   static Widget _buildPaymentCard(
       bool isDarkMode, TrackShipmentModel shipment) {
+    final palette = AppPalette.forMode(isDarkMode);
     final paymentStatusLabel = shipment.paymentStatus?.trim().isNotEmpty == true
         ? shipment.paymentStatus!.trim()
         : (ShipmentStatusHelper.isCodPaymentMode(shipment.method)
@@ -558,6 +573,11 @@ class TrackShipmentWidgets {
     final isPending = paymentStatusLabel == 'PENDING';
     final isSuccess =
         paymentStatusLabel == 'SUCCESS' || paymentStatusLabel == 'PAID';
+    final tintColors = isSuccess
+        ? [palette.successSoft, palette.successSoft]
+        : isPending
+            ? [palette.accentMuted, palette.accentMuted]
+            : [palette.infoSoft, palette.infoSoft];
 
     return Card(
       elevation: 3,
@@ -574,7 +594,7 @@ class TrackShipmentWidgets {
               children: [
                 Icon(
                   Icons.payment,
-                  color: Colors.deepPurple[400],
+                  color: BrandColors.purpleMid,
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -592,69 +612,64 @@ class TrackShipmentWidgets {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: isSuccess
-                      ? [Colors.green[50]!, Colors.green[100]!]
-                      : isPending
-                          ? [Colors.orange[50]!, Colors.orange[100]!]
-                          : [Colors.blue[50]!, Colors.blue[100]!],
+                  colors: tintColors,
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Total Amount',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.deepPurple,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'ETB ${shipment.totalAmount?.toStringAsFixed(2) ?? shipment.netFee}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple[900],
-                              ),
-                            ),
-                          ],
+                  Text(
+                    'Total Amount',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: palette.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        _formatTrackedAmount(shipment),
+                        maxLines: 1,
+                        softWrap: false,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: palette.textPrimary,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isSuccess
-                              ? Colors.green[400]
-                              : isPending
-                                  ? Colors.orange[400]
-                                  : Colors.blue[400],
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          paymentStatusLabel,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSuccess
+                            ? BrandColors.success
+                            : isPending
+                                ? BrandColors.orange
+                                : BrandColors.info,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        paymentStatusLabel,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
+                    ),
                   ),
                   if (shipment.paymentStatusDescription != null) ...[
                     const SizedBox(height: 12),
@@ -662,7 +677,7 @@ class TrackShipmentWidgets {
                       shipment.paymentStatusDescription!,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[700],
+                        color: palette.textSecondary,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -673,12 +688,17 @@ class TrackShipmentWidgets {
                       'Transaction Ref',
                       shipment.transactionReference!,
                       isDarkMode,
+                      palette: palette,
                     ),
                   ],
                   if (shipment.method.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     _buildInfoRow(
-                        'Payment Method', shipment.method, isDarkMode),
+                      'Payment Method',
+                      shipment.method,
+                      isDarkMode,
+                      palette: palette,
+                    ),
                   ],
                 ],
               ),
@@ -706,7 +726,7 @@ class TrackShipmentWidgets {
               children: [
                 Icon(
                   Icons.qr_code,
-                  color: Colors.deepPurple[400],
+                  color: BrandColors.purpleMid,
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -727,7 +747,7 @@ class TrackShipmentWidgets {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.deepPurple[200]!,
+                    color: BrandColors.purpleLight,
                     width: 2,
                   ),
                 ),
@@ -744,7 +764,7 @@ class TrackShipmentWidgets {
                         child: Icon(
                           Icons.image_not_supported,
                           size: 48,
-                          color: Colors.grey,
+                          color: BrandColors.neutral500,
                         ),
                       ),
                     );
@@ -788,7 +808,7 @@ class TrackShipmentWidgets {
               children: [
                 Icon(
                   Icons.timeline,
-                  color: Colors.deepPurple[400],
+                  color: BrandColors.purpleMid,
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -846,15 +866,15 @@ class TrackShipmentWidgets {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDarkMode
-              ? [Colors.green.shade700, Colors.green.shade500]
-              : [Colors.green.shade600, Colors.green.shade400],
+              ? [BrandColors.successDeep, BrandColors.success]
+              : [BrandColors.success, BrandColors.success],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.green.withOpacity(0.35),
+            color: BrandColors.success.withOpacity(0.35),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -896,15 +916,15 @@ class TrackShipmentWidgets {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDarkMode
-              ? [Colors.orange.shade800, Colors.orange.shade600]
-              : [Colors.orange.shade700, Colors.orange.shade500],
+              ? [BrandColors.orangeDeep, BrandColors.orange]
+              : [BrandColors.orangeDeep, BrandColors.orange],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withOpacity(0.35),
+            color: BrandColors.orange.withOpacity(0.35),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -970,7 +990,7 @@ class TrackShipmentWidgets {
                   color: statusColor,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white,
+                    color: AppPalette.forMode(isDarkMode).surface,
                     width: 3,
                   ),
                   boxShadow: [
@@ -1031,12 +1051,12 @@ class TrackShipmentWidgets {
                       Icon(
                         Icons.access_time,
                         size: 14,
-                        color: Colors.grey[600],
+                        color: BrandColors.neutral600,
                       ),
                       Text(
                         formattedTime,
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: BrandColors.neutral600,
                           fontSize: 12,
                         ),
                       ),
@@ -1044,12 +1064,12 @@ class TrackShipmentWidgets {
                         Icon(
                           Icons.person,
                           size: 14,
-                          color: Colors.grey[600]!,
+                          color: BrandColors.neutral600,
                         ),
                         Text(
                           'user: $user',
                           style: TextStyle(
-                            color: Colors.grey[600]!,
+                            color: BrandColors.neutral600,
                             fontSize: 12,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -1059,12 +1079,12 @@ class TrackShipmentWidgets {
                         Icon(
                           Icons.store,
                           size: 14,
-                          color: Colors.grey[600]!,
+                          color: BrandColors.neutral600,
                         ),
                         Text(
                           'branch: $branchName',
                           style: TextStyle(
-                            color: Colors.grey[600]!,
+                            color: BrandColors.neutral600,
                             fontSize: 12,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -1084,14 +1104,14 @@ class TrackShipmentWidgets {
   static Color _getStatusColor(String? statusCode) {
     switch (statusCode?.toUpperCase()) {
       case 'PAR':
-        return Colors.orange;
+        return BrandColors.orange;
       case 'SUCCESS':
       case 'COMPLETED':
-        return Colors.green;
+        return BrandColors.success;
       case 'PENDING':
-        return Colors.blue;
+        return BrandColors.info;
       default:
-        return Colors.deepPurple;
+        return BrandColors.purpleMid;
     }
   }
 
@@ -1128,19 +1148,19 @@ class TrackShipmentWidgets {
         gradient: LinearGradient(
           colors: isDarkMode
               ? [
-                  Colors.deepPurple.withValues(alpha: 0.35),
-                  Colors.indigo.withValues(alpha: 0.25),
+                  BrandColors.purpleMid.withValues(alpha: 0.35),
+                  BrandColors.info.withValues(alpha: 0.25),
                 ]
               : [
-                  Colors.deepPurple.shade50,
-                  Colors.indigo.shade50,
+                  BrandColors.purpleSoft,
+                  BrandColors.infoSoft,
                 ],
         ),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isDarkMode
-              ? Colors.deepPurple.withValues(alpha: 0.4)
-              : Colors.deepPurple.shade100,
+              ? BrandColors.purpleMid.withValues(alpha: 0.4)
+              : BrandColors.purpleSoft,
         ),
       ),
       child: Row(
@@ -1229,19 +1249,19 @@ class TrackShipmentWidgets {
         gradient: LinearGradient(
           colors: isDarkMode
               ? [
-                  const Color(0xFF0F766E).withValues(alpha: 0.35),
-                  const Color(0xFF0369A1).withValues(alpha: 0.25),
+                  BrandColors.success.withValues(alpha: 0.35),
+                  BrandColors.info.withValues(alpha: 0.25),
                 ]
               : [
-                  const Color(0xFFECFDF5),
-                  const Color(0xFFEFF6FF),
+                  BrandColors.successSoft,
+                  BrandColors.infoSoft,
                 ],
         ),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isDarkMode
-              ? const Color(0xFF14B8A6).withValues(alpha: 0.45)
-              : const Color(0xFF99F6E4),
+              ? BrandColors.success.withValues(alpha: 0.45)
+              : BrandColors.successLight,
         ),
       ),
       child: Row(
@@ -1251,20 +1271,20 @@ class TrackShipmentWidgets {
             height: 42,
             decoration: BoxDecoration(
               color: isDarkMode
-                  ? const Color(0xFF14B8A6).withValues(alpha: 0.2)
+                  ? BrandColors.success.withValues(alpha: 0.2)
                   : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isDarkMode
-                    ? const Color(0xFF14B8A6).withValues(alpha: 0.35)
-                    : const Color(0xFF99F6E4),
+                    ? BrandColors.success.withValues(alpha: 0.35)
+                    : BrandColors.successLight,
               ),
             ),
             child: Icon(
               Icons.grid_view_rounded,
               color: isDarkMode
-                  ? const Color(0xFF5EEAD4)
-                  : const Color(0xFF0F766E),
+                  ? BrandColors.successLight
+                  : BrandColors.success,
               size: 22,
             ),
           ),
@@ -1291,8 +1311,8 @@ class TrackShipmentWidgets {
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.4,
                       color: isDarkMode
-                          ? const Color(0xFF5EEAD4)
-                          : const Color(0xFF0F766E),
+                          ? BrandColors.successLight
+                          : BrandColors.success,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -1316,8 +1336,8 @@ class TrackShipmentWidgets {
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.3,
                       color: isDarkMode
-                          ? const Color(0xFF5EEAD4)
-                          : const Color(0xFF0F766E),
+                          ? BrandColors.successLight
+                          : BrandColors.success,
                     ),
                   ),
               ],
@@ -1338,8 +1358,8 @@ class TrackShipmentWidgets {
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.8,
                 color: isDarkMode
-                    ? const Color(0xFF5EEAD4)
-                    : const Color(0xFF0F766E),
+                    ? BrandColors.successLight
+                    : BrandColors.success,
               ),
             ),
           ),
@@ -1348,7 +1368,13 @@ class TrackShipmentWidgets {
     );
   }
 
-  static Widget _buildInfoRow(String label, String value, bool isDarkMode) {
+  static Widget _buildInfoRow(
+    String label,
+    String value,
+    bool isDarkMode, {
+    AppPalette? palette,
+  }) {
+    final p = palette ?? AppPalette.forMode(isDarkMode);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -1356,7 +1382,7 @@ class TrackShipmentWidgets {
           label,
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: p.textSecondary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -1366,7 +1392,7 @@ class TrackShipmentWidgets {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppPalette.forMode(isDarkMode).textPrimary,
+              color: p.textPrimary,
             ),
             textAlign: TextAlign.end,
           ),
@@ -1376,21 +1402,23 @@ class TrackShipmentWidgets {
   }
 
   static Widget _buildDetailChip(
-      IconData icon, String label, MaterialColor color, bool isDarkMode) {
+      IconData icon, String label, Color color, bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900] : color[50],
+        color: isDarkMode
+            ? BrandColors.neutral900
+            : Color.alphaBlend(color.withValues(alpha: 0.10), Colors.white),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: color[200]!,
+          color: color.withValues(alpha: 0.35),
           width: 1.5,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color[700], size: 20),
+          Icon(icon, color: color, size: 20),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
@@ -1398,7 +1426,7 @@ class TrackShipmentWidgets {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: isDarkMode ? Colors.white : color[900],
+                color: isDarkMode ? Colors.white : Color.lerp(color, Colors.black, 0.45)!,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -1409,26 +1437,28 @@ class TrackShipmentWidgets {
   }
 
   static Widget _buildDetailBox(String label, String value, IconData icon,
-      MaterialColor color, bool isDarkMode) {
+      Color color, bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900] : color[50],
+        color: isDarkMode
+            ? BrandColors.neutral900
+            : Color.alphaBlend(color.withValues(alpha: 0.10), Colors.white),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: color[200]!,
+          color: color.withValues(alpha: 0.35),
           width: 1.5,
         ),
       ),
       child: Column(
         children: [
-          Icon(icon, color: color[700], size: 28),
+          Icon(icon, color: color, size: 28),
           const SizedBox(height: 8),
           Text(
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey[600],
+              color: BrandColors.neutral600,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -1438,11 +1468,114 @@ class TrackShipmentWidgets {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : color[900],
+              color: isDarkMode ? Colors.white : Color.lerp(color, Colors.black, 0.45)!,
             ),
           ),
         ],
       ),
     );
+  }
+
+  static Widget buildCustomerHistoryList({
+    required BuildContext context,
+    required List<CustomerShipmentHistoryItem> items,
+    required ValueChanged<String> onSelect,
+  }) {
+    final palette = context.palette;
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      itemCount: items.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        final item = items[index];
+        final dateLabel = _formatHistoryDate(item.awbDate);
+        final status = item.statusLabel;
+        return Material(
+          color: palette.surface,
+          borderRadius: BorderRadius.circular(16),
+          elevation: 2,
+          shadowColor: Colors.black.withValues(alpha: 0.08),
+          child: InkWell(
+            onTap: () => onSelect(item.awb),
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: palette.accentMuted,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.inventory_2_outlined,
+                      color: palette.accent,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.awb,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                            color: palette.textPrimary,
+                          ),
+                        ),
+                        if (status.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            status,
+                            style: TextStyle(
+                              color: palette.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                        if (item.origin != null || item.destination != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            '${item.origin ?? '—'} → ${item.destination ?? '—'}',
+                            style: TextStyle(
+                              color: palette.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                        if (dateLabel != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            dateLabel,
+                            style: TextStyle(
+                              color: palette.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: palette.textSecondary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static String? _formatHistoryDate(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return null;
+    final parsed = DateTime.tryParse(raw);
+    if (parsed == null) return raw;
+    return DateFormat('dd MMM yyyy, HH:mm').format(parsed);
   }
 }

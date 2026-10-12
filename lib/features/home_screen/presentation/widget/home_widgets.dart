@@ -1,4 +1,8 @@
 import 'package:courier_app/core/theme/app_palette.dart';
+import 'package:courier_app/core/theme/app_typography.dart';
+import 'package:courier_app/core/widgets/brand_widgets.dart';
+import 'package:courier_app/core/widgets/status_chip.dart';
+import 'package:courier_app/core/widgets/ui_primitives.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -23,16 +27,8 @@ class HomeWidgets {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: isDarkMode
-                  ? [
-                      palette.background,
-                      const Color(0xFF0F2444),
-                      palette.background,
-                    ]
-                  : [
-                      palette.background,
-                      palette.accentMuted.withValues(alpha: 0.4),
-                      palette.scaffoldSecondary,
-                    ],
+                  ? [palette.background, palette.background]
+                  : [palette.background, palette.scaffoldSecondary],
             ),
           ),
           child: child,
@@ -50,123 +46,98 @@ class HomeWidgets {
     final palette = context.palette;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 4),
+      margin: const EdgeInsets.only(top: 12, bottom: 4),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDarkMode
-              ? [
-                  const Color(0xFFFF5A00).withValues(alpha: 0.85),
-                  const Color(0xFFC2410C),
-                  const Color(0xFF1E3A5F),
-                ]
-              : [
-                  const Color(0xFFFF7A33),
-                  const Color(0xFFFF5A00),
-                  const Color(0xFFE85D04),
-                ],
+              ? const [Color(0xFF3A2380), Color(0xFF241552)]
+              : const [Color(0xFF4F1D9E), BrandColors.purple, Color(0xFF2E0F66)],
         ),
         boxShadow: [
           BoxShadow(
-            color: palette.accent.withValues(alpha: isDarkMode ? 0.25 : 0.35),
+            color: BrandColors.purple.withValues(alpha: isDarkMode ? 0.3 : 0.28),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
             Positioned(
-              right: -30,
-              top: -30,
+              right: -36,
+              top: -36,
               child: Container(
-                width: 120,
-                height: 120,
+                width: 130,
+                height: 130,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.12),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    width: 18,
+                  ),
                 ),
               ),
             ),
             Positioned(
-              left: -20,
-              bottom: -30,
-              child: Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
-              ),
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(height: 3, color: palette.accent),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
               child: Row(
                 children: [
                   Container(
-                    width: 56,
-                    height: 56,
+                    width: 58,
+                    height: 58,
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.22),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.45),
-                        width: 2,
-                      ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Icon(
-                      Icons.local_shipping_rounded,
-                      size: 28,
-                      color: Colors.white.withValues(alpha: 0.95),
+                    child: Image.asset(
+                      'assets/images/hudhud_logo.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          greetingForTime(),
+                          greetingForTime().toUpperCase(),
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.85),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          isLoadingRole ? 'Loading...' : displayRole,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            height: 1.1,
-                            letterSpacing: -0.5,
-                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.8,
+                            color: Colors.white.withValues(alpha: 0.75),
                           ),
                         ),
                         const SizedBox(height: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
+                        Text(
+                          isLoadingRole ? 'Loading...' : displayRole,
+                          style: AppFonts.heading(
+                            fontSize: 24,
+                            height: 1.15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            'HudHud Courier',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                              color: Colors.white.withValues(alpha: 0.95),
-                            ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'HudHud Express',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.8,
+                            color: Colors.white.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -188,21 +159,22 @@ class HomeWidgets {
   }) {
     final palette = context.palette;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 8, 4, 12),
+      padding: const EdgeInsets.fromLTRB(4, 20, 4, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.3,
-              color: palette.textPrimary,
+            style: AppFonts.heading(
+              fontSize: 19,
+              fontWeight: FontWeight.w600,
+              color: context.isDarkMode ? palette.textPrimary : palette.primary,
             ),
           ),
+          const SizedBox(height: 6),
+          const BrandRule(width: 36),
           if (subtitle != null) ...[
-            const SizedBox(height: 2),
+            const SizedBox(height: 8),
             Text(
               subtitle,
               style: TextStyle(
@@ -227,15 +199,17 @@ class HomeWidgets {
     required VoidCallback onTap,
     required bool isDarkMode,
   }) {
-    return _HomeActionCard(
-      icon: icon,
-      label: label,
-      description: description,
-      color: color,
-      gradientStart: gradientStart,
-      gradientEnd: gradientEnd,
-      isDarkMode: isDarkMode,
-      onTap: onTap,
+    return FadeSlideIn(
+      child: _HomeActionCard(
+        icon: icon,
+        label: label,
+        description: description,
+        color: color,
+        gradientStart: gradientStart,
+        gradientEnd: gradientEnd,
+        isDarkMode: isDarkMode,
+        onTap: onTap,
+      ),
     );
   }
 
@@ -248,13 +222,15 @@ class HomeWidgets {
     required VoidCallback onTap,
     required bool isDarkMode,
   }) {
-    return _HomeFeatureTile(
-      icon: icon,
-      title: title,
-      subtitle: subtitle,
-      accentColor: accentColor,
-      isDarkMode: isDarkMode,
-      onTap: onTap,
+    return FadeSlideIn(
+      child: _HomeFeatureTile(
+        icon: icon,
+        title: title,
+        subtitle: subtitle,
+        accentColor: accentColor,
+        isDarkMode: isDarkMode,
+        onTap: onTap,
+      ),
     );
   }
 
@@ -313,18 +289,7 @@ class HomeWidgets {
         final palette = context.palette;
 
         return Container(
-          decoration: BoxDecoration(
-            color: palette.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: palette.border),
-            boxShadow: [
-              BoxShadow(
-                color: palette.cardShadow,
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+          decoration: palette.cardDecoration,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -335,30 +300,13 @@ class HomeWidgets {
                   children: [
                     Text(
                       orderNumber,
-                      style: TextStyle(
+                      style: AppFonts.heading(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: palette.textPrimary,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: palette.accentMuted,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        status,
-                        style: TextStyle(
-                          color: palette.accent,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                    StatusChip.auto(status),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -395,9 +343,9 @@ class HomeWidgets {
             ),
             Text(
               value,
-              style: TextStyle(
+              style: AppFonts.heading(
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
                 color: palette.textPrimary,
               ),
             ),
@@ -439,7 +387,6 @@ class _HomeActionCardState extends State<_HomeActionCard> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final isDark = widget.isDarkMode;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
@@ -450,34 +397,18 @@ class _HomeActionCardState extends State<_HomeActionCard> {
         widget.onTap();
       },
       child: AnimatedScale(
-        scale: _pressed ? 0.96 : 1,
+        scale: _pressed ? 0.97 : 1,
         duration: const Duration(milliseconds: 100),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDark
-                  ? [
-                      Color.alphaBlend(
-                        widget.color.withValues(alpha: 0.3),
-                        palette.surface,
-                      ),
-                      palette.surface,
-                    ]
-                  : [widget.gradientStart, widget.gradientEnd],
-            ),
-            border: Border.all(
-              color: isDark
-                  ? widget.color.withValues(alpha: 0.3)
-                  : Colors.white.withValues(alpha: 0.9),
-            ),
+            color: palette.surface,
+            border: Border.all(color: palette.border.withValues(alpha: 0.6)),
             boxShadow: [
               BoxShadow(
-                color: widget.color.withValues(alpha: isDark ? 0.15 : 0.14),
+                color: palette.cardShadow,
                 blurRadius: _pressed ? 6 : 12,
-                offset: Offset(0, _pressed ? 3 : 6),
+                offset: Offset(0, _pressed ? 2 : 5),
               ),
             ],
           ),
@@ -486,21 +417,7 @@ class _HomeActionCardState extends State<_HomeActionCard> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.1)
-                        : Colors.white.withValues(alpha: 0.9),
-                  ),
-                  child: Icon(
-                    widget.icon,
-                    size: 22,
-                    color: widget.color,
-                  ),
-                ),
+                IconBadge(icon: widget.icon, color: widget.color, size: 44),
                 const SizedBox(height: 10),
                 Text(
                   widget.label,
@@ -509,8 +426,8 @@ class _HomeActionCardState extends State<_HomeActionCard> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    height: 1.1,
+                    fontWeight: FontWeight.w600,
+                    height: 1.15,
                     color: palette.textPrimary,
                   ),
                 ),
@@ -564,17 +481,17 @@ class _HomeFeatureTile extends StatelessWidget {
           HapticFeedback.selectionClick();
           onTap();
         },
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         child: Ink(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             color: palette.surface,
             border: Border.all(color: palette.border),
             boxShadow: isDarkMode
                 ? null
                 : [
                     BoxShadow(
-                      color: palette.cardShadow.withValues(alpha: 0.5),
+                      color: palette.cardShadow,
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -584,20 +501,7 @@ class _HomeFeatureTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: LinearGradient(
-                      colors: [
-                        accentColor.withValues(alpha: 0.2),
-                        accentColor.withValues(alpha: 0.08),
-                      ],
-                    ),
-                  ),
-                  child: Icon(icon, color: accentColor, size: 22),
-                ),
+                IconBadge(icon: icon, color: accentColor),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -605,9 +509,9 @@ class _HomeFeatureTile extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: TextStyle(
+                        style: AppFonts.heading(
                           fontSize: 15,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: palette.textPrimary,
                         ),
                       ),

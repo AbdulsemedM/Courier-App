@@ -167,7 +167,7 @@ class BalanceSheetTable extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+        color: isDarkMode ? BrandColors.neutral900 : BrandColors.neutral50,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -289,7 +289,7 @@ class CategoryRow extends StatelessWidget {
     final isDarkMode = context.isDarkMode;
     final bgColor = backgroundColor ??
         (isTotal
-            ? (isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50])
+            ? (isDarkMode ? BrandColors.infoDeep.withOpacity(0.3) : BrandColors.infoSoft)
             : null);
 
     return Container(

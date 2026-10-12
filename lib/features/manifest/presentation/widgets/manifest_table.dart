@@ -143,7 +143,7 @@ class ManifestTable extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _branchAvatar(_branchInitials(manifest.branch), Colors.blue),
+          _branchAvatar(_branchInitials(manifest.branch), BrandColors.info),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
@@ -161,7 +161,7 @@ class ManifestTable extends StatelessWidget {
             ),
           ),
           _branchAvatar(
-              _branchInitials(manifest.receiverBranch), Colors.deepPurple),
+              _branchInitials(manifest.receiverBranch), BrandColors.purpleMid),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
@@ -386,14 +386,14 @@ class ManifestTable extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.deepPurple.withOpacity(0.12),
+        color: BrandColors.purpleMid.withOpacity(0.12),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         label,
         style: const TextStyle(
           fontSize: 11,
-          color: Colors.deepPurple,
+          color: BrandColors.purpleMid,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -475,7 +475,7 @@ class ManifestTable extends StatelessWidget {
         IconButton(
           icon: Icon(
             Icons.qr_code_2_outlined,
-            color: hasQr ? Colors.deepPurple : palette.textSecondary,
+            color: hasQr ? BrandColors.purpleMid : palette.textSecondary,
             size: 20,
           ),
           tooltip: 'QR Code',

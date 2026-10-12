@@ -490,9 +490,9 @@ class _BranchReportNetScreenState extends State<BranchReportNetScreen> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFF4F46E5),
-            Color(0xFF7C3AED),
-            Color(0xFF0D9488),
+            BrandColors.purpleMid,
+            BrandColors.purpleMid,
+            BrandColors.success,
           ],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
@@ -500,7 +500,7 @@ class _BranchReportNetScreenState extends State<BranchReportNetScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4F46E5).withOpacity(0.25),
+            color: BrandColors.purpleMid.withOpacity(0.25),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -523,7 +523,7 @@ class _BranchReportNetScreenState extends State<BranchReportNetScreen> {
             icon: const Icon(Icons.download, size: 18),
             label: const Text('Export CSV'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF22C55E),
+              backgroundColor: BrandColors.success,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -577,22 +577,22 @@ class _BranchReportNetScreenState extends State<BranchReportNetScreen> {
       _SummaryCardData(
         'Total Shipments',
         summary.totalShipments.toString(),
-        const Color(0xFF2563EB),
+        BrandColors.info,
       ),
       _SummaryCardData(
         'CASH Shipments',
         summary.cash.toString(),
-        const Color(0xFF16A34A),
+        BrandColors.success,
       ),
       _SummaryCardData(
         'COD Shipments',
         summary.cod.toString(),
-        const Color(0xFFEA580C),
+        BrandColors.orange,
       ),
       _SummaryCardData(
         'Total Fee',
         summary.totalFee.toStringAsFixed(2),
-        const Color(0xFF9333EA),
+        BrandColors.purpleMid,
       ),
     ];
 
@@ -668,7 +668,7 @@ class _BranchReportNetScreenState extends State<BranchReportNetScreen> {
           scrollDirection: Axis.horizontal,
           child: DataTable(
             headingRowColor: WidgetStateProperty.all(
-              const Color(0xFF334155),
+              BrandColors.neutral700,
             ),
             dataRowColor: WidgetStateProperty.resolveWith((states) {
               if (states.contains(WidgetState.selected)) {
@@ -790,12 +790,12 @@ class _BranchReportNetScreenState extends State<BranchReportNetScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: isReadyForPickup
-            ? const Color(0xFFEA580C)
+            ? BrandColors.orange
             : context.palette.surface,
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
           color: isReadyForPickup
-              ? const Color(0xFFEA580C)
+              ? BrandColors.orange
               : context.palette.border,
         ),
       ),
@@ -851,7 +851,7 @@ class _BranchReportNetScreenState extends State<BranchReportNetScreen> {
       padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
       child: Column(
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
+          Icon(Icons.error_outline, size: 64, color: BrandColors.dangerLight),
           const SizedBox(height: 16),
           Text(
             'Error: $message',

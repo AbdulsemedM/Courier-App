@@ -282,26 +282,27 @@ class ShipmentStatusHelper {
     }
   }
 
+  /// Muted brand-aligned tones that read well on both light and dark surfaces.
   static Color colorForCode(String code) {
     switch (code.toUpperCase()) {
       case 'OTW':
-        return Colors.blue;
+        return const Color(0xFF3F74B8);
       case 'ARR':
-        return Colors.green;
+        return const Color(0xFF2E8B5F);
       case 'MIS':
-        return Colors.red;
+        return const Color(0xFFC0392B);
       case 'TRA':
-        return Colors.orange;
+        return const Color(0xFFC9821A);
       case 'CTM':
-        return Colors.brown;
+        return const Color(0xFF8A6A4A);
       case 'DEL':
-        return Colors.teal;
+        return const Color(0xFF1F8A8A);
       case 'R4P':
-        return Colors.deepOrange;
+        return const Color(0xFFF55905);
       case 'PAR':
-        return Colors.amber;
+        return const Color(0xFFB8922A);
       default:
-        return Colors.purple;
+        return const Color(0xFF6B3FC4);
     }
   }
 }

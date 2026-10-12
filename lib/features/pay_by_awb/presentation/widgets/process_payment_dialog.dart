@@ -40,8 +40,8 @@ class ProcessPaymentDialog extends StatefulWidget {
 
 class _ProcessPaymentDialogState extends State<ProcessPaymentDialog> {
   static final _palette = AppPalette.light;
-  static const _accent = Color(0xFF5B3895);
-  static const _fieldFill = Color(0xFFF3F4F6);
+  static const _accent = BrandColors.purple;
+  static const _fieldFill = BrandColors.neutral100;
 
   final TextEditingController _payerPhoneController = TextEditingController();
   List<PaymentMethodModel> _methods = [];

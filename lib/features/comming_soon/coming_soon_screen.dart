@@ -44,10 +44,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 75, 23, 160),
-                    const Color(0xFF5b3895),
-                  ]
+                ? [context.palette.background, context.palette.surface]
                 : [context.palette.background, context.palette.background],
           ),
         ),
@@ -71,7 +68,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
               ShaderMask(
                 shaderCallback: (bounds) => LinearGradient(
                   colors: isDarkMode
-                      ? [Colors.white, Colors.blue.shade200]
+                      ? [Colors.white, BrandColors.infoLight]
                       : [context.palette.textPrimary, context.palette.textSecondary],
                 ).createShader(bounds),
                 child: const Text(
@@ -123,7 +120,7 @@ class _ComingSoonScreenState extends State<ComingSoonScreen>
                     Icon(
                       Icons.engineering_outlined,
                       size: 48,
-                      color: isDarkMode ? context.palette.textSecondary : Colors.blue.shade700,
+                      color: isDarkMode ? context.palette.textSecondary : BrandColors.infoDeep,
                     ),
                     const SizedBox(height: 16),
                     Text(

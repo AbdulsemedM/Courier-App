@@ -146,26 +146,26 @@ class _ManifestScreenState extends State<ManifestScreen> {
   Future<void> _downloadManifest(ManifestModel manifest) async {
     final url = manifest.downloadUrl;
     if (url == null || url.isEmpty) {
-      displaySnack(context, 'Download link not available', Colors.orange);
+      displaySnack(context, 'Download link not available', BrandColors.orange);
       return;
     }
 
     final uri = Uri.tryParse(url);
     if (uri == null) {
-      displaySnack(context, 'Invalid download link', Colors.red);
+      displaySnack(context, 'Invalid download link', BrandColors.danger);
       return;
     }
 
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && mounted) {
-      displaySnack(context, 'Unable to open download link', Colors.red);
+      displaySnack(context, 'Unable to open download link', BrandColors.danger);
     }
   }
 
   void _showManifestQr(ManifestModel manifest) {
     final url = manifest.barcodeUrl;
     if (url == null || url.isEmpty) {
-      displaySnack(context, 'QR code not available', Colors.orange);
+      displaySnack(context, 'QR code not available', BrandColors.orange);
       return;
     }
 
@@ -234,9 +234,9 @@ class _ManifestScreenState extends State<ManifestScreen> {
               curr is ManifestAwbActionFailure,
           listener: (context, state) {
             if (state is ManifestAwbActionSuccess) {
-              displaySnack(context, state.message, Colors.green);
+              displaySnack(context, state.message, BrandColors.success);
             } else if (state is ManifestAwbActionFailure) {
-              displaySnack(context, state.message, Colors.red);
+              displaySnack(context, state.message, BrandColors.danger);
             }
           },
         ),
@@ -693,7 +693,7 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
       displaySnack(
         context,
         'AWB already on manifest or in incoming list',
-        Colors.orange,
+        BrandColors.orange,
       );
       return;
     }
@@ -709,7 +709,7 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
         .toList();
 
     if (values.isEmpty) {
-      displaySnack(context, 'Enter an AWB number', Colors.orange);
+      displaySnack(context, 'Enter an AWB number', BrandColors.orange);
       return;
     }
 
@@ -728,7 +728,7 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
       displaySnack(
         context,
         'AWB already on manifest or in incoming list',
-        Colors.orange,
+        BrandColors.orange,
       );
     }
   }
@@ -742,7 +742,7 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
       displaySnack(
         context,
         'Add at least one new AWB before updating the manifest',
-        Colors.orange,
+        BrandColors.orange,
       );
       return;
     }
@@ -752,7 +752,7 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
         .toList();
 
     if (newAwbs.isEmpty) {
-      displaySnack(context, 'No new AWBs to add', Colors.orange);
+      displaySnack(context, 'No new AWBs to add', BrandColors.orange);
       return;
     }
 
@@ -765,7 +765,7 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
     final userId = int.tryParse(userIdRaw ?? '');
     if (!mounted) return;
     if (userId == null) {
-      displaySnack(context, 'User not found. Please log in again.', Colors.red);
+      displaySnack(context, 'User not found. Please log in again.', BrandColors.danger);
       return;
     }
 
@@ -933,7 +933,7 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
                               trailing: IconButton(
                                 icon: const Icon(
                                   Icons.delete_outline,
-                                  color: Colors.red,
+                                  color: BrandColors.danger,
                                 ),
                                 onPressed: () {
                                   setState(() => _loadedAwbs.remove(awb));
@@ -1009,7 +1009,7 @@ class _ManageManifestAwbsSheetState extends State<_ManageManifestAwbsSheet> {
                               trailing: IconButton(
                                 icon: const Icon(
                                   Icons.close,
-                                  color: Colors.red,
+                                  color: BrandColors.danger,
                                   size: 20,
                                 ),
                                 onPressed: () => _removeIncomingAwb(awb),

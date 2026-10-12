@@ -245,8 +245,8 @@ class _ThirdPageState extends State<ThirdPage> {
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      Colors.green[400]!,
-                                      Colors.green[600]!,
+                                      BrandColors.success,
+                                      BrandColors.success,
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
@@ -254,7 +254,7 @@ class _ThirdPageState extends State<ThirdPage> {
                                   borderRadius: BorderRadius.circular(16),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.green.withOpacity(0.3),
+                                      color: BrandColors.success.withOpacity(0.3),
                                       blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     ),
@@ -343,8 +343,8 @@ class _ThirdPageState extends State<ThirdPage> {
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      Colors.deepPurple[600]!,
-                                      Colors.deepPurple[800]!,
+                                      BrandColors.purpleMid,
+                                      BrandColors.purple,
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
@@ -420,7 +420,7 @@ class _ThirdPageState extends State<ThirdPage> {
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       color: isDarkMode
-                          ? const Color(0xFF1A1F37).withOpacity(0.5)
+                          ? BrandColors.neutral900.withOpacity(0.5)
                           : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
@@ -442,7 +442,7 @@ class _ThirdPageState extends State<ThirdPage> {
                           children: [
                             Icon(
                               Icons.local_shipping_outlined,
-                              color: Colors.red[400],
+                              color: BrandColors.danger,
                               size: 24,
                             ),
                             const SizedBox(width: 12),
@@ -451,7 +451,7 @@ class _ThirdPageState extends State<ThirdPage> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.red[400],
+                                color: BrandColors.danger,
                               ),
                             ),
                           ],
@@ -538,7 +538,7 @@ class _ThirdPageState extends State<ThirdPage> {
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: isDarkMode
-                                ? const Color(0xFF1A1F37).withOpacity(0.5)
+                                ? BrandColors.neutral900.withOpacity(0.5)
                                 : Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
@@ -648,8 +648,8 @@ class _ThirdPageState extends State<ThirdPage> {
                           label: Text(isLoading ? 'Submitting...' : 'Submit'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isDarkMode
-                                ? Colors.green[700]
-                                : Colors.green,
+                                ? BrandColors.successDeep
+                                : BrandColors.success,
                             foregroundColor: Colors.white,
                             padding:
                                 const EdgeInsets.symmetric(vertical: 20),
@@ -742,7 +742,7 @@ class _ThirdPageState extends State<ThirdPage> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.blue[400]! : Colors.blue[700]!,
+                color: isDarkMode ? BrandColors.info : BrandColors.infoDeep,
                 width: 2,
               ),
             ),
@@ -811,7 +811,7 @@ class _ThirdPageState extends State<ThirdPage> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.blue[400]! : Colors.blue[700]!,
+                color: isDarkMode ? BrandColors.info : BrandColors.infoDeep,
                 width: 2,
               ),
             ),

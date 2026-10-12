@@ -69,6 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final palette = context.palette;
     final isDarkMode = themeProvider.isDarkMode;
+    final brandPurple =
+        isDarkMode ? const Color(0xFFB79CF0) : palette.primary;
 
     final quickActions = <Widget>[
       if (_can(AppPermissions.addShipment))
@@ -77,9 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icons.add_box_rounded,
           label: 'Add Shipment',
           description: 'New package',
-          color: const Color(0xFFEA580C),
-          gradientStart: const Color(0xFFFFF7ED),
-          gradientEnd: const Color(0xFFFFEDD5),
+          color: palette.accent,
+          gradientStart: palette.accentMuted,
+          gradientEnd: palette.surface,
           isDarkMode: isDarkMode,
           onTap: () => _openWithPermission(
             AppPermissions.addShipment,
@@ -93,9 +95,9 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icons.radar_rounded,
           label: 'Track Order',
           description: 'Find AWB',
-          color: const Color(0xFF2563EB),
-          gradientStart: const Color(0xFFEFF6FF),
-          gradientEnd: const Color(0xFFDBEAFE),
+          color: brandPurple,
+          gradientStart: palette.primarySoft,
+          gradientEnd: palette.surface,
           isDarkMode: isDarkMode,
           onTap: () => _openWithPermission(
             AppPermissions.trackShipment,
@@ -109,9 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icons.qr_code_scanner_rounded,
           label: 'Change Status',
           description: 'Scan barcode',
-          color: const Color(0xFF0D9488),
-          gradientStart: const Color(0xFFF0FDFA),
-          gradientEnd: const Color(0xFFCCFBF1),
+          color: palette.info,
+          gradientStart: palette.infoSoft,
+          gradientEnd: palette.surface,
           isDarkMode: isDarkMode,
           onTap: () => _openWithPermission(
             AppPermissions.changeShipmentStatus,
@@ -126,16 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
       extendBodyBehindAppBar: false,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          'Home',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: palette.textPrimary,
-          ),
-        ),
+        title: const Text('Home'),
         actions: [
           IconButton(
             icon: Icon(
@@ -214,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: Icons.analytics_rounded,
                       title: 'Reports',
                       subtitle: 'Branch and admin insights',
-                      accentColor: palette.accent,
+                      accentColor: brandPurple,
                       isDarkMode: isDarkMode,
                       onTap: () => Navigator.push(
                         context,
@@ -231,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: Icons.tune_rounded,
                       title: 'Other Settings',
                       subtitle: 'Branches, fees & configuration',
-                      accentColor: const Color(0xFF6366F1),
+                      accentColor: palette.info,
                       isDarkMode: isDarkMode,
                       onTap: () => Navigator.push(
                         context,
@@ -248,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: Icons.account_balance_wallet_rounded,
                       title: 'Accounting',
                       subtitle: 'Ledgers, balances & closeout',
-                      accentColor: const Color(0xFF059669),
+                      accentColor: palette.success,
                       isDarkMode: isDarkMode,
                       onTap: () => Navigator.push(
                         context,
@@ -278,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(builder: (context) => screen),
       );
     } else {
-      displaySnack(context, deniedMessage, Colors.red);
+      displaySnack(context, deniedMessage, context.palette.danger);
     }
   }
 }

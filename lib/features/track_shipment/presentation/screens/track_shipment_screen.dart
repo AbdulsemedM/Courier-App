@@ -15,11 +15,14 @@ import 'package:courier_app/features/shipment/data/repository/deliver_shipment_r
 import 'package:courier_app/features/shipment/presentation/widgets/deliver_shipment_modal.dart';
 import 'package:courier_app/features/track_shipment/bloc/track_shipment_bloc.dart';
 import 'package:courier_app/features/track_shipment/presentation/widgets/track_shipment_widget.dart';
+import 'package:courier_app/features/track_shipment/utils/phone_query_normalizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
+
+enum _SearchMode { awb, phone }
 
 class TrackShipmentScreen extends StatefulWidget {
   const TrackShipmentScreen({super.key});
@@ -38,6 +41,9 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   bool _hasCameraPermission = false;
   bool _handlingHidScan = false;
   List<BranchesModel>? _cachedBranches;
+  _SearchMode _searchMode = _SearchMode.awb;
+  bool _openedFromPhoneHistory = false;
+  String? _activeAwb;
 
   @override
   void initState() {
@@ -141,10 +147,11 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     barcode = barcode.trim();
 
     setState(() {
+      _searchMode = _SearchMode.awb;
       _searchController.text = barcode;
     });
 
-    _onSearch();
+    _searchByAwb(barcode);
   }
 
   void _onSearchControllerChanged() {
@@ -204,7 +211,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Camera permission is required to scan barcodes'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
       _requestCameraPermission();
@@ -226,18 +233,79 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   }
 
   void _onSearch() {
+    if (_searchMode == _SearchMode.phone) {
+      _searchByPhone();
+      return;
+    }
+
     final awb = _searchController.text.trim();
     if (awb.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter an AWB number'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
       return;
     }
 
+    _searchByAwb(awb);
+  }
+
+  void _searchByAwb(String awb) {
+    setState(() {
+      _openedFromPhoneHistory = false;
+      _activeAwb = awb;
+    });
+    final bloc = context.read<TrackShipmentBloc>();
+    bloc.add(TrackShipmentClear());
+    bloc.add(TrackShipment(awb));
+  }
+
+  void _searchByPhone() {
+    final raw = _searchController.text.trim();
+    late final String phone;
+    try {
+      phone = PhoneQueryNormalizer.normalize(raw);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: BrandColors.danger,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _openedFromPhoneHistory = false;
+      _activeAwb = null;
+    });
+    context.read<TrackShipmentBloc>().add(TrackShipmentByPhone(phone));
+  }
+
+  void _openHistoryItem(String awb) {
+    setState(() {
+      _openedFromPhoneHistory = true;
+      _activeAwb = awb;
+    });
     context.read<TrackShipmentBloc>().add(TrackShipment(awb));
+  }
+
+  void _backToPhoneHistory() {
+    setState(() => _openedFromPhoneHistory = false);
+    context.read<TrackShipmentBloc>().add(TrackShipmentShowPhoneHistory());
+  }
+
+  void _setSearchMode(_SearchMode mode) {
+    if (_searchMode == mode) return;
+    setState(() {
+      _searchMode = mode;
+      _openedFromPhoneHistory = false;
+      _activeAwb = null;
+      _searchController.clear();
+    });
+    context.read<TrackShipmentBloc>().add(TrackShipmentClear());
   }
 
   void _refreshTrackingForAwb(String awb, {bool preservePreviousData = false}) {
@@ -247,7 +315,11 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
         );
   }
 
-  String get _currentAwb => _searchController.text.trim();
+  String get _currentAwb {
+    if (_activeAwb != null && _activeAwb!.isNotEmpty) return _activeAwb!;
+    if (_searchMode == _SearchMode.awb) return _searchController.text.trim();
+    return '';
+  }
 
   Future<void> _handlePay(String awb) async {
     final result = await showProcessPaymentDialog(context: context, awb: awb);
@@ -332,7 +404,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
             displaySnack(
               outerContext,
               successMessage,
-              Colors.green,
+              BrandColors.success,
               duration: const Duration(seconds: 4),
             );
             _refreshTrackingForAwb(awb, preservePreviousData: true);
@@ -345,16 +417,70 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                 displaySnack(
                   outerContext,
                   recovered,
-                  Colors.green,
+                  BrandColors.success,
                   duration: const Duration(seconds: 4),
                 );
                 _refreshTrackingForAwb(awb, preservePreviousData: true);
                 return;
               }
             }
-            displaySnack(outerContext, error.toString(), Colors.red);
+            displaySnack(outerContext, error.toString(), BrandColors.danger);
           }
         },
+      ),
+    );
+  }
+
+  Widget _buildModeToggle() {
+    final palette = context.palette;
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: palette.surface,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          _modeChip('AWB', _SearchMode.awb, Icons.qr_code_2_rounded),
+          _modeChip('Phone', _SearchMode.phone, Icons.phone_rounded),
+        ],
+      ),
+    );
+  }
+
+  Widget _modeChip(String label, _SearchMode mode, IconData icon) {
+    final selected = _searchMode == mode;
+    const selectedColor = BrandColors.purple;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _setSearchMode(mode),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: selected ? selectedColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: selected ? Colors.white : context.palette.textSecondary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  color: selected ? Colors.white : context.palette.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -371,17 +497,17 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
           current is CheckPaymentStatusFailure,
       listener: (context, state) {
         if (state is InitiatePaymentSuccess) {
-          displaySnack(context, state.message, Colors.green);
+          displaySnack(context, state.message, BrandColors.success);
         } else if (state is InitiatePaymentFailure) {
-          displaySnack(context, state.errorMessage, Colors.red);
+          displaySnack(context, state.errorMessage, BrandColors.danger);
         } else if (state is CheckPaymentStatusSuccess) {
           final awb = _currentAwb;
           if (awb.isNotEmpty) {
             _refreshTrackingForAwb(awb);
           }
-          displaySnack(context, state.message, Colors.green);
+          displaySnack(context, state.message, BrandColors.success);
         } else if (state is CheckPaymentStatusFailure) {
-          displaySnack(context, state.errorMessage, Colors.red);
+          displaySnack(context, state.errorMessage, BrandColors.danger);
         }
       },
       child: Scaffold(
@@ -389,42 +515,50 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
           context.palette.appBarBackground,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: isDarkMode
-            ? const Color.fromARGB(255, 75, 23, 160)
-            : const Color.fromARGB(255, 75, 23, 160),
-        title: Text(
-          'Track Shipment',
-          style: TextStyle(
-            color: context.palette.textPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+        backgroundColor: context.palette.appBarBackground,
+        leading: BlocBuilder<TrackShipmentBloc, TrackShipmentState>(
+          builder: (context, state) {
+            final showHistoryBack = _openedFromPhoneHistory &&
+                state is! TrackShipmentPhoneHistorySuccess;
+            return IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: context.palette.textPrimary,
+              ),
+              tooltip: showHistoryBack ? 'Back to shipments' : 'Back',
+              onPressed: showHistoryBack
+                  ? _backToPhoneHistory
+                  : () => Navigator.maybePop(context),
+            );
+          },
         ),
+        title: const Text('Track Shipment'),
       ),
       body: Column(
           children: [
             Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: _buildModeToggle(),
+            ),
+            Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container(
-                decoration: BoxDecoration(
-                  color: context.palette.appBarBackground,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                decoration: context.palette.cardDecoration.copyWith(
+                  borderRadius: BorderRadius.circular(18),
                 ),
                 child: TextField(
                   controller: _searchController,
                   focusNode: _textFieldFocusNode,
+                  keyboardType: _searchMode == _SearchMode.phone
+                      ? TextInputType.phone
+                      : TextInputType.text,
                   style: TextStyle(
                     color: context.palette.textPrimary,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Enter AWB Number or Scan',
+                    hintText: _searchMode == _SearchMode.phone
+                        ? 'Enter phone (09… or +251…)'
+                        : 'Enter AWB Number or Scan',
                     hintStyle: TextStyle(
                       color: context.palette.textSecondary,
                     ),
@@ -442,8 +576,8 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                                   ? Icons.qr_code_scanner
                                   : Icons.scanner,
                               color: isDarkMode
-                                  ? Colors.blue[300]
-                                  : Colors.blue[700],
+                                  ? BrandColors.infoLight
+                                  : BrandColors.infoDeep,
                             ),
                             onPressed: () {
                               // Scanner is always active for hardware scanners
@@ -455,7 +589,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                                         : 'Urovo Scanner Active - Press scan button',
                                   ),
                                   duration: const Duration(seconds: 2),
-                                  backgroundColor: Colors.blue,
+                                  backgroundColor: BrandColors.info,
                                 ),
                               );
                             },
@@ -467,8 +601,8 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                             icon: Icon(
                               Icons.camera_alt,
                               color: isDarkMode
-                                  ? Colors.green[300]
-                                  : Colors.green[700],
+                                  ? BrandColors.successLight
+                                  : BrandColors.successDeep,
                             ),
                             onPressed: _showCameraScanner,
                             tooltip: 'Scan with Camera',
@@ -485,12 +619,12 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                       ],
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(18),
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
                     fillColor:
-                        context.palette.appBarBackground,
+                        context.palette.surface,
                   ),
                   textInputAction: TextInputAction.search,
                   onSubmitted: (_) => _onSearch(),
@@ -502,6 +636,32 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                 builder: (context, state) {
                   if (state is TrackShipmentLoading) {
                     return TrackOrderWidgets.buildShimmerEffect(context);
+                  }
+
+                  if (state is TrackShipmentPhoneHistorySuccess) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                          child: Text(
+                            '${state.items.length} shipments found',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              color: context.palette.textPrimary,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: TrackShipmentWidgets.buildCustomerHistoryList(
+                            context: context,
+                            items: state.items,
+                            onSelect: _openHistoryItem,
+                          ),
+                        ),
+                      ],
+                    );
                   }
 
                   if (state is TrackShipmentSuccess) {
@@ -541,14 +701,14 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                           Icon(
                             Icons.error_outline,
                             size: 64,
-                            color: isDarkMode ? Colors.red[300] : Colors.red,
+                            color: isDarkMode ? BrandColors.dangerLight : BrandColors.danger,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Error tracking shipment',
                             style: TextStyle(
                               fontSize: 18,
-                              color: isDarkMode ? Colors.red[300] : Colors.red,
+                              color: isDarkMode ? BrandColors.dangerLight : BrandColors.danger,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -576,11 +736,14 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Enter AWB number to track shipment',
+                          _searchMode == _SearchMode.phone
+                              ? 'Enter a phone number to see shipments'
+                              : 'Enter AWB number to track shipment',
                           style: TextStyle(
                             fontSize: 18,
                             color: context.palette.textSecondary,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -669,8 +832,8 @@ class _CameraScannerDialogState extends State<_CameraScannerDialog> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: widget.isDarkMode
-                      ? Colors.blue.shade700
-                      : Colors.blue.shade200,
+                      ? BrandColors.infoDeep
+                      : BrandColors.infoLight,
                   width: 2,
                 ),
               ),

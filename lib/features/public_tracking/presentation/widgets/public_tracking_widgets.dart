@@ -11,8 +11,8 @@ class PublicTrackingWidgets {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Shimmer.fromColors(
-        baseColor: isDark ? Colors.grey[850]! : palette.border,
-        highlightColor: isDark ? Colors.grey[700]! : palette.surfaceMuted,
+        baseColor: isDark ? BrandColors.neutral800 : palette.border,
+        highlightColor: isDark ? BrandColors.neutral700 : palette.surfaceMuted,
         child: Column(
           children: List.generate(
             3,
@@ -480,15 +480,15 @@ class PublicTrackingWidgets {
   static Color _getStatusColor(String? statusCode) {
     switch (statusCode?.toUpperCase()) {
       case 'PAR':
-        return Colors.orange;
+        return BrandColors.orange;
       case 'DEL':
       case 'SUCCESS':
       case 'COMPLETED':
-        return Colors.green;
+        return BrandColors.success;
       case 'PENDING':
-        return Colors.blue;
+        return BrandColors.info;
       default:
-        return Colors.deepPurple;
+        return BrandColors.purpleMid;
     }
   }
 

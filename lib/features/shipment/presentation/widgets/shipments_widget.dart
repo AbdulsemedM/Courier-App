@@ -128,8 +128,8 @@ class ShipmentsWidgets {
               (Set<MaterialState> states) {
                 if (states.contains(MaterialState.selected)) {
                   return isDarkMode
-                      ? Colors.blue.withOpacity(0.1)
-                      : Colors.blue[100]!;
+                      ? BrandColors.info.withOpacity(0.1)
+                      : BrandColors.infoSoft;
                 }
                 return AppPalette.forMode(isDarkMode).surface;
               },
@@ -261,7 +261,7 @@ class ShipmentsWidgets {
                           IconButton(
                             icon: Icon(
                               Icons.print,
-                              color: isDarkMode ? Colors.blue[300] : Colors.blue,
+                              color: isDarkMode ? BrandColors.infoLight : BrandColors.info,
                               size: 20,
                             ),
                             onPressed: () {
@@ -282,7 +282,7 @@ class ShipmentsWidgets {
                             IconButton(
                               icon: Icon(
                                 Icons.payment,
-                                color: isDarkMode ? Colors.amber[300] : Colors.amber[800],
+                                color: isDarkMode ? BrandColors.warningLight : BrandColors.warningDeep,
                                 size: 20,
                               ),
                               onPressed: () {
@@ -296,7 +296,7 @@ class ShipmentsWidgets {
                             IconButton(
                               icon: Icon(
                                 Icons.local_shipping,
-                                color: isDarkMode ? Colors.green[300] : Colors.green,
+                                color: isDarkMode ? BrandColors.successLight : BrandColors.success,
                                 size: 20,
                               ),
                               onPressed: () {
@@ -322,23 +322,23 @@ class ShipmentsWidgets {
   static Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'arr':
-        return Colors.orange;
+        return BrandColors.orange;
       case 'tra':
-        return Colors.blue;
+        return BrandColors.info;
       case 'r4p':
-        return Colors.deepOrange;
+        return BrandColors.orange;
       case 'mis':
-        return Colors.red;
+        return BrandColors.danger;
       case 'otw':
-        return Colors.yellow;
+        return BrandColors.warning;
       case 'ctm':
-        return Colors.indigo;
+        return BrandColors.info;
       case 'del':
-        return Colors.amber;
+        return BrandColors.warning;
       case 'par':
-        return Colors.deepPurple;
+        return BrandColors.purpleMid;
       default:
-        return Colors.grey;
+        return BrandColors.neutral500;
     }
   }
 
@@ -347,8 +347,8 @@ class ShipmentsWidgets {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Shimmer.fromColors(
-        baseColor: isDarkMode ? Colors.grey[850]! : AppPalette.forMode(isDarkMode).border,
-        highlightColor: isDarkMode ? Colors.grey[700]! : AppPalette.forMode(isDarkMode).surfaceMuted,
+        baseColor: isDarkMode ? BrandColors.neutral800 : AppPalette.forMode(isDarkMode).border,
+        highlightColor: isDarkMode ? BrandColors.neutral700 : AppPalette.forMode(isDarkMode).surfaceMuted,
         child: Column(
           children: [
             // Search and Filter Shimmer

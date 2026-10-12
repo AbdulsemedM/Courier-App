@@ -242,7 +242,7 @@ class TellerByBranchTable extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: status.isOpen ? Colors.green : Colors.red,
+                            color: status.isOpen ? BrandColors.success : BrandColors.danger,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -284,9 +284,9 @@ class TellerByBranchTable extends StatelessWidget {
                                 onStatusToggle!(teller.id, value);
                               }
                             },
-                            activeColor: const Color(0xFF9C27B0),
-                            inactiveThumbColor: Colors.grey,
-                            inactiveTrackColor: Colors.grey[300],
+                            activeColor: BrandColors.purpleMid,
+                            inactiveThumbColor: BrandColors.neutral500,
+                            inactiveTrackColor: BrandColors.neutral300,
                           )
                         : const SizedBox.shrink(),
                   ),
@@ -301,22 +301,22 @@ class TellerByBranchTable extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status.toUpperCase()) {
       case 'ASSIGNED':
-        return Colors.green;
+        return BrandColors.success;
       case 'UNASSIGNED':
-        return Colors.red;
+        return BrandColors.danger;
       default:
-        return Colors.grey;
+        return BrandColors.neutral500;
     }
   }
 
   Color _getTellerStatusColor(String status) {
     switch (status.toUpperCase()) {
       case 'ASSIGNED':
-        return Colors.green;
+        return BrandColors.success;
       case 'UNASSIGNED':
-        return Colors.red;
+        return BrandColors.danger;
       default:
-        return Colors.grey;
+        return BrandColors.neutral500;
     }
   }
 }

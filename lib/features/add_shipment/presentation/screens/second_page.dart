@@ -3,6 +3,7 @@ import 'package:courier_app/features/add_shipment/model/service_modes_model.dart
 import 'package:courier_app/features/add_shipment/model/shipment_type_model.dart';
 import 'package:courier_app/features/add_shipment/model/transport_mode_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:courier_app/core/theme/app_palette.dart';
 
 class SecondPage extends StatefulWidget {
@@ -31,6 +32,7 @@ class SecondPage extends StatefulWidget {
 
 class _SecondPageState extends State<SecondPage> {
   String? selectedUnit;
+  late final TextEditingController _quantityController;
 
   @override
   void initState() {
@@ -42,6 +44,34 @@ class _SecondPageState extends State<SecondPage> {
     } else {
       selectedUnit = existingUnit;
     }
+    _quantityController = TextEditingController(
+      text: _quantityDisplayText(widget.formData['quantity']),
+    );
+  }
+
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    super.dispose();
+  }
+
+  String _quantityDisplayText(dynamic value) {
+    if (value == null) {
+      return '';
+    }
+    if (value is num) {
+      if (value % 1 == 0) {
+        return value.toInt().toString();
+      }
+      return value.toString();
+    }
+    return value.toString();
+  }
+
+  void _onQuantityChanged(String value) {
+    final normalized = value.replaceAll(',', '.');
+    widget.formData['quantity'] = double.tryParse(normalized) ?? 0;
+    setState(() {});
   }
 
   @override
@@ -58,7 +88,7 @@ class _SecondPageState extends State<SecondPage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.blue[400],
+              color: BrandColors.info,
             ),
           ),
           const SizedBox(height: 16),
@@ -67,11 +97,13 @@ class _SecondPageState extends State<SecondPage> {
               Expanded(
                 child: _buildTextField(
                   label: 'Quantity',
-                  value: widget.formData['quantity']?.toString() ?? '',
-                  onChanged: (value) =>
-                      widget.formData['quantity'] = int.tryParse(value) ?? 0,
+                  value: _quantityController.text,
+                  controller: _quantityController,
+                  onChanged: _onQuantityChanged,
                   isDarkMode: isDarkMode,
-                  keyboardType: TextInputType.number,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: const [_DecimalTextInputFormatter()],
                 ),
               ),
               const SizedBox(width: 16),
@@ -276,6 +308,8 @@ class _SecondPageState extends State<SecondPage> {
     required bool isDarkMode,
     TextInputType? keyboardType,
     int? maxLines,
+    TextEditingController? controller,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,9 +322,11 @@ class _SecondPageState extends State<SecondPage> {
         ),
         const SizedBox(height: 8),
         TextFormField(
-          initialValue: value,
+          controller: controller,
+          initialValue: controller == null ? value : null,
           onChanged: onChanged,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           style: TextStyle(
             color: context.palette.textPrimary,
           ),
@@ -313,7 +349,7 @@ class _SecondPageState extends State<SecondPage> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.blue[400]! : Colors.blue[700]!,
+                color: isDarkMode ? BrandColors.info : BrandColors.infoDeep,
               ),
             ),
           ),
@@ -372,7 +408,7 @@ class _SecondPageState extends State<SecondPage> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: isDarkMode ? Colors.blue[400]! : Colors.blue[700]!,
+                color: isDarkMode ? BrandColors.info : BrandColors.infoDeep,
               ),
             ),
           ),
@@ -486,7 +522,7 @@ class _SecondPageState extends State<SecondPage> {
                         value: id,
                         groupValue: selectedId,
                         onChanged: (value) => onChanged(value),
-                        activeColor: Colors.blue,
+                        activeColor: BrandColors.info,
                       ),
                       ConstrainedBox(
                         constraints: BoxConstraints(maxWidth: maxLabelWidth),
@@ -508,5 +544,24 @@ class _SecondPageState extends State<SecondPage> {
         ),
       ],
     );
+  }
+}
+
+class _DecimalTextInputFormatter extends TextInputFormatter {
+  const _DecimalTextInputFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final text = newValue.text.replaceAll(',', '.');
+    if (text.isEmpty || RegExp(r'^\d*\.?\d*$').hasMatch(text)) {
+      return newValue.copyWith(
+        text: text,
+        composing: TextRange.empty,
+      );
+    }
+    return oldValue;
   }
 }

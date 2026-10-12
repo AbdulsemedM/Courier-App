@@ -62,7 +62,7 @@ class _BranchesScreenState extends State<BranchesScreen> {
   //             // context.read<BranchesBloc>().add(DeleteBranchEvent(branch.id));
   //             // Navigator.pop(context);
   //           },
-  //           child: const Text('Delete', style: TextStyle(color: Colors.red)),
+  //           child: const Text('Delete', style: TextStyle(color: BrandColors.danger)),
   //         ),
   //       ],
   //     ),
@@ -72,10 +72,10 @@ class _BranchesScreenState extends State<BranchesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.isDarkMode ? const Color(0xFF5B3895) : context.palette.background,
+      backgroundColor: context.palette.background,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: context.isDarkMode ? const Color.fromARGB(255, 75, 23, 160) : context.palette.appBarBackground,
+        backgroundColor: context.palette.appBarBackground,
         title: Text(
           'Branches',
           style: TextStyle(color: context.palette.textPrimary),

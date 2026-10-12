@@ -76,7 +76,7 @@ class _ShipmentInvoiceScreenState extends State<ShipmentInvoiceScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error generating PDF: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
     } finally {
@@ -101,7 +101,7 @@ class _ShipmentInvoiceScreenState extends State<ShipmentInvoiceScreen> {
                 ? 'Invoice printed successfully!'
                 : 'Failed to connect to printer.',
           ),
-          backgroundColor: success ? Colors.green : Colors.red,
+          backgroundColor: success ? BrandColors.success : BrandColors.danger,
         ),
       );
     } catch (e) {
@@ -109,7 +109,7 @@ class _ShipmentInvoiceScreenState extends State<ShipmentInvoiceScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error printing: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: BrandColors.danger,
         ),
       );
     }
@@ -120,13 +120,9 @@ class _ShipmentInvoiceScreenState extends State<ShipmentInvoiceScreen> {
     final isDarkMode = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode
-          ? const Color.fromARGB(255, 75, 23, 160)
-          : const Color.fromARGB(255, 75, 23, 160),
+      backgroundColor: context.palette.background,
       appBar: AppBar(
-        backgroundColor: isDarkMode
-            ? const Color.fromARGB(255, 75, 23, 160)
-            : const Color.fromARGB(255, 75, 23, 160),
+        backgroundColor: context.palette.appBarBackground,
         title: const Text('Shipment Invoice'),
       ),
       body: Column(
@@ -168,7 +164,7 @@ class _ShipmentInvoiceScreenState extends State<ShipmentInvoiceScreen> {
                                   label: const Text('Print Invoice'),
                                   style: ElevatedButton.styleFrom(
                                     minimumSize: const Size.fromHeight(50),
-                                    backgroundColor: Colors.blue,
+                                    backgroundColor: BrandColors.info,
                                     foregroundColor: Colors.white,
                                   ),
                                 ),
