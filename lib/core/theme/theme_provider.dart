@@ -175,7 +175,7 @@ class ThemeProvider extends ChangeNotifier {
             fontWeight: FontWeight.w600,
             letterSpacing: 0.2,
           ),
-          minimumSize: const Size.fromHeight(52),
+          minimumSize: const Size(64, 52),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
@@ -190,7 +190,7 @@ class ThemeProvider extends ChangeNotifier {
             fontFamily: AppFonts.sans,
             fontWeight: FontWeight.w600,
           ),
-          minimumSize: const Size.fromHeight(52),
+          minimumSize: const Size(64, 52),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
@@ -204,7 +204,7 @@ class ThemeProvider extends ChangeNotifier {
             fontFamily: AppFonts.sans,
             fontWeight: FontWeight.w600,
           ),
-          minimumSize: const Size.fromHeight(48),
+          minimumSize: const Size(64, 48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),

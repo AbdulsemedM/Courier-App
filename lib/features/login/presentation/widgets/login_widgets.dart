@@ -229,6 +229,7 @@ class LoginWidgets {
                 ),
                 const SizedBox(height: 28),
                 SizedBox(
+                  width: double.infinity,
                   height: 52,
                   child: FilledButton(
                     onPressed: isLoading
