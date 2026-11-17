@@ -8,12 +8,17 @@ import 'logging_interceptor.dart';
 class ProviderSetup {
   static final CacheService cacheService = CacheService();
 
-  static ApiProvider getApiProvider(String baseUrl, {String? authToken}) {
+  static ApiProvider getApiProvider(
+    String baseUrl, {
+    String? authToken,
+    Duration timeout = const Duration(seconds: 30),
+  }) {
     return ApiProvider(
       // baseUrl: baseUrl,
       authInterceptor: AuthInterceptor(token: authToken),
       errorInterceptor: ErrorInterceptor(),
       loggingInterceptor: LoggingInterceptor(),
+      timeout: timeout,
     );
   }
 

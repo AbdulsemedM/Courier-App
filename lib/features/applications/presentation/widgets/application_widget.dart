@@ -1,6 +1,8 @@
 // import 'package:courier_app/features/add_shipment/presentation/screens/payment_screen.dart';
 import 'package:courier_app/app/utils/responsive_helper.dart';
 import 'package:courier_app/core/utils/app_permissions.dart';
+import 'package:courier_app/features/cashier_pay/presentation/branch_cashiers_screen.dart';
+import 'package:courier_app/features/cashier_pay/presentation/cashier_pay_screen.dart';
 import 'package:courier_app/features/comming_soon/coming_soon_screen.dart';
 // import 'package:courier_app/features/miles_configuration/presentation/screens/miles_configuration_screen.dart';
 import 'package:courier_app/features/pay_by_awb/presentation/screen/pay_by_awb_screen.dart';
@@ -368,6 +370,8 @@ class MenuOption {
   final String permission;
   /// If non-empty, user needs any of these permissions.
   final List<String> anyOf;
+  /// Visibility decided elsewhere (e.g. by an API check), not by permissions.
+  final bool unrestricted;
 
   const MenuOption({
     required this.title,
@@ -379,10 +383,12 @@ class MenuOption {
     required this.screen,
     this.permission = '',
     this.anyOf = const [],
+    this.unrestricted = false,
   })  : gradientStart = gradientStart ?? color,
         gradientEnd = gradientEnd ?? color;
 
   bool isAllowed(List<String> permissions) {
+    if (unrestricted) return true;
     if (anyOf.isNotEmpty) {
       return PermissionGuard.hasAny(permissions, anyOf);
     }
@@ -404,6 +410,7 @@ class MenuOption {
       screen: screen,
       permission: permission,
       anyOf: anyOf,
+      unrestricted: unrestricted,
     );
   }
 }
@@ -491,3 +498,29 @@ final List<MenuOption> defaultMenuOptions = [
   ),
   // Miles Configuration, Roles, Other Settings — hidden per product request
 ];
+
+/// Shown only to branch cashiers (`GET /cashiers/me` → `isCashier`), the same
+/// rule the web dashboard uses for its "Cashier Pay" menu item.
+final MenuOption cashierPayMenuOption = MenuOption(
+  title: 'Cashier Pay',
+  subtitle: 'Pay expenses via QPay',
+  icon: Icons.account_balance_wallet_rounded,
+  color: BrandColors.success,
+  gradientStart: BrandColors.successSoft,
+  gradientEnd: BrandColors.successSoft,
+  screen: const CashierPayScreen(),
+  unrestricted: true,
+);
+
+/// HQ finance: manage branch cashiers, top-ups and payouts. Shown for HQ
+/// finance/admin roles or when `/cashiers/me` → `isHq` (see CashierAccess).
+final MenuOption branchCashiersMenuOption = MenuOption(
+  title: 'Branch Cashiers',
+  subtitle: 'Cashiers, top-ups & payouts',
+  icon: Icons.manage_accounts_rounded,
+  color: BrandColors.purpleMid,
+  gradientStart: BrandColors.purpleSoft,
+  gradientEnd: BrandColors.purpleSoft,
+  screen: const BranchCashiersScreen(),
+  unrestricted: true,
+);

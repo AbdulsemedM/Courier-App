@@ -1,6 +1,7 @@
 import 'package:courier_app/app/utils/dialog_utils.dart';
 import 'package:courier_app/configuration/phone_number_manager.dart';
 import 'package:courier_app/features/applications/presentation/widgets/application_widget.dart';
+import 'package:courier_app/features/cashier_pay/data/cashier_access.dart';
 import 'package:courier_app/features/applications/presentation/widgets/shipment_type_modal.dart';
 import 'package:courier_app/features/shelves_management/presentation/screen/shelves_screen.dart';
 import 'package:courier_app/features/shelves_management/presentation/screen/shelf_transfer_screen.dart';
@@ -41,6 +42,20 @@ class _ApplicationsScreenState extends State<ApplicationsScreen> {
           .where((option) => option.isAllowed(permissions))
           .toList();
     });
+    _addCashierOptions();
+  }
+
+  /// Cashier features are not tied to a permission name: branch cashiers are
+  /// identified by `/cashiers/me`, HQ finance by role or `isHq`.
+  Future<void> _addCashierOptions() async {
+    final access = await CashierAccess.load();
+    if (!mounted) return;
+    final extra = [
+      if (access.isCashier) cashierPayMenuOption,
+      if (access.canOpenHq) branchCashiersMenuOption,
+    ].where((o) => !_visibleOptions.contains(o)).toList();
+    if (extra.isEmpty) return;
+    setState(() => _visibleOptions = [..._visibleOptions, ...extra]);
   }
 
   void _handleOptionSelected(MenuOption option) {
